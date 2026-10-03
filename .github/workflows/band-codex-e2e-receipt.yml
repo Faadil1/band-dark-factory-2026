@@ -1,0 +1,111 @@
+name: BAND Codex E2E Receipt
+
+on:
+  push:
+    branches:
+      - test/band-codex-e2e-turn
+
+permissions:
+  contents: read
+
+jobs:
+  return-receipt-to-band:
+    if: github.event.head_commit.message == 'test: prove BAND Codex end-to-end relay'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      BAND_ROOM_ID: 599c34c3-62d4-4a24-bb45-361d2fee8bf2
+      BAND_COORDINATOR_AGENT_ID: ${{ secrets.BAND_COORDINATOR_AGENT_ID }}
+      BAND_COORDINATOR_API_KEY: ${{ secrets.BAND_COORDINATOR_API_KEY }}
+      BAND_IMPLEMENTER_AGENT_ID: ${{ secrets.BAND_IMPLEMENTER_AGENT_ID }}
+      BAND_IMPLEMENTER_API_KEY: ${{ secrets.BAND_IMPLEMENTER_API_KEY }}
+
+    steps:
+      - name: Checkout exact pushed candidate
+        uses: actions/checkout@v4
+
+      - name: Verify candidate marker
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -qx 'BAND_CODEX_E2E=PROVEN' evidence/band-codex-e2e-turn.md
+
+      - name: Resolve Coordinator identity
+        id: band
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/participants.json"
+          CODE="$(curl --silent --show-error             --user-agent "BAND-Dark-Factory-2026-GitHub-Actions/1.0"             --output "$OUT" --write-out "%{http_code}"             -H "X-API-Key: $BAND_IMPLEMENTER_API_KEY"             -H "Accept: application/json"             "https://app.band.ai/api/v1/agent/chats/$BAND_ROOM_ID/participants")"
+          test "$CODE" = "200"
+          python - "$OUT" "$BAND_COORDINATOR_AGENT_ID" "$GITHUB_OUTPUT" <<'PY'
+          import json, sys
+          path, coord_id, out=sys.argv[1:]
+          payload=json.load(open(path, encoding="utf-8"))
+          data=payload.get("data") or []
+          if isinstance(data, dict):
+              data=data.get("participants") or data.get("items") or []
+          for item in data:
+              iid=str(item.get("id") or item.get("participant_id") or "")
+              if iid == coord_id:
+                  h=str(item.get("handle") or "").lstrip("@")
+                  n=str(item.get("name") or h)
+                  if not h:
+                      raise SystemExit("Coordinator handle missing")
+                  with open(out,"a",encoding="utf-8") as f:
+                      f.write(f"coordinator_handle={h}\n")
+                      f.write(f"coordinator_name={n}\n")
+                  print("Coordinator identity resolved.")
+                  raise SystemExit(0)
+          raise SystemExit("Coordinator not present in room")
+          PY
+
+      - name: Implementer posts result receipt to BAND
+        shell: bash
+        env:
+          COORDINATOR_HANDLE: ${{ steps.band.outputs.coordinator_handle }}
+          COORDINATOR_NAME: ${{ steps.band.outputs.coordinator_name }}
+        run: |
+          set -euo pipefail
+          BODY="$(python - <<'PY'
+          import json, os
+          h=os.environ["COORDINATOR_HANDLE"]
+          n=os.environ["COORDINATOR_NAME"]
+          aid=os.environ["BAND_COORDINATOR_AGENT_ID"]
+          sha=os.environ["GITHUB_SHA"]
+          print(json.dumps({
+            "message": {
+              "content": f"@{h} E2E_RECEIPT_FROM_IMPLEMENTER: BAND_CODEX_E2E=PROVEN output_sha={sha}",
+              "mentions": [{"id": aid, "name": n, "handle": h}]
+            }
+          }))
+          PY
+          )"
+          CODE="$(curl --silent --show-error             --user-agent "BAND-Dark-Factory-2026-GitHub-Actions/1.0"             --output "$RUNNER_TEMP/receipt.json" --write-out "%{http_code}"             -X POST             -H "X-API-Key: $BAND_IMPLEMENTER_API_KEY"             -H "Accept: application/json"             -H "Content-Type: application/json"             -d "$BODY"             "https://app.band.ai/api/v1/agent/chats/$BAND_ROOM_ID/messages")"
+          if [ "$CODE" != "200" ] && [ "$CODE" != "201" ]; then
+            cat "$RUNNER_TEMP/receipt.json"
+            exit 1
+          fi
+
+      - name: Coordinator verifies full BAND round trip
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/coordinator-context.json"
+          CODE="$(curl --silent --show-error             --user-agent "BAND-Dark-Factory-2026-GitHub-Actions/1.0"             --output "$OUT" --write-out "%{http_code}"             -H "X-API-Key: $BAND_COORDINATOR_API_KEY"             -H "Accept: application/json"             "https://app.band.ai/api/v1/agent/chats/$BAND_ROOM_ID/context")"
+          test "$CODE" = "200"
+          python - "$OUT" <<'PY'
+          import json, sys
+          raw=json.dumps(json.load(open(sys.argv[1], encoding="utf-8")))
+          for needle in ("E2E_TASK_FROM_COORDINATOR","E2E_RECEIPT_FROM_IMPLEMENTER","BAND_CODEX_E2E=PROVEN"):
+              if needle not in raw:
+                  raise SystemExit(f"missing BAND round-trip evidence: {needle}")
+          print("BAND -> Codex -> relay -> BAND round trip: PROVEN")
+          PY
+
+      - name: Upload safe E2E receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: band-codex-e2e-receipt
+          path: |
+            evidence/band-codex-e2e-turn.md
