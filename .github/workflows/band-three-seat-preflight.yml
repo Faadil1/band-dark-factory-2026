@@ -177,7 +177,10 @@ jobs:
                       raise RuntimeError(f"{role}: heartbeat not acknowledged")
                   print(f"{role}: WebSocket agent_rooms join + heartbeat OK")
 
-          asyncio.run(asyncio.gather(*(probe_ws(role, agent) for role, agent in agents.items())))
+          async def probe_all():
+              await asyncio.gather(*(probe_ws(role, agent) for role, agent in agents.items()))
+
+          asyncio.run(probe_all())
 
           # 3. Coordinator creates a rehearsal-only room.
           _, created, _ = request(agents["coordinator"], "POST", "/chats", {})
