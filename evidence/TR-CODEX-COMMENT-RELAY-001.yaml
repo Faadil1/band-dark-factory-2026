@@ -1,0 +1,58 @@
+version: 0.1.0
+project_id: band_dark_factory_wearedevelopers_2026
+claim_id: TR_CODEX_COMMENT_RELAY_001
+date: 2026-10-03
+status: COMPLETE
+proof_class: TECHNICAL_PROOF
+
+claim: >-
+  Codex Cloud can produce a bounded machine-readable patch that GitHub Actions validates,
+  commits, and pushes to the intended same-repository pull-request branch without giving
+  the Codex task a GitHub write credential.
+
+scenario:
+  pull_request: 15
+  input_head_sha: 27193859ddde25e51603bf6470b111b496e517e5
+  codex_patch_comment_id: 5971844042
+  workflow: Codex Cloud Comment Relay Probe
+  workflow_run_id: 37142043495
+  job_id: 111258329837
+  output_head_sha: 6ad6b55fcd0e27982315af41a01da4936818b70e
+  merged_proof_sha: c0d177136b71e04c80c14184dd9d432674ed77e7
+
+observed:
+  codex_task_triggered_from_github_comment: PASS
+  bounded_file_change_created_by_codex: PASS
+  base64_unified_diff_emitted_by_official_codex_bot: PASS
+  bot_identity_gate: PASS
+  fork_pr_rejection_gate: PASS
+  patch_scope_gate: PASS
+  git_apply_check: PASS
+  git_diff_check: PASS
+  github_actions_commit: PASS
+  github_actions_push_to_exact_pr_branch: PASS
+
+authority:
+  codex_has_github_write_credential: false
+  publisher: GitHub Actions
+  publisher_credential: built_in_repository_scoped_GITHUB_TOKEN
+
+truth_boundary:
+  proves:
+    - codex_cloud_to_machine_readable_patch
+    - codex_bot_comment_to_github_actions_trigger
+    - bounded_patch_validation
+    - autonomous_commit_and_push_to_exact_pr_branch
+    - no_human_publication_between_codex_result_and_branch_update
+    - no_github_write_credential_exposed_to_codex_task
+  does_not_prove:
+    - BAND_seat_to_codex_end_to_end_routing
+    - autonomous_toy_factory
+    - remote_agents_count_as_required_Band_Desktop_seats
+    - real_Pocketful_stage_conformance
+
+superseded_or_rejected_path:
+  direct_codex_git_push:
+    status: BLOCKED
+    reason: setup_only_secret_did_not_provide_a_safe_persistent_agent_phase_git_credential
+    retained_as_history: true
