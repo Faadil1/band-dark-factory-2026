@@ -27,7 +27,7 @@ technical_reality:
     evidence_repo: Faadil1/faadil-agent-system
     workflow_run_id: 37083966183
     interpretation: environment_proof_only
-  dedicated_repo_actions_preflight: PENDING
+  dedicated_repo_actions_preflight: RUNNING
   band_remote_agents:
     coordinator: CREATED
     implementer: PENDING
