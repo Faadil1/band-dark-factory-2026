@@ -113,14 +113,18 @@ missing_edges:
     direct_git_push_path: BLOCKED_RETAINED_AS_HISTORY
     autonomous_publish_back_to_GitHub: PROVEN_VIA_GITHUB_ACTIONS_RELAY
   - claim_id: BAND_TO_CODEX_END_TO_END
-    status: MISSING
-    expected_next_evidence: BAND_seat_task_to_Codex_patch_to_relay_commit_to_BAND_receipt
+    status: COMPLETE
+    evidence: evidence/TR-BAND-CODEX-E2E-001.yaml
   - claim_id: SUBMISSION_SEAT_IDENTITY_ELIGIBILITY
     status: UNKNOWN
     expected_next_evidence: organizer_primary_clarification_or_unambiguous_Band_Desktop_seat_run
   - claim_id: CODING_AGENT_RUNTIME
-    status: MISSING
-    expected_next_evidence: actual_harness_model_and_repo_scoped_execution_for_all_three
+    status: PARTIAL
+    observed:
+      repo_scoped_execution: PROVEN
+      BAND_to_Codex_transport: PROVEN
+      exact_harness_and_model_values_in_mandates: MISSING
+    expected_next_evidence: updated_generic_mandates_with_real_harness_model_values
   - claim_id: AUTONOMOUS_TOY_FACTORY
     status: MISSING
     expected_next_evidence: full_Toy_run_room_export_commits_and_harness
