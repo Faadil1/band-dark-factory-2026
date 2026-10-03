@@ -48,10 +48,14 @@ technical_reality:
   remote_agent_runtime_connectivity: PROVEN_PREFLIGHT
   codex_cloud_bridge:
     github_trigger: PROVEN
-    cloud_environment_for_repo: MISSING
-    codex_task_execution: BLOCKED_BY_MISSING_ENVIRONMENT
+    cloud_environment_for_repo: CREATED
+    environment_repo: Faadil1/band-dark-factory-2026
+    environment_image: universal
+    environment_agent_internet_access: OFF
+    environment_post_setup_caching: ON
+    codex_task_execution: PENDING_FIRST_SUCCESSFUL_TASK
     probe_pr: 7
-    bot_response: create_environment_for_this_repo
+    latest_probe_result: no_bot_response_or_commit_after_environment_creation
   reciprocal_handle_messaging: PROVEN_PREFLIGHT
   rehearsal_room_id: 599c34c3-62d4-4a24-bb45-361d2fee8bf2
   submission_remote_seat_eligibility: UNKNOWN_OFFICIAL_CLARIFICATION_REQUIRED
@@ -88,7 +92,7 @@ evidence_graph:
 
 exact_next_gate: TECHNICAL_REALITY_CHECK
 exact_next_action: >-
-  Create and publish a Codex Cloud environment for Faadil1/band-dark-factory-2026 using the user's ChatGPT/Codex
-  access. Then re-trigger PR #7 with @codex and verify that Codex Cloud makes the bounded commit without an OpenAI
-  API key. If proven, use this path as the candidate coding runtime for the Toy rehearsal. Keep submission seat
-  eligibility as a separate UNKNOWN until organizer clarification or a Desktop-seat fallback is proven.
+  Initialize the newly created Codex Cloud environment with one bounded first task from the environment's Use this
+  flow, then re-trigger PR #7 with @codex and verify that Codex Cloud pushes the requested one-line commit without
+  an OpenAI API key. If the GitHub-triggered task still does not start, classify the direct @codex bridge as BLOCKED
+  for this account and use Codex Cloud manually only for non-submitted development support.
