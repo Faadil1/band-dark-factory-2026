@@ -1,0 +1,350 @@
+name: BAND Three-Seat Preflight
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/band-three-seat-preflight.yml"
+      - "state/BAND-THREE-SEAT-PREFLIGHT-TRIGGER.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  three-seat-preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      BAND_COORDINATOR_AGENT_ID: ${{ secrets.BAND_COORDINATOR_AGENT_ID }}
+      BAND_COORDINATOR_API_KEY: ${{ secrets.BAND_COORDINATOR_API_KEY }}
+      BAND_IMPLEMENTER_AGENT_ID: ${{ secrets.BAND_IMPLEMENTER_AGENT_ID }}
+      BAND_IMPLEMENTER_API_KEY: ${{ secrets.BAND_IMPLEMENTER_API_KEY }}
+      BAND_REVIEWER_AGENT_ID: ${{ secrets.BAND_REVIEWER_AGENT_ID }}
+      BAND_REVIEWER_API_KEY: ${{ secrets.BAND_REVIEWER_API_KEY }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install WebSocket client
+        run: python -m pip install "websockets==15.0.1"
+
+      - name: Validate six BAND secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          for v in             BAND_COORDINATOR_AGENT_ID BAND_COORDINATOR_API_KEY             BAND_IMPLEMENTER_AGENT_ID BAND_IMPLEMENTER_API_KEY             BAND_REVIEWER_AGENT_ID BAND_REVIEWER_API_KEY
+          do
+            test -n "${!v}"
+          done
+          echo "All three BAND remote-agent credential pairs are present."
+
+      - name: Prove identities, WebSockets, and reciprocal messaging
+        shell: bash
+        run: |
+          python - <<'PY'
+          import asyncio
+          import json
+          import os
+          import subprocess
+          import time
+          from pathlib import Path
+          import websockets
+
+          BASES = [
+              "https://app.band.ai/api/v1/agent",
+              "https://api.band.ai/api/v1/agent",
+          ]
+
+          agents = {
+              "coordinator": {
+                  "id": os.environ["BAND_COORDINATOR_AGENT_ID"].strip(),
+                  "key": os.environ["BAND_COORDINATOR_API_KEY"].strip(),
+              },
+              "implementer": {
+                  "id": os.environ["BAND_IMPLEMENTER_AGENT_ID"].strip(),
+                  "key": os.environ["BAND_IMPLEMENTER_API_KEY"].strip(),
+              },
+              "reviewer": {
+                  "id": os.environ["BAND_REVIEWER_AGENT_ID"].strip(),
+                  "key": os.environ["BAND_REVIEWER_API_KEY"].strip(),
+              },
+          }
+
+          def request(agent, method, path, body=None, expected=(200, 201, 204)):
+              last = None
+              for base in BASES:
+                  cmd = [
+                      "curl", "--silent", "--show-error",
+                      "--user-agent", "curl/8.5.0",
+                      "--request", method,
+                      "--header", f"X-API-Key: {agent['key']}",
+                      "--header", "Accept: application/json",
+                  ]
+                  if body is not None:
+                      cmd += [
+                          "--header", "Content-Type: application/json",
+                          "--data", json.dumps(body),
+                      ]
+                  cmd += ["--write-out", "\n__HTTP__:%{http_code}", f"{base}{path}"]
+                  cp = subprocess.run(cmd, text=True, capture_output=True)
+                  if cp.returncode != 0:
+                      last = f"curl exit {cp.returncode}: {cp.stderr[:400]}"
+                      continue
+                  if "\n__HTTP__:" not in cp.stdout:
+                      last = f"missing HTTP marker: {cp.stdout[:400]}"
+                      continue
+                  payload_text, code_text = cp.stdout.rsplit("\n__HTTP__:", 1)
+                  code = int(code_text.strip())
+                  if code in expected:
+                      if not payload_text.strip():
+                          return code, None, base
+                      try:
+                          return code, json.loads(payload_text), base
+                      except json.JSONDecodeError:
+                          return code, payload_text, base
+                  last = f"{base} HTTP {code}: {payload_text[:800]}"
+                  # 403 from one hostname may be an edge/WAF behavior; try the alternate host.
+                  if code not in (403, 404):
+                      break
+              raise RuntimeError(last or f"{method} {path} failed")
+
+          # 1. Validate all three REST identities.
+          for role, agent in agents.items():
+              _, payload, used_base = request(agent, "GET", "/me")
+              data = (payload or {}).get("data") or {}
+              returned = str(data.get("id") or "")
+              if returned != agent["id"]:
+                  raise RuntimeError(f"{role}: REST identity returned a different agent id")
+              agent["name"] = data.get("name") or role.title()
+              agent["handle"] = data.get("handle") or ""
+              if not agent["handle"]:
+                  raise RuntimeError(f"{role}: REST identity did not return a handle")
+              print(f"{role}: REST identity OK via {used_base}; handle=@{agent['handle']}")
+
+          # 2. Validate each agent's Phoenix WebSocket identity/channel.
+          async def probe_ws(role, agent):
+              url = (
+                  "wss://app.band.ai/api/v1/socket/websocket"
+                  f"?api_key={agent['key']}&agent_id={agent['id']}&vsn=2.0.0"
+              )
+              async with websockets.connect(
+                  url,
+                  open_timeout=20,
+                  close_timeout=10,
+                  ping_interval=None,
+                  max_size=2**20,
+              ) as ws:
+                  topic = f"agent_rooms:{agent['id']}"
+                  await ws.send(json.dumps(["1", "1", topic, "phx_join", {}]))
+                  joined = False
+                  deadline = asyncio.get_running_loop().time() + 15
+                  while asyncio.get_running_loop().time() < deadline:
+                      msg = json.loads(await asyncio.wait_for(
+                          ws.recv(), timeout=max(0.1, deadline - asyncio.get_running_loop().time())
+                      ))
+                      if (
+                          isinstance(msg, list) and len(msg) == 5
+                          and msg[1] == "1" and msg[2] == topic
+                          and msg[3] == "phx_reply"
+                      ):
+                          if (msg[4] or {}).get("status") != "ok":
+                              raise RuntimeError(f"{role}: agent_rooms join rejected")
+                          joined = True
+                          break
+                  if not joined:
+                      raise RuntimeError(f"{role}: agent_rooms join not acknowledged")
+                  await ws.send(json.dumps([None, "2", "phoenix", "heartbeat", {}]))
+                  heartbeat = False
+                  deadline = asyncio.get_running_loop().time() + 10
+                  while asyncio.get_running_loop().time() < deadline:
+                      msg = json.loads(await asyncio.wait_for(
+                          ws.recv(), timeout=max(0.1, deadline - asyncio.get_running_loop().time())
+                      ))
+                      if (
+                          isinstance(msg, list) and len(msg) == 5
+                          and msg[1] == "2" and msg[2] == "phoenix"
+                          and msg[3] == "phx_reply"
+                      ):
+                          heartbeat = (msg[4] or {}).get("status") == "ok"
+                          break
+                  if not heartbeat:
+                      raise RuntimeError(f"{role}: heartbeat not acknowledged")
+                  print(f"{role}: WebSocket agent_rooms join + heartbeat OK")
+
+          async def probe_all():
+              await asyncio.gather(*(probe_ws(role, agent) for role, agent in agents.items()))
+
+          asyncio.run(probe_all())
+
+          # 3. Coordinator creates a rehearsal-only room.
+          _, created, _ = request(agents["coordinator"], "POST", "/chats", {"chat": {}})
+          chat = (created or {}).get("data") or {}
+          chat_id = str(chat.get("id") or "")
+          if not chat_id:
+              raise RuntimeError("Coordinator created a chat but no chat id was returned")
+          print(f"Created BAND rehearsal room: {chat_id}")
+
+          # 4. Add Implementer and Reviewer by exact Agent IDs.
+          for role in ("implementer", "reviewer"):
+              request(
+                  agents["coordinator"],
+                  "POST",
+                  f"/chats/{chat_id}/participants",
+                  {"participant": {"participant_id": agents[role]["id"], "role": "member"}},
+              )
+              print(f"Added {role} to rehearsal room")
+
+          # Refresh participants and use BAND-returned identity records for mentions.
+          _, participants_payload, _ = request(
+              agents["coordinator"], "GET", f"/chats/{chat_id}/participants"
+          )
+          rows = (participants_payload or {}).get("data") or []
+          by_id = {str(p.get("id")): p for p in rows}
+          for role, agent in agents.items():
+              p = by_id.get(agent["id"])
+              if not p:
+                  raise RuntimeError(f"{role}: missing from BAND room participant list")
+              agent["name"] = p.get("name") or agent["name"]
+              agent["handle"] = p.get("handle") or agent["handle"]
+
+          def mention(agent):
+              return {
+                  "id": agent["id"],
+                  "name": agent["name"],
+                  "handle": agent["handle"],
+              }
+
+          # 5. Coordinator -> Implementer with explicit @handle.
+          impl = agents["implementer"]
+          coord = agents["coordinator"]
+          outbound_1 = {
+              "message": {
+                  "content": (
+                      f"@{impl['handle']} Technical Reality handoff: "
+                      f"reply to @{coord['handle']} with REMOTE-SEAT-ACK."
+                  ),
+                  "mentions": [mention(impl)],
+              }
+          }
+          _, sent1, _ = request(
+              coord, "POST", f"/chats/{chat_id}/messages", outbound_1
+          )
+          sent1_data = (sent1 or {}).get("data") or {}
+          first_message_id = str(sent1_data.get("id") or "")
+          if not first_message_id:
+              raise RuntimeError("Coordinator message did not return a message id")
+          print("Coordinator -> Implementer @handle message recorded")
+
+          # 6. Implementer receives the directed message through startup sync.
+          received = None
+          for _ in range(8):
+              code, payload, _ = request(
+                  impl, "GET", f"/chats/{chat_id}/messages/next", expected=(200, 204)
+              )
+              if code == 200 and payload:
+                  received = (payload or {}).get("data") or payload
+                  break
+              time.sleep(1)
+          if not received:
+              raise RuntimeError("Implementer did not receive Coordinator message")
+          received_id = str(received.get("id") or "")
+          if not received_id:
+              raise RuntimeError("Implementer received a message without an id")
+
+          # Mark it processing, then reply.
+          request(impl, "POST", f"/chats/{chat_id}/messages/{received_id}/processing", {})
+          outbound_2 = {
+              "message": {
+                  "content": (
+                      f"@{coord['handle']} REMOTE-SEAT-ACK from "
+                      f"@{impl['handle']}; reciprocal handoff path is live."
+                  ),
+                  "mentions": [mention(coord)],
+              }
+          }
+          _, sent2, _ = request(
+              impl, "POST", f"/chats/{chat_id}/messages", outbound_2
+          )
+          sent2_data = (sent2 or {}).get("data") or {}
+          second_message_id = str(sent2_data.get("id") or "")
+          if not second_message_id:
+              raise RuntimeError("Implementer reply did not return a message id")
+          request(impl, "POST", f"/chats/{chat_id}/messages/{received_id}/processed", {})
+          print("Implementer -> Coordinator reciprocal @handle reply recorded")
+
+          # 7. Coordinator receives the reply, proving directionality.
+          reply = None
+          for _ in range(8):
+              code, payload, _ = request(
+                  coord, "GET", f"/chats/{chat_id}/messages/next", expected=(200, 204)
+              )
+              if code == 200 and payload:
+                  candidate = (payload or {}).get("data") or payload
+                  if str(candidate.get("id") or "") == second_message_id:
+                      reply = candidate
+                      break
+                  # Process any older backlog item and keep draining.
+                  cid = str(candidate.get("id") or "")
+                  if cid:
+                      request(coord, "POST", f"/chats/{chat_id}/messages/{cid}/processing", {})
+                      request(coord, "POST", f"/chats/{chat_id}/messages/{cid}/processed", {})
+              time.sleep(1)
+          if not reply:
+              raise RuntimeError("Coordinator did not receive Implementer reciprocal reply")
+          reply_id = str(reply.get("id") or "")
+          request(coord, "POST", f"/chats/{chat_id}/messages/{reply_id}/processing", {})
+          request(coord, "POST", f"/chats/{chat_id}/messages/{reply_id}/processed", {})
+
+          # 8. Reviewer REST path sanity: ensure it can see this room.
+          _, reviewer_chats, _ = request(agents["reviewer"], "GET", "/chats")
+          reviewer_rows = (reviewer_chats or {}).get("data") or []
+          if isinstance(reviewer_rows, dict):
+              reviewer_rows = reviewer_rows.get("items") or reviewer_rows.get("chats") or []
+          if not any(str(r.get("id") or "") == chat_id for r in reviewer_rows):
+              # Membership propagation may lag; direct room GET is the stronger check.
+              request(agents["reviewer"], "GET", f"/chats/{chat_id}")
+          print("Reviewer REST room access OK")
+
+          evidence = {
+              "status": "PROVEN",
+              "chat_id": chat_id,
+              "agents": {
+                  role: {
+                      "id": agent["id"],
+                      "name": agent["name"],
+                      "handle": agent["handle"],
+                      "rest_identity": "PASS",
+                      "websocket_agent_rooms": "PASS",
+                      "heartbeat": "PASS",
+                  }
+                  for role, agent in agents.items()
+              },
+              "reciprocal_messaging": {
+                  "coordinator_to_implementer": "PASS",
+                  "implementer_to_coordinator": "PASS",
+                  "first_message_id": first_message_id,
+                  "second_message_id": second_message_id,
+              },
+              "scope": "technical-reality preflight only; no LLM and no product code",
+          }
+          out = Path("artifacts/band-three-seat-preflight")
+          out.mkdir(parents=True, exist_ok=True)
+          (out / "evidence.json").write_text(
+              json.dumps(evidence, indent=2), encoding="utf-8"
+          )
+          print(json.dumps(evidence, indent=2))
+          PY
+
+      - name: Upload three-seat evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: band-three-seat-preflight
+          path: artifacts/band-three-seat-preflight/**
+          if-no-files-found: warn

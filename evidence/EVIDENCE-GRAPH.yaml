@@ -62,10 +62,57 @@ claims:
         - hidden_test_success
         - production_readiness
 
+  - id: TR_BAND_THREE_SEAT_001
+    claim: >-
+      Three distinct BAND remote-agent identities can authenticate from the dedicated GitHub Actions runtime,
+      join BAND channels, share one room, and complete a reciprocal @handle exchange.
+    classification: COMPLETE
+    proof_class: TECHNICAL_PROOF
+    scenario:
+      id: three_seat_connectivity_and_reciprocal_handoff
+      description: no-LLM preflight for Coordinator, Implementer, and Reviewer
+    runtime_execution:
+      platform: GitHub Actions
+      workflow: BAND Three-Seat Preflight
+      workflow_run_id: 37123547256
+      job_id: 111204236054
+      head_sha: 13a7ed7679bbbab56f70da01ce2342b2cd6242ef
+      result: success
+    dependency:
+      BAND_agent_api: https://app.band.ai/api/v1/agent
+      BAND_websocket: wss://app.band.ai/api/v1/socket/websocket
+    receipt_or_telemetry:
+      room_id: 599c34c3-62d4-4a24-bb45-361d2fee8bf2
+      coordinator_to_implementer_message_id: 3440b207-d534-4c8e-af48-ca0b708e90fb
+      implementer_to_coordinator_message_id: 9ef292a0-76cb-46cb-b166-700deb34331b
+      artifact_id: 11273483465
+      artifact_digest: sha256:ab0394b5c639ef2f87ac10a0af37291ec13343dd0d767b446920d58be9e63631
+    commit:
+      repository: Faadil1/band-dark-factory-2026
+      sha: 13a7ed7679bbbab56f70da01ce2342b2cd6242ef
+    deployment:
+      status: N/A
+      reason: connectivity_preflight_not_application_deployment
+    truth_boundary:
+      proves:
+        - three_remote_agent_credentials_valid
+        - REST_identity_path_for_all_three
+        - WebSocket_agent_rooms_and_heartbeat_for_all_three
+        - shared_room_membership
+        - reciprocal_at_handle_message_exchange
+      does_not_prove:
+        - official_submission_eligibility_of_remote_agents_as_Band_Desktop_seats
+        - coding_model_or_harness_runtime
+        - autonomous_Toy_Factory
+        - submitted_run_autonomy
+
 missing_edges:
-  - claim_id: BAND_REMOTE_AGENT_CONNECTIVITY
+  - claim_id: SUBMISSION_SEAT_IDENTITY_ELIGIBILITY
+    status: UNKNOWN
+    expected_next_evidence: organizer_primary_clarification_or_unambiguous_Band_Desktop_seat_run
+  - claim_id: CODING_AGENT_RUNTIME
     status: MISSING
-    expected_next_evidence: remote_agent_runtime_execution_plus_BAND_message_receipt
-  - claim_id: RECIPROCAL_SEAT_COLLABORATION
+    expected_next_evidence: actual_harness_model_and_repo_scoped_execution_for_all_three
+  - claim_id: AUTONOMOUS_TOY_FACTORY
     status: MISSING
-    expected_next_evidence: room_message_exchange_and_export
+    expected_next_evidence: full_Toy_run_room_export_commits_and_harness

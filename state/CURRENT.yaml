@@ -42,11 +42,13 @@ technical_reality:
       harness and reproduced the documented 2/8 baseline. This is not a Toy Factory completion claim.
   dedicated_repo_actions_preflight: PROVEN
   band_remote_agents:
-    coordinator: CREATED
-    implementer: PENDING
-    reviewer: PENDING
-  remote_agent_runtime_connectivity: PENDING
-  reciprocal_handle_messaging: PENDING
+    coordinator: CREATED_AND_CONNECTIVITY_PROVEN
+    implementer: CREATED_AND_CONNECTIVITY_PROVEN
+    reviewer: CREATED_AND_CONNECTIVITY_PROVEN
+  remote_agent_runtime_connectivity: PROVEN_PREFLIGHT
+  reciprocal_handle_messaging: PROVEN_PREFLIGHT
+  rehearsal_room_id: 599c34c3-62d4-4a24-bb45-361d2fee8bf2
+  submission_remote_seat_eligibility: UNKNOWN_OFFICIAL_CLARIFICATION_REQUIRED
 
 factory:
   minimum_submission_seats: 3
@@ -55,7 +57,7 @@ factory:
     - implementer
     - reviewer
   standing_mandates: TEMPLATE_NOT_SUBMISSION_READY
-  reason: harness_and_model_fields_must_be_filled_after_remote_runtime_is_selected
+  reason: actual_coding_harness_and_model_values_are_still_TBD
 
 conditional_gateway_registry:
   PROJECT_AUTHORIZED: PROVEN
@@ -66,6 +68,9 @@ conditional_gateway_registry:
   REAL_TRACK_BUILD: BLOCKED_BY_TRACK_LOCK
   EVIDENCE_GRAPH: ACTIVE
   RUNTIME_COMMIT_BINDING: ACTIVE
+  BAND_THREE_SEAT_CONNECTIVITY: PROVEN_PREFLIGHT
+  RECIPROCAL_HANDLE_MESSAGING: PROVEN_PREFLIGHT
+  SUBMISSION_SEAT_IDENTITY_ELIGIBILITY: UNKNOWN
   JUDGE_PERFORMANCE_ASSURANCE: BLOCKED_BY_BUILD_CANDIDATE
   SUBMISSION_INTEGRITY: BLOCKED_BY_BUILD_CANDIDATE
   PROTECTED_HUMAN_SUBMISSION: BLOCKED_BY_SUBMISSION_READY
@@ -77,6 +82,7 @@ evidence_graph:
 
 exact_next_gate: TECHNICAL_REALITY_CHECK
 exact_next_action: >-
-  Connect the BAND Coordinator remote agent to a remote runtime scoped only to this dedicated repository,
-  then create Implementer and Reviewer, record their actual harness/model values in mandates, and prove
-  reciprocal @handle messaging. Do not start the real Pocketful run.
+  Select and prove the real coding harness/model runtime for Coordinator, Implementer, and Reviewer, then replace
+  TBD values in the generic mandates. In parallel, obtain primary organizer clarification that Remote Agents count
+  as the challenge's required Band Desktop seat identities, or prepare unambiguous Desktop seats for the final
+  submitted run. Do not start the real Pocketful run before Technical Reality and Toy Factory gates close.
