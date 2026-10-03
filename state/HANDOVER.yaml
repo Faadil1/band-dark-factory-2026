@@ -22,6 +22,10 @@ current_truth:
   pocketful_recommended: true
   pocketful_locked: false
   coordinator_remote_agent_created: true
+  implementer_remote_agent_created: true
+  reviewer_remote_agent_created: true
+  three_seat_remote_connectivity: proven_preflight
+  reciprocal_handle_messaging: proven_preflight
   dedicated_repo_created: true
   local_workstation_execution: intentionally_avoided
   remote_linux_harness: proven_in_operational_repo
@@ -44,12 +48,16 @@ do_not_start:
 
 next_gate:
   name: TECHNICAL_REALITY_CHECK
+  proven_now:
+    - Coordinator_Implementer_Reviewer_REST_identity
+    - Coordinator_Implementer_Reviewer_WebSocket_and_heartbeat
+    - shared_BAND_room_creation_and_membership
+    - reciprocal_Coordinator_Implementer_at_handle_exchange
+    - Reviewer_room_access
   remaining_pass_conditions:
-    - remote_Coordinator_connects_to_BAND
-    - remote_runtime_is_scoped_only_to_dedicated_repo
-    - Implementer_and_Reviewer_remote_agents_created
+    - remote_runtime_is_scoped_only_to_dedicated_repo_for_real_coding_execution
     - mandate_harness_and_model_fields_are_real_not_TBD
-    - at_least_two_owned_seats_exchange_reciprocal_at_handle_messages
+    - primary_official_clarification_on_Remote_Agent_vs_Band_Desktop_seat_identity_or_unambiguous_Desktop_fallback
   after_pass:
     - TOY_FACTORY_REHEARSAL
     - TRACK_LOCK
