@@ -19,7 +19,7 @@ jobs:
     timeout-minutes: 10
     env:
       GH_TOKEN: ${{ github.token }}
-      EXPECTED_PATH: evidence/codex-cloud-comment-relay-probe.md
+      ALLOWED_PATHS: "evidence/codex-cloud-comment-relay-probe.md evidence/band-codex-e2e-probe.md"
 
     steps:
       - name: Resolve pull request head
@@ -76,7 +76,7 @@ jobs:
         run: |
           set -euo pipefail
           python - <<'PY'
-          import re
+          import os, re
           from pathlib import Path
           patch = Path("/tmp/codex.patch").read_text(encoding="utf-8", errors="strict")
           paths = set()
@@ -85,10 +85,10 @@ jobs:
                   paths.add(line[6:])
               elif line.startswith("--- a/"):
                   paths.add(line[6:])
-          expected = {"evidence/codex-cloud-comment-relay-probe.md"}
-          if paths != expected:
+          allowed = set(os.environ["ALLOWED_PATHS"].split())
+          if len(paths) != 1 or not paths.issubset(allowed):
               raise SystemExit(f"Patch scope mismatch: {sorted(paths)}")
-          print("Patch scope OK.")
+          print("Patch scope OK:", next(iter(paths)))
           PY
 
       - name: Apply and verify patch
@@ -100,7 +100,11 @@ jobs:
           git diff --check
 
           CHANGED="$(git diff --name-only)"
-          test "$CHANGED" = "$EXPECTED_PATH"
+          test "$(printf '%s\n' "$CHANGED" | sed '/^$/d' | wc -l)" -eq 1
+          case " $ALLOWED_PATHS " in
+            *" $CHANGED "*) ;;
+            *) echo "Changed path not allowlisted: $CHANGED"; exit 1 ;;
+          esac
 
       - name: Commit and push exact candidate
         shell: bash
@@ -108,8 +112,9 @@ jobs:
           set -euo pipefail
           git config user.name "BAND Codex Relay"
           git config user.email "band-codex-relay@users.noreply.github.com"
-          git add "$EXPECTED_PATH"
-          git commit -m "test: prove Codex Cloud comment relay"
+          CHANGED="$(git diff --name-only)"
+          git add -- "$CHANGED"
+          git commit -m "test: apply bounded Codex relay patch"
           git push origin "HEAD:${{ steps.pr.outputs.head_ref }}"
 
           echo "CODEX_COMMENT_RELAY_AUTONOMOUS_PUSH=PROVEN"
