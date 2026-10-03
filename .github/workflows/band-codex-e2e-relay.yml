@@ -9,18 +9,23 @@ permissions:
   pull-requests: read
 
 jobs:
-  apply-codex-patch:
+  apply-codex-patch-and-return-band-receipt:
     if: >-
       github.event.issue.pull_request &&
       github.event.comment.user.login == 'chatgpt-codex-connector[bot]' &&
-      contains(github.event.comment.body, 'BAND_CODEX_PATCH_B64_BEGIN') &&
-      contains(github.event.comment.body, 'BAND_CODEX_PATCH_B64_END')
+      contains(github.event.comment.body, 'BAND_V3_PATCH_B64_BEGIN') &&
+      contains(github.event.comment.body, 'BAND_V3_PATCH_B64_END')
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
       GH_TOKEN: ${{ github.token }}
-      EXPECTED_BRANCH: test/band-codex-e2e-turn
-      EXPECTED_PATH: evidence/band-codex-e2e-turn.md
+      EXPECTED_BRANCH: test/band-codex-e2e-turn-v3
+      EXPECTED_PATH: evidence/band-codex-e2e-turn-v3.md
+      BAND_ROOM_ID: 599c34c3-62d4-4a24-bb45-361d2fee8bf2
+      BAND_COORDINATOR_AGENT_ID: ${{ secrets.BAND_COORDINATOR_AGENT_ID }}
+      BAND_COORDINATOR_API_KEY: ${{ secrets.BAND_COORDINATOR_API_KEY }}
+      BAND_IMPLEMENTER_AGENT_ID: ${{ secrets.BAND_IMPLEMENTER_AGENT_ID }}
+      BAND_IMPLEMENTER_API_KEY: ${{ secrets.BAND_IMPLEMENTER_API_KEY }}
 
     steps:
       - name: Resolve and validate PR head
@@ -52,47 +57,164 @@ jobs:
           event=json.load(open(os.environ["GITHUB_EVENT_PATH"], encoding="utf-8"))
           body=event["comment"]["body"]
           m=re.search(
-              r"BAND_CODEX_PATCH_B64_BEGIN\s*([A-Za-z0-9+/=\r\n]+?)\s*BAND_CODEX_PATCH_B64_END",
+              r"BAND_V3_PATCH_B64_BEGIN\s*([A-Za-z0-9+/=\r\n]+?)\s*BAND_V3_PATCH_B64_END",
               body, flags=re.S
           )
           if not m:
-              raise SystemExit("missing BAND Codex patch markers")
+              raise SystemExit("missing BAND v3 patch markers")
           payload=re.sub(r"\s+", "", m.group(1))
           patch=base64.b64decode(payload, validate=True)
-          open("/tmp/band-codex.patch","wb").write(patch)
-          print(f"decoded_patch_bytes={len(patch)}")
+          open("/tmp/band-codex-v3.patch","wb").write(patch)
           PY
 
-      - name: Enforce path and apply patch
+      - name: Enforce scope and apply patch
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
           from pathlib import Path
-          patch=Path("/tmp/band-codex.patch").read_text(encoding="utf-8")
+          patch=Path("/tmp/band-codex-v3.patch").read_text(encoding="utf-8")
           paths=set()
           for line in patch.splitlines():
               if line.startswith("+++ b/"):
                   paths.add(line[6:])
               elif line.startswith("--- a/"):
                   paths.add(line[6:])
-          expected={"evidence/band-codex-e2e-turn.md"}
-          if paths != expected:
+          if paths != {"evidence/band-codex-e2e-turn-v3.md"}:
               raise SystemExit(f"patch scope mismatch: {sorted(paths)}")
-          print("Patch scope OK.")
           PY
-          git apply --check /tmp/band-codex.patch
-          git apply /tmp/band-codex.patch
+          git apply --check /tmp/band-codex-v3.patch
+          git apply /tmp/band-codex-v3.patch
           git diff --check
           test "$(git diff --name-only)" = "$EXPECTED_PATH"
-          grep -qx 'BAND_CODEX_E2E=PROVEN' "$EXPECTED_PATH"
+          grep -qx 'BAND_CODEX_E2E_V3=PROVEN' "$EXPECTED_PATH"
 
       - name: Commit and push exact candidate
+        id: publish
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "BAND Codex Relay"
           git config user.email "band-codex-relay@users.noreply.github.com"
           git add "$EXPECTED_PATH"
-          git commit -m "test: prove BAND Codex end-to-end relay"
+          git commit -m "test: prove BAND Codex end-to-end relay v3"
+          FINAL_SHA="$(git rev-parse HEAD)"
           git push origin "HEAD:$EXPECTED_BRANCH"
+          echo "final_sha=$FINAL_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Resolve Coordinator identity in BAND
+        id: band
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/participants.json"
+          CODE="$(curl --silent --show-error             --user-agent "BAND-Dark-Factory-2026-GitHub-Actions/1.0"             --output "$OUT" --write-out "%{http_code}"             -H "X-API-Key: $BAND_IMPLEMENTER_API_KEY"             -H "Accept: application/json"             "https://app.band.ai/api/v1/agent/chats/$BAND_ROOM_ID/participants")"
+          test "$CODE" = "200"
+          python - "$OUT" "$BAND_COORDINATOR_AGENT_ID" "$GITHUB_OUTPUT" <<'PY'
+          import json, sys
+          path, coord_id, out=sys.argv[1:]
+          payload=json.load(open(path, encoding="utf-8"))
+          data=payload.get("data") or []
+          if isinstance(data, dict):
+              data=data.get("participants") or data.get("items") or []
+          for item in data:
+              iid=str(item.get("id") or item.get("participant_id") or "")
+              if iid == coord_id:
+                  h=str(item.get("handle") or "").lstrip("@")
+                  n=str(item.get("name") or h)
+                  if not h:
+                      raise SystemExit("Coordinator handle missing")
+                  with open(out,"a",encoding="utf-8") as f:
+                      f.write(f"coordinator_handle={h}\n")
+                      f.write(f"coordinator_name={n}\n")
+                  raise SystemExit(0)
+          raise SystemExit("Coordinator not present in room")
+          PY
+
+      - name: Implementer records runtime receipt back in BAND
+        id: receipt
+        shell: bash
+        env:
+          COORDINATOR_HANDLE: ${{ steps.band.outputs.coordinator_handle }}
+          COORDINATOR_NAME: ${{ steps.band.outputs.coordinator_name }}
+          FINAL_SHA: ${{ steps.publish.outputs.final_sha }}
+        run: |
+          set -euo pipefail
+          BODY="$(python - <<'PY'
+          import json, os
+          h=os.environ["COORDINATOR_HANDLE"]
+          n=os.environ["COORDINATOR_NAME"]
+          aid=os.environ["BAND_COORDINATOR_AGENT_ID"]
+          sha=os.environ["FINAL_SHA"]
+          print(json.dumps({
+            "message": {
+              "content": f"@{h} E2E_V3_RECEIPT_FROM_IMPLEMENTER: BAND_CODEX_E2E_V3=PROVEN output_sha={sha}",
+              "mentions": [{"id": aid, "name": n, "handle": h}]
+            }
+          }))
+          PY
+          )"
+          OUT="$RUNNER_TEMP/receipt.json"
+          CODE="$(curl --silent --show-error             --user-agent "BAND-Dark-Factory-2026-GitHub-Actions/1.0"             --output "$OUT" --write-out "%{http_code}"             -X POST             -H "X-API-Key: $BAND_IMPLEMENTER_API_KEY"             -H "Accept: application/json"             -H "Content-Type: application/json"             -d "$BODY"             "https://app.band.ai/api/v1/agent/chats/$BAND_ROOM_ID/messages")"
+          if [ "$CODE" != "200" ] && [ "$CODE" != "201" ]; then
+            cat "$OUT"
+            exit 1
+          fi
+          python - "$OUT" "$GITHUB_OUTPUT" <<'PY'
+          import json, sys
+          payload=json.load(open(sys.argv[1], encoding="utf-8"))
+          data=payload.get("data") or {}
+          rid=str(data.get("id") or "")
+          if not rid:
+              raise SystemExit("receipt message id missing")
+          with open(sys.argv[2],"a",encoding="utf-8") as f:
+              f.write(f"receipt_message_id={rid}\n")
+          PY
+
+      - name: Coordinator verifies full round trip
+        shell: bash
+        env:
+          FINAL_SHA: ${{ steps.publish.outputs.final_sha }}
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/coordinator-context.json"
+          CODE="$(curl --silent --show-error             --user-agent "BAND-Dark-Factory-2026-GitHub-Actions/1.0"             --output "$OUT" --write-out "%{http_code}"             -H "X-API-Key: $BAND_COORDINATOR_API_KEY"             -H "Accept: application/json"             "https://app.band.ai/api/v1/agent/chats/$BAND_ROOM_ID/context")"
+          test "$CODE" = "200"
+          python - "$OUT" "$FINAL_SHA" <<'PY'
+          import json, sys
+          raw=json.dumps(json.load(open(sys.argv[1], encoding="utf-8")))
+          for needle in (
+              "E2E_V3_TASK_FROM_COORDINATOR",
+              "E2E_V3_RECEIPT_FROM_IMPLEMENTER",
+              "BAND_CODEX_E2E_V3=PROVEN",
+              sys.argv[2],
+          ):
+              if needle not in raw:
+                  raise SystemExit(f"missing round-trip evidence: {needle}")
+          print("BAND -> Codex -> relay -> BAND round trip: PROVEN")
+          PY
+
+      - name: Write evidence receipt
+        shell: bash
+        env:
+          FINAL_SHA: ${{ steps.publish.outputs.final_sha }}
+          RECEIPT_ID: ${{ steps.receipt.outputs.receipt_message_id }}
+        run: |
+          mkdir -p artifacts/band-codex-e2e-v3
+          cat > artifacts/band-codex-e2e-v3/evidence.json <<EOF
+          {
+            "status": "PROVEN",
+            "band_room_id": "$BAND_ROOM_ID",
+            "codex_comment_id": "${{ github.event.comment.id }}",
+            "workflow_run_id": "${{ github.run_id }}",
+            "output_head_sha": "$FINAL_SHA",
+            "implementer_receipt_message_id": "$RECEIPT_ID",
+            "human_steering_after_initial_pr_open": false
+          }
+          EOF
+
+      - name: Upload E2E evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: band-codex-e2e-v3
+          path: artifacts/band-codex-e2e-v3/evidence.json
