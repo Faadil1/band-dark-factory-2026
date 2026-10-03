@@ -2,9 +2,9 @@ name: BAND to Codex E2E Trigger
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened]
     paths:
-      - "state/BAND-CODEX-E2E-TRIGGER.md"
+      - "state/BAND-CODEX-E2E-V3-TRIGGER.md"
 
 permissions:
   contents: read
@@ -15,7 +15,7 @@ jobs:
   dispatch-from-band-seat:
     if: >-
       github.event.pull_request.head.repo.full_name == github.repository &&
-      github.event.pull_request.head.ref == 'test/band-codex-e2e-turn'
+      github.event.pull_request.head.ref == 'test/band-codex-e2e-turn-v3'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
@@ -69,10 +69,9 @@ jobs:
               f.write(f"coordinator_name={cn}\n")
               f.write(f"implementer_handle={ih}\n")
               f.write(f"implementer_name={inn}\n")
-          print("BAND participants resolved.")
           PY
 
-      - name: Coordinator dispatches bounded task to Implementer in BAND
+      - name: Coordinator dispatches bounded task in BAND
         shell: bash
         env:
           IMPLEMENTER_HANDLE: ${{ steps.band.outputs.implementer_handle }}
@@ -87,9 +86,9 @@ jobs:
           print(json.dumps({
             "message": {
               "content": (
-                f"@{h} E2E_TASK_FROM_COORDINATOR: prove the bounded coding transport. "
-                "Target only evidence/band-codex-e2e-turn.md and add BAND_CODEX_E2E=PROVEN. "
-                "Use the Codex patch relay; no human steering."
+                f"@{h} E2E_V3_TASK_FROM_COORDINATOR: prove the bounded coding transport. "
+                "Target only evidence/band-codex-e2e-turn-v3.md and add BAND_CODEX_E2E_V3=PROVEN. "
+                "Use the Codex patch relay; no human steering after this handoff."
               ),
               "mentions": [{"id": aid, "name": n, "handle": h}]
             }
@@ -101,7 +100,6 @@ jobs:
             cat "$RUNNER_TEMP/coord-task.json"
             exit 1
           fi
-          echo "Coordinator task posted to BAND."
 
       - name: Implementer observes BAND task
         shell: bash
@@ -113,9 +111,8 @@ jobs:
           python - "$OUT" <<'PY'
           import json, sys
           raw=json.dumps(json.load(open(sys.argv[1], encoding="utf-8")))
-          if "E2E_TASK_FROM_COORDINATOR" not in raw:
+          if "E2E_V3_TASK_FROM_COORDINATOR" not in raw:
               raise SystemExit("Implementer context did not contain Coordinator task")
-          print("Implementer observed BAND task.")
           PY
 
       - name: Implementer dispatches Codex task through GitHub
@@ -127,19 +124,17 @@ jobs:
           cat > "$RUNNER_TEMP/codex-comment.md" <<'EOF'
           @codex Execute only the bounded task received by the Implementer seat.
 
-          Modify only `evidence/band-codex-e2e-turn.md`.
-          Add the exact line `BAND_CODEX_E2E=PROVEN` immediately below the "Expected result" paragraph.
+          Modify only `evidence/band-codex-e2e-turn-v3.md`.
+          Add the exact line `BAND_CODEX_E2E_V3=PROVEN` immediately below the "Expected result" paragraph.
           Do not commit. Do not push. Do not modify any other file.
 
           At the end:
-          1. run `git diff --binary -- evidence/band-codex-e2e-turn.md | base64 -w0`;
+          1. run `git diff --binary -- evidence/band-codex-e2e-turn-v3.md | base64 -w0`;
           2. return the single-line base64 payload between these exact markers, with no code fence:
 
-          BAND_CODEX_PATCH_B64_BEGIN
+          BAND_V3_PATCH_B64_BEGIN
           <base64 payload>
-          BAND_CODEX_PATCH_B64_END
+          BAND_V3_PATCH_B64_END
           EOF
-
           BODY="$(jq -Rs '{body:.}' < "$RUNNER_TEMP/codex-comment.md")"
           gh api             --method POST             -H "Accept: application/vnd.github+json"             "repos/$REPO/issues/$PR/comments"             --input - <<<"$BODY" >/dev/null
-          echo "Implementer dispatched @codex task via GitHub comment."
