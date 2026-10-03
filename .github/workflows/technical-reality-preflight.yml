@@ -82,10 +82,11 @@ jobs:
           print("highest_contiguous=", report.get("highest_contiguous"))
 
           assert report.get("state") == "completed", report
-          assert report.get("errors") == 0, report
-          assert report.get("collected") == 8, report
-          assert report.get("passed") == 2, report
-          assert report.get("failed") == 6, report
+          stage = report.get("checks", {}).get("1", {})
+          assert stage.get("errors") == 0, report
+          assert stage.get("collected") == 8, report
+          assert stage.get("passed") == 2, report
+          assert stage.get("failed") == 6, report
           PY
 
       - name: Upload preflight evidence

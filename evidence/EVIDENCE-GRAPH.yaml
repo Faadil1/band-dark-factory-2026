@@ -1,0 +1,71 @@
+version: 0.1.0
+project_id: band_dark_factory_wearedevelopers_2026
+date: 2026-10-02
+policy: EVIDENCE-GRAPH-POLICY.yaml
+status: ACTIVE
+
+claims:
+  - id: TR_REMOTE_HARNESS_001
+    claim: >-
+      The dedicated operational repository can execute the official BAND harness in isolated Docker mode
+      on a GitHub-hosted Ubuntu runner without relying on the user's work computer for WSL or Docker.
+    classification: COMPLETE
+    proof_class: TECHNICAL_PROOF
+    scenario:
+      id: untouched_toy_stage1_baseline
+      description: >-
+        Clone the official kickoff repository, install the official harness and Playwright, create the untouched
+        Toy scaffold baseline, and run stage 1 with --mode isolated.
+      expected: official documented baseline completes with 8 checks, 2 passing, 6 failing, 0 errors
+    runtime_execution:
+      platform: GitHub Actions
+      repository: Faadil1/band-dark-factory-2026
+      workflow: BAND Technical Reality Preflight
+      workflow_run_id: 37088155823
+      job_id: 111102603176
+      runner: ubuntu-24.04
+      python: 3.12.14
+      docker: 28.0.4
+      result:
+        state: completed
+        collected: 8
+        passed: 2
+        failed: 6
+        errors: 0
+        claimed_stage: null
+    dependency:
+      official_kickoff_repository: band-ai/dark-factory-wearedevs
+      official_kickoff_sha: 803560d2a678ace1414465c098eb0ab5380ffade
+      harness_mode: isolated
+      playwright: installed_from_official_requirements_flow
+    receipt_or_telemetry:
+      artifact_id: 11261580853
+      artifact_name: band-technical-reality-preflight
+      artifact_digest: sha256:57d5a06eedd851e11d6ac101ece386ba7fc12d7b884dba1bf13499ff9b19d314
+      workflow_job_conclusion: success
+    commit:
+      repository: Faadil1/band-dark-factory-2026
+      sha: 8b049ad15f27a08fdfb01efb3af32bc68d95f99d
+      note: exact PR-head commit containing the canonical state used by the successful workflow run
+    deployment:
+      status: N/A
+      reason: CI_preflight_claim_not_a_deployed_application
+    truth_boundary:
+      proves:
+        - GitHub-hosted_Linux_runner_can_run_official_isolated_harness
+        - Docker_and_Playwright_environment_is_viable
+        - untouched_Toy_scaffold_reproduces_documented_baseline
+      does_not_prove:
+        - BAND_remote_agent_connectivity
+        - autonomous_Toy_Factory
+        - Pocketful_stage_conformance
+        - hidden_test_success
+        - production_readiness
+
+missing_edges:
+  - claim_id: BAND_REMOTE_AGENT_CONNECTIVITY
+    status: MISSING
+    expected_next_evidence: remote_agent_runtime_execution_plus_BAND_message_receipt
+  - claim_id: RECIPROCAL_SEAT_COLLABORATION
+    status: MISSING
+    expected_next_evidence: room_message_exchange_and_export

@@ -23,11 +23,24 @@ technical_reality:
   local_wsl2: BLOCKED_BY_ADMIN
   local_docker: BLOCKED_BY_ADMIN
   remote_linux_harness:
-    status: PROVEN_EXTERNALLY
-    evidence_repo: Faadil1/faadil-agent-system
-    workflow_run_id: 37083966183
-    interpretation: environment_proof_only
-  dedicated_repo_actions_preflight: PENDING
+    status: PROVEN_IN_OPERATIONAL_REPO
+    workflow_run_id: 37087966392
+    job_id: 111102055177
+    head_commit: d72d29811e3b7a11c3488cf3c8fc2cf75c2ac592
+    artifact_id: 11260918352
+    artifact_digest: sha256:66ab6bf9382e72bc166cea2a6568b64b6fc2e6059b848dbe62b692664ea0ee0a
+    official_kickoff_sha: 803560d2a678ace1414465c098eb0ab5380ffade
+    observed_baseline:
+      state: completed
+      stage_1_collected: 8
+      stage_1_passed: 2
+      stage_1_failed: 6
+      stage_1_errors: 0
+      claimed_stage: null
+    interpretation: >-
+      Environment proof only. The untouched Toy scaffold built and served through the official isolated Docker
+      harness and reproduced the documented 2/8 baseline. This is not a Toy Factory completion claim.
+  dedicated_repo_actions_preflight: PROVEN
   band_remote_agents:
     coordinator: CREATED
     implementer: PENDING
@@ -51,14 +64,19 @@ conditional_gateway_registry:
   TOY_FACTORY_REHEARSAL: BLOCKED_BY_TECHNICAL_REALITY_CHECK
   TRACK_LOCK: BLOCKED_BY_TOY_FACTORY_REHEARSAL
   REAL_TRACK_BUILD: BLOCKED_BY_TRACK_LOCK
-  EVIDENCE_GRAPH: PENDING_FIRST_PROMOTED_RUNTIME_CLAIM
-  RUNTIME_COMMIT_BINDING: PENDING
+  EVIDENCE_GRAPH: ACTIVE
+  RUNTIME_COMMIT_BINDING: ACTIVE
   JUDGE_PERFORMANCE_ASSURANCE: BLOCKED_BY_BUILD_CANDIDATE
   SUBMISSION_INTEGRITY: BLOCKED_BY_BUILD_CANDIDATE
   PROTECTED_HUMAN_SUBMISSION: BLOCKED_BY_SUBMISSION_READY
 
+evidence_graph:
+  status: ACTIVE
+  path: evidence/EVIDENCE-GRAPH.yaml
+  first_material_claim: TR_REMOTE_HARNESS_001
+
 exact_next_gate: TECHNICAL_REALITY_CHECK
 exact_next_action: >-
-  Prove the dedicated repository's GitHub Actions harness path, connect the BAND Coordinator remote agent
-  to a remote runtime without exposing the work computer filesystem, then create Implementer and Reviewer
-  and prove reciprocal @handle messaging. Do not start the real Pocketful run.
+  Connect the BAND Coordinator remote agent to a remote runtime scoped only to this dedicated repository,
+  then create Implementer and Reviewer, record their actual harness/model values in mandates, and prove
+  reciprocal @handle messaging. Do not start the real Pocketful run.
