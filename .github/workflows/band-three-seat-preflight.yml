@@ -183,7 +183,7 @@ jobs:
           asyncio.run(probe_all())
 
           # 3. Coordinator creates a rehearsal-only room.
-          _, created, _ = request(agents["coordinator"], "POST", "/chats", {})
+          _, created, _ = request(agents["coordinator"], "POST", "/chats", {"chat": {}})
           chat = (created or {}).get("data") or {}
           chat_id = str(chat.get("id") or "")
           if not chat_id:
