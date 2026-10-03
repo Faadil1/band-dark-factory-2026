@@ -11,4 +11,6 @@ Expected result:
 - Implementer records the resulting receipt back in BAND from the same relay workflow.
 - Coordinator observes both the task and receipt in the shared BAND room.
 
+BAND_CODEX_E2E_V3=PROVEN
+
 This probe does not start the Toy Factory or Pocketful build.
