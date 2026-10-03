@@ -1,0 +1,97 @@
+name: BAND Technical Reality Preflight
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/technical-reality-preflight.yml"
+      - "state/**"
+      - "FACTORY.md"
+      - "mandates/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  official-harness-preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout operational repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify runner primitives
+        run: |
+          python --version
+          git --version
+          docker --version
+          docker info
+
+      - name: Clone official kickoff package
+        run: |
+          git clone --depth 1 https://github.com/band-ai/dark-factory-wearedevs.git challenge
+          git -C challenge rev-parse HEAD
+
+      - name: Install official harness
+        working-directory: challenge
+        run: |
+          python -m venv .venv
+          . .venv/bin/activate
+          python -m pip install --upgrade pip
+          python -m pip install -r harness/requirements.txt
+          python -m playwright install --with-deps chromium
+          python -m harness --help
+
+      - name: Prepare untouched Toy baseline
+        working-directory: challenge
+        run: |
+          mkdir -p ../band-work/toy-result/stage-1 ../band-work/toy-result/mandates ../band-work/checks
+          cp -a scaffold/. ../band-work/toy-result/stage-1/
+          cp -a toy/mandates/. ../band-work/toy-result/mandates/
+          git -C ../band-work/toy-result init -b main
+          git -C ../band-work/toy-result config user.name "BAND Preflight"
+          git -C ../band-work/toy-result config user.email "band-preflight@example.test"
+          git -C ../band-work/toy-result add .
+          git -C ../band-work/toy-result commit -m "Baseline Toy scaffold"
+
+      - name: Exercise isolated Docker harness
+        working-directory: challenge
+        shell: bash
+        run: |
+          . .venv/bin/activate
+          set +e
+          python -m harness run             --track toy             --repo ../band-work/toy-result             --stage 1             --mode isolated             --out ../band-work/checks/remote-preflight
+          HARNESS_RC=$?
+          set -e
+          echo "harness_exit_code=$HARNESS_RC"
+          cat ../band-work/checks/remote-preflight/report.json
+
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path("../band-work/checks/remote-preflight/report.json").read_text())
+          print("report_state=", report.get("state"))
+          print("claimed_stage=", report.get("claimed_stage"))
+          print("highest_contiguous=", report.get("highest_contiguous"))
+
+          assert report.get("state") == "completed", report
+          assert report.get("errors") == 0, report
+          assert report.get("collected") == 8, report
+          assert report.get("passed") == 2, report
+          assert report.get("failed") == 6, report
+          PY
+
+      - name: Upload preflight evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: band-technical-reality-preflight
+          path: band-work/checks/remote-preflight/**
+          if-no-files-found: warn

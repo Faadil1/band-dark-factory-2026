@@ -1,0 +1,64 @@
+version: 0.1.0
+project_id: band_dark_factory_wearedevelopers_2026
+date: 2026-10-02
+status: ACTIVE
+lifecycle_state: TECHNICAL_REALITY_CHECK
+
+source_of_truth:
+  central_control_plane: Faadil1/faadil-agent-system@main
+  central_project_path: projects/band-dark-factory-2026
+  pbpd_workspace: Faadil1/pbpd-cowork-system@d125bffe848cc6a0b5484af66d762591519f8a0d
+  living_prd: projects/band-dark-factory-2026/incoming/LIVING-PRD.md
+  operational_repository: Faadil1/band-dark-factory-2026
+
+authorization:
+  project_authorized: PROVEN
+  living_prd: PRD_READY
+  recommended_track: POCKETFUL
+  track_lock: NOT_PROVEN
+  real_track_build: BLOCKED
+
+technical_reality:
+  local_windows_git: PROVEN
+  local_wsl2: BLOCKED_BY_ADMIN
+  local_docker: BLOCKED_BY_ADMIN
+  remote_linux_harness:
+    status: PROVEN_EXTERNALLY
+    evidence_repo: Faadil1/faadil-agent-system
+    workflow_run_id: 37083966183
+    interpretation: environment_proof_only
+  dedicated_repo_actions_preflight: PENDING
+  band_remote_agents:
+    coordinator: CREATED
+    implementer: PENDING
+    reviewer: PENDING
+  remote_agent_runtime_connectivity: PENDING
+  reciprocal_handle_messaging: PENDING
+
+factory:
+  minimum_submission_seats: 3
+  current_target_seats:
+    - coordinator
+    - implementer
+    - reviewer
+  standing_mandates: TEMPLATE_NOT_SUBMISSION_READY
+  reason: harness_and_model_fields_must_be_filled_after_remote_runtime_is_selected
+
+conditional_gateway_registry:
+  PROJECT_AUTHORIZED: PROVEN
+  LIVING_PRD: PROVEN
+  TECHNICAL_REALITY_CHECK: ACTIVE
+  TOY_FACTORY_REHEARSAL: BLOCKED_BY_TECHNICAL_REALITY_CHECK
+  TRACK_LOCK: BLOCKED_BY_TOY_FACTORY_REHEARSAL
+  REAL_TRACK_BUILD: BLOCKED_BY_TRACK_LOCK
+  EVIDENCE_GRAPH: PENDING_FIRST_PROMOTED_RUNTIME_CLAIM
+  RUNTIME_COMMIT_BINDING: PENDING
+  JUDGE_PERFORMANCE_ASSURANCE: BLOCKED_BY_BUILD_CANDIDATE
+  SUBMISSION_INTEGRITY: BLOCKED_BY_BUILD_CANDIDATE
+  PROTECTED_HUMAN_SUBMISSION: BLOCKED_BY_SUBMISSION_READY
+
+exact_next_gate: TECHNICAL_REALITY_CHECK
+exact_next_action: >-
+  Prove the dedicated repository's GitHub Actions harness path, connect the BAND Coordinator remote agent
+  to a remote runtime without exposing the work computer filesystem, then create Implementer and Reviewer
+  and prove reciprocal @handle messaging. Do not start the real Pocketful run.
