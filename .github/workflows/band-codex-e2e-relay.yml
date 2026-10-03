@@ -1,0 +1,98 @@
+name: BAND Codex E2E Relay
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  apply-codex-patch:
+    if: >-
+      github.event.issue.pull_request &&
+      github.event.comment.user.login == 'chatgpt-codex-connector[bot]' &&
+      contains(github.event.comment.body, 'BAND_CODEX_PATCH_B64_BEGIN') &&
+      contains(github.event.comment.body, 'BAND_CODEX_PATCH_B64_END')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      EXPECTED_BRANCH: test/band-codex-e2e-turn
+      EXPECTED_PATH: evidence/band-codex-e2e-turn.md
+
+    steps:
+      - name: Resolve and validate PR head
+        id: pr
+        shell: bash
+        run: |
+          set -euo pipefail
+          PR='${{ github.event.issue.number }}'
+          REPO='${{ github.repository }}'
+          JSON="$(gh api "repos/$REPO/pulls/$PR")"
+          HEAD_REPO="$(jq -r '.head.repo.full_name' <<<"$JSON")"
+          HEAD_REF="$(jq -r '.head.ref' <<<"$JSON")"
+          test "$HEAD_REPO" = "$REPO"
+          test "$HEAD_REF" = "$EXPECTED_BRANCH"
+          echo "head_ref=$HEAD_REF" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout exact PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.pr.outputs.head_ref }}
+          fetch-depth: 0
+
+      - name: Extract Codex patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import base64, json, os, re
+          event=json.load(open(os.environ["GITHUB_EVENT_PATH"], encoding="utf-8"))
+          body=event["comment"]["body"]
+          m=re.search(
+              r"BAND_CODEX_PATCH_B64_BEGIN\s*([A-Za-z0-9+/=\r\n]+?)\s*BAND_CODEX_PATCH_B64_END",
+              body, flags=re.S
+          )
+          if not m:
+              raise SystemExit("missing BAND Codex patch markers")
+          payload=re.sub(r"\s+", "", m.group(1))
+          patch=base64.b64decode(payload, validate=True)
+          open("/tmp/band-codex.patch","wb").write(patch)
+          print(f"decoded_patch_bytes={len(patch)}")
+          PY
+
+      - name: Enforce path and apply patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          patch=Path("/tmp/band-codex.patch").read_text(encoding="utf-8")
+          paths=set()
+          for line in patch.splitlines():
+              if line.startswith("+++ b/"):
+                  paths.add(line[6:])
+              elif line.startswith("--- a/"):
+                  paths.add(line[6:])
+          expected={"evidence/band-codex-e2e-turn.md"}
+          if paths != expected:
+              raise SystemExit(f"patch scope mismatch: {sorted(paths)}")
+          print("Patch scope OK.")
+          PY
+          git apply --check /tmp/band-codex.patch
+          git apply /tmp/band-codex.patch
+          git diff --check
+          test "$(git diff --name-only)" = "$EXPECTED_PATH"
+          grep -qx 'BAND_CODEX_E2E=PROVEN' "$EXPECTED_PATH"
+
+      - name: Commit and push exact candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "BAND Codex Relay"
+          git config user.email "band-codex-relay@users.noreply.github.com"
+          git add "$EXPECTED_PATH"
+          git commit -m "test: prove BAND Codex end-to-end relay"
+          git push origin "HEAD:$EXPECTED_BRANCH"

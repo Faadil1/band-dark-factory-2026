@@ -1,0 +1,145 @@
+name: BAND to Codex E2E Trigger
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - "state/BAND-CODEX-E2E-TRIGGER.md"
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  dispatch-from-band-seat:
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'test/band-codex-e2e-turn'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      BAND_ROOM_ID: 599c34c3-62d4-4a24-bb45-361d2fee8bf2
+      BAND_COORDINATOR_AGENT_ID: ${{ secrets.BAND_COORDINATOR_AGENT_ID }}
+      BAND_COORDINATOR_API_KEY: ${{ secrets.BAND_COORDINATOR_API_KEY }}
+      BAND_IMPLEMENTER_AGENT_ID: ${{ secrets.BAND_IMPLEMENTER_AGENT_ID }}
+      BAND_IMPLEMENTER_API_KEY: ${{ secrets.BAND_IMPLEMENTER_API_KEY }}
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - name: Validate BAND credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$BAND_COORDINATOR_AGENT_ID"
+          test -n "$BAND_COORDINATOR_API_KEY"
+          test -n "$BAND_IMPLEMENTER_AGENT_ID"
+          test -n "$BAND_IMPLEMENTER_API_KEY"
+
+      - name: Resolve BAND participant identities
+        id: band
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/participants.json"
+          CODE="$(curl --silent --show-error             --user-agent "BAND-Dark-Factory-2026-GitHub-Actions/1.0"             --output "$OUT" --write-out "%{http_code}"             -H "X-API-Key: $BAND_COORDINATOR_API_KEY"             -H "Accept: application/json"             "https://app.band.ai/api/v1/agent/chats/$BAND_ROOM_ID/participants")"
+          test "$CODE" = "200"
+
+          python - "$OUT" "$BAND_COORDINATOR_AGENT_ID" "$BAND_IMPLEMENTER_AGENT_ID" "$GITHUB_OUTPUT" <<'PY'
+          import json, sys
+          path, coord_id, impl_id, out = sys.argv[1:]
+          payload = json.load(open(path, encoding="utf-8"))
+          data = payload.get("data") or []
+          if isinstance(data, dict):
+              data = data.get("participants") or data.get("items") or []
+          def resolve(agent_id):
+              for item in data:
+                  iid = str(item.get("id") or item.get("participant_id") or "")
+                  if iid == agent_id:
+                      handle = str(item.get("handle") or "").lstrip("@")
+                      name = str(item.get("name") or handle)
+                      if not handle:
+                          raise SystemExit(f"missing handle for {agent_id}")
+                      return handle, name
+              raise SystemExit(f"participant {agent_id} not found")
+          ch, cn = resolve(coord_id)
+          ih, inn = resolve(impl_id)
+          with open(out, "a", encoding="utf-8") as f:
+              f.write(f"coordinator_handle={ch}\n")
+              f.write(f"coordinator_name={cn}\n")
+              f.write(f"implementer_handle={ih}\n")
+              f.write(f"implementer_name={inn}\n")
+          print("BAND participants resolved.")
+          PY
+
+      - name: Coordinator dispatches bounded task to Implementer in BAND
+        shell: bash
+        env:
+          IMPLEMENTER_HANDLE: ${{ steps.band.outputs.implementer_handle }}
+          IMPLEMENTER_NAME: ${{ steps.band.outputs.implementer_name }}
+        run: |
+          set -euo pipefail
+          BODY="$(python - <<'PY'
+          import json, os
+          h=os.environ["IMPLEMENTER_HANDLE"]
+          n=os.environ["IMPLEMENTER_NAME"]
+          aid=os.environ["BAND_IMPLEMENTER_AGENT_ID"]
+          print(json.dumps({
+            "message": {
+              "content": (
+                f"@{h} E2E_TASK_FROM_COORDINATOR: prove the bounded coding transport. "
+                "Target only evidence/band-codex-e2e-turn.md and add BAND_CODEX_E2E=PROVEN. "
+                "Use the Codex patch relay; no human steering."
+              ),
+              "mentions": [{"id": aid, "name": n, "handle": h}]
+            }
+          }))
+          PY
+          )"
+          CODE="$(curl --silent --show-error             --user-agent "BAND-Dark-Factory-2026-GitHub-Actions/1.0"             --output "$RUNNER_TEMP/coord-task.json" --write-out "%{http_code}"             -X POST             -H "X-API-Key: $BAND_COORDINATOR_API_KEY"             -H "Accept: application/json"             -H "Content-Type: application/json"             -d "$BODY"             "https://app.band.ai/api/v1/agent/chats/$BAND_ROOM_ID/messages")"
+          if [ "$CODE" != "200" ] && [ "$CODE" != "201" ]; then
+            cat "$RUNNER_TEMP/coord-task.json"
+            exit 1
+          fi
+          echo "Coordinator task posted to BAND."
+
+      - name: Implementer observes BAND task
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/impl-context.json"
+          CODE="$(curl --silent --show-error             --user-agent "BAND-Dark-Factory-2026-GitHub-Actions/1.0"             --output "$OUT" --write-out "%{http_code}"             -H "X-API-Key: $BAND_IMPLEMENTER_API_KEY"             -H "Accept: application/json"             "https://app.band.ai/api/v1/agent/chats/$BAND_ROOM_ID/context")"
+          test "$CODE" = "200"
+          python - "$OUT" <<'PY'
+          import json, sys
+          raw=json.dumps(json.load(open(sys.argv[1], encoding="utf-8")))
+          if "E2E_TASK_FROM_COORDINATOR" not in raw:
+              raise SystemExit("Implementer context did not contain Coordinator task")
+          print("Implementer observed BAND task.")
+          PY
+
+      - name: Implementer dispatches Codex task through GitHub
+        shell: bash
+        run: |
+          set -euo pipefail
+          PR='${{ github.event.pull_request.number }}'
+          REPO='${{ github.repository }}'
+          cat > "$RUNNER_TEMP/codex-comment.md" <<'EOF'
+          @codex Execute only the bounded task received by the Implementer seat.
+
+          Modify only `evidence/band-codex-e2e-turn.md`.
+          Add the exact line `BAND_CODEX_E2E=PROVEN` immediately below the "Expected result" paragraph.
+          Do not commit. Do not push. Do not modify any other file.
+
+          At the end:
+          1. run `git diff --binary -- evidence/band-codex-e2e-turn.md | base64 -w0`;
+          2. return the single-line base64 payload between these exact markers, with no code fence:
+
+          BAND_CODEX_PATCH_B64_BEGIN
+          <base64 payload>
+          BAND_CODEX_PATCH_B64_END
+          EOF
+
+          BODY="$(jq -Rs '{body:.}' < "$RUNNER_TEMP/codex-comment.md")"
+          gh api             --method POST             -H "Accept: application/vnd.github+json"             "repos/$REPO/issues/$PR/comments"             --input - <<<"$BODY" >/dev/null
+          echo "Implementer dispatched @codex task via GitHub comment."
