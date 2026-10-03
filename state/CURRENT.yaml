@@ -46,6 +46,12 @@ technical_reality:
     implementer: CREATED_AND_CONNECTIVITY_PROVEN
     reviewer: CREATED_AND_CONNECTIVITY_PROVEN
   remote_agent_runtime_connectivity: PROVEN_PREFLIGHT
+  codex_cloud_bridge:
+    github_trigger: PROVEN
+    cloud_environment_for_repo: MISSING
+    codex_task_execution: BLOCKED_BY_MISSING_ENVIRONMENT
+    probe_pr: 7
+    bot_response: create_environment_for_this_repo
   reciprocal_handle_messaging: PROVEN_PREFLIGHT
   rehearsal_room_id: 599c34c3-62d4-4a24-bb45-361d2fee8bf2
   submission_remote_seat_eligibility: UNKNOWN_OFFICIAL_CLARIFICATION_REQUIRED
@@ -82,7 +88,7 @@ evidence_graph:
 
 exact_next_gate: TECHNICAL_REALITY_CHECK
 exact_next_action: >-
-  Select and prove the real coding harness/model runtime for Coordinator, Implementer, and Reviewer, then replace
-  TBD values in the generic mandates. In parallel, obtain primary organizer clarification that Remote Agents count
-  as the challenge's required Band Desktop seat identities, or prepare unambiguous Desktop seats for the final
-  submitted run. Do not start the real Pocketful run before Technical Reality and Toy Factory gates close.
+  Create and publish a Codex Cloud environment for Faadil1/band-dark-factory-2026 using the user's ChatGPT/Codex
+  access. Then re-trigger PR #7 with @codex and verify that Codex Cloud makes the bounded commit without an OpenAI
+  API key. If proven, use this path as the candidate coding runtime for the Toy rehearsal. Keep submission seat
+  eligibility as a separate UNKNOWN until organizer clarification or a Desktop-seat fallback is proven.
