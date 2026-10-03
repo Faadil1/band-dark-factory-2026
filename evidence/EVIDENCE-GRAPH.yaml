@@ -21,8 +21,8 @@ claims:
       platform: GitHub Actions
       repository: Faadil1/band-dark-factory-2026
       workflow: BAND Technical Reality Preflight
-      workflow_run_id: 37087966392
-      job_id: 111102055177
+      workflow_run_id: 37088155823
+      job_id: 111102603176
       runner: ubuntu-24.04
       python: 3.12.14
       docker: 28.0.4
@@ -39,14 +39,14 @@ claims:
       harness_mode: isolated
       playwright: installed_from_official_requirements_flow
     receipt_or_telemetry:
-      artifact_id: 11260918352
+      artifact_id: 11261580853
       artifact_name: band-technical-reality-preflight
-      artifact_digest: sha256:66ab6bf9382e72bc166cea2a6568b64b6fc2e6059b848dbe62b692664ea0ee0a
+      artifact_digest: sha256:57d5a06eedd851e11d6ac101ece386ba7fc12d7b884dba1bf13499ff9b19d314
       workflow_job_conclusion: success
     commit:
       repository: Faadil1/band-dark-factory-2026
-      sha: d72d29811e3b7a11c3488cf3c8fc2cf75c2ac592
-      note: exact PR-head commit used by the successful workflow run
+      sha: 8b049ad15f27a08fdfb01efb3af32bc68d95f99d
+      note: exact PR-head commit containing the canonical state used by the successful workflow run
     deployment:
       status: N/A
       reason: CI_preflight_claim_not_a_deployed_application
