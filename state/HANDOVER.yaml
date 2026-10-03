@@ -58,10 +58,11 @@ next_gate:
     - Codex_machine_readable_patch_generation
     - GitHub_Actions_relay_scope_validation
     - GitHub_Actions_autonomous_commit_and_push_without_Codex_write_credential
+    - BAND_remote_seat_to_Codex_relay_to_BAND_round_trip
+    - repo_scoped_remote_coding_execution
   remaining_pass_conditions:
-    - end_to_end_BAND_seat_to_Codex_relay_to_BAND_evidence_turn
-    - remote_runtime_is_scoped_only_to_dedicated_repo_for_real_coding_execution
     - mandate_harness_and_model_fields_are_real_not_TBD
+    - BAND_Desktop_version_requirement_verified
     - primary_official_clarification_on_Remote_Agent_vs_Band_Desktop_seat_identity_or_unambiguous_Desktop_fallback
   after_pass:
     - TOY_FACTORY_REHEARSAL
