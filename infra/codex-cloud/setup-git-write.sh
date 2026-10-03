@@ -9,34 +9,38 @@ if [[ -z "${GH_TOKEN:-}" ]]; then
   exit 1
 fi
 
-if ! command -v gh >/dev/null 2>&1; then
-  echo "GitHub CLI (gh) is required in the Codex Cloud image." >&2
+# Fine-grained PATs are intended for narrowly scoped automation. Validate the
+# token against this repository without printing it.
+HTTP_CODE="$(curl --silent --show-error --output /tmp/band-codex-repo.json --write-out "%{http_code}"   -H "Authorization: Bearer ${GH_TOKEN}"   -H "Accept: application/vnd.github+json"   -H "X-GitHub-Api-Version: 2022-11-28"   "https://api.github.com/repos/${REPO_SLUG}")"
+
+if [[ "$HTTP_CODE" != "200" ]]; then
+  echo "GH_TOKEN cannot read the configured repository (HTTP $HTTP_CODE)." >&2
   exit 1
 fi
+rm -f /tmp/band-codex-repo.json
 
-# Authenticate gh using the repo-scoped short-lived token, then remove the
-# environment variable so subsequent shell output cannot accidentally expose it.
-printf '%s' "$GH_TOKEN" | gh auth login --hostname github.com --with-token >/dev/null
+# Keep the credential in Git's in-memory credential-cache daemon rather than
+# embedding it in source, the remote URL, or a plaintext credential file.
+# Container caching must remain OFF so this setup is executed for every task.
+git config --global credential.helper "cache --timeout=7200"
+
+printf 'protocol=https\nhost=github.com\nusername=x-access-token\npassword=%s\n\n' "$GH_TOKEN"   | git credential approve
+
 unset GH_TOKEN
 
-# Configure Git to use gh's secure credential helper. The token value is not
-# written into the repository remote URL.
-gh auth setup-git --hostname github.com >/dev/null
-
-# Codex Cloud task checkouts currently arrive without an origin remote.
+# Codex Cloud task checkouts may arrive without an origin remote.
 if git remote get-url origin >/dev/null 2>&1; then
   git remote set-url origin "$REMOTE_URL"
 else
   git remote add origin "$REMOTE_URL"
 fi
 
-# Use a neutral non-personal identity for autonomous commits.
 git config user.name "BAND Codex Cloud"
 git config user.email "band-codex-cloud@users.noreply.github.com"
 
-# Fail closed if authenticated read access does not work.
+# Fail closed unless the credential cache can authenticate Git itself.
 git ls-remote origin HEAD >/dev/null
 
 echo "Codex Cloud GitHub write bootstrap configured."
 echo "origin=$(git remote get-url origin)"
-gh auth status --hostname github.com
+echo "credential_backend=git-credential-cache"
