@@ -1,0 +1,368 @@
+name: BAND to Codex End-to-End Probe
+
+on:
+  pull_request:
+    paths:
+      - "state/BAND-CODEX-E2E-TRIGGER.md"
+      - "evidence/band-codex-e2e-probe.md"
+      - ".github/workflows/band-codex-end-to-end-probe.yml"
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
+jobs:
+  end-to-end:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BAND_COORDINATOR_AGENT_ID: ${{ secrets.BAND_COORDINATOR_AGENT_ID }}
+      BAND_COORDINATOR_API_KEY: ${{ secrets.BAND_COORDINATOR_API_KEY }}
+      BAND_IMPLEMENTER_AGENT_ID: ${{ secrets.BAND_IMPLEMENTER_AGENT_ID }}
+      BAND_IMPLEMENTER_API_KEY: ${{ secrets.BAND_IMPLEMENTER_API_KEY }}
+      BAND_REVIEWER_AGENT_ID: ${{ secrets.BAND_REVIEWER_AGENT_ID }}
+      BAND_REVIEWER_API_KEY: ${{ secrets.BAND_REVIEWER_API_KEY }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+      INITIAL_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      REPOSITORY: ${{ github.repository }}
+
+    steps:
+      - name: Checkout probe branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Validate credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          for v in \
+            BAND_COORDINATOR_AGENT_ID BAND_COORDINATOR_API_KEY \
+            BAND_IMPLEMENTER_AGENT_ID BAND_IMPLEMENTER_API_KEY \
+            BAND_REVIEWER_AGENT_ID BAND_REVIEWER_API_KEY
+          do
+            test -n "${!v}"
+          done
+
+      - name: Run BAND seat to Codex relay to BAND receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import base64
+          import json
+          import os
+          import subprocess
+          import time
+          from pathlib import Path
+
+          BASES = [
+              "https://app.band.ai/api/v1/agent",
+              "https://api.band.ai/api/v1/agent",
+          ]
+          repo = os.environ["REPOSITORY"]
+          pr_number = os.environ["PR_NUMBER"]
+          head_ref = os.environ["PR_HEAD_REF"]
+          initial_sha = os.environ["INITIAL_HEAD_SHA"]
+          target_path = "evidence/band-codex-e2e-probe.md"
+          marker = "BAND_CODEX_E2E=PROVEN"
+
+          agents = {
+              "coordinator": {
+                  "id": os.environ["BAND_COORDINATOR_AGENT_ID"].strip(),
+                  "key": os.environ["BAND_COORDINATOR_API_KEY"].strip(),
+              },
+              "implementer": {
+                  "id": os.environ["BAND_IMPLEMENTER_AGENT_ID"].strip(),
+                  "key": os.environ["BAND_IMPLEMENTER_API_KEY"].strip(),
+              },
+              "reviewer": {
+                  "id": os.environ["BAND_REVIEWER_AGENT_ID"].strip(),
+                  "key": os.environ["BAND_REVIEWER_API_KEY"].strip(),
+              },
+          }
+
+          def band_request(agent, method, path, body=None, expected=(200, 201, 204)):
+              last = None
+              for base in BASES:
+                  cmd = [
+                      "curl", "--silent", "--show-error",
+                      "--user-agent", "BAND-Dark-Factory-2026-E2E/1.0",
+                      "--request", method,
+                      "--header", f"X-API-Key: {agent['key']}",
+                      "--header", "Accept: application/json",
+                  ]
+                  if body is not None:
+                      cmd += [
+                          "--header", "Content-Type: application/json",
+                          "--data", json.dumps(body),
+                      ]
+                  cmd += ["--write-out", "\n__HTTP__:%{http_code}", f"{base}{path}"]
+                  cp = subprocess.run(cmd, text=True, capture_output=True)
+                  if cp.returncode != 0 or "\n__HTTP__:" not in cp.stdout:
+                      last = cp.stderr[:500] or cp.stdout[:500]
+                      continue
+                  payload_text, code_text = cp.stdout.rsplit("\n__HTTP__:", 1)
+                  code = int(code_text.strip())
+                  if code in expected:
+                      if not payload_text.strip():
+                          return code, None
+                      try:
+                          return code, json.loads(payload_text)
+                      except json.JSONDecodeError:
+                          return code, payload_text
+                  last = f"{base} HTTP {code}: {payload_text[:800]}"
+                  if code not in (403, 404):
+                      break
+              raise RuntimeError(last or f"BAND {method} {path} failed")
+
+          def gh_json(args):
+              cp = subprocess.run(
+                  ["gh", "api", *args],
+                  text=True,
+                  capture_output=True,
+                  check=False,
+                  env=os.environ.copy(),
+              )
+              if cp.returncode != 0:
+                  raise RuntimeError(f"gh api failed: {cp.stderr[:1000]}")
+              return json.loads(cp.stdout)
+
+          def send_message(sender, chat_id, content, mentions):
+              body = {
+                  "message": {
+                      "content": content,
+                      "mentions": [
+                          {
+                              "id": a["id"],
+                              "name": a["name"],
+                              "handle": a["handle"],
+                          }
+                          for a in mentions
+                      ],
+                  }
+              }
+              _, payload = band_request(sender, "POST", f"/chats/{chat_id}/messages", body)
+              return str(((payload or {}).get("data") or {}).get("id") or "")
+
+          # Resolve exact BAND identities.
+          for role, agent in agents.items():
+              _, payload = band_request(agent, "GET", "/me")
+              data = (payload or {}).get("data") or {}
+              if str(data.get("id") or "") != agent["id"]:
+                  raise RuntimeError(f"{role}: BAND identity mismatch")
+              agent["name"] = data.get("name") or role.title()
+              agent["handle"] = data.get("handle") or ""
+              if not agent["handle"]:
+                  raise RuntimeError(f"{role}: BAND handle missing")
+
+          coord = agents["coordinator"]
+          impl = agents["implementer"]
+          reviewer = agents["reviewer"]
+
+          # Coordinator creates the room and adds peers.
+          _, created = band_request(coord, "POST", "/chats", {"chat": {}})
+          chat_id = str(((created or {}).get("data") or {}).get("id") or "")
+          if not chat_id:
+              raise RuntimeError("No BAND chat id returned")
+
+          for peer in (impl, reviewer):
+              band_request(
+                  coord,
+                  "POST",
+                  f"/chats/{chat_id}/participants",
+                  {"participant": {"participant_id": peer["id"], "role": "member"}},
+              )
+
+          # Refresh room identities so mention records match BAND canonical values.
+          _, payload = band_request(coord, "GET", f"/chats/{chat_id}/participants")
+          rows = (payload or {}).get("data") or []
+          by_id = {str(row.get("id") or ""): row for row in rows}
+          for agent in agents.values():
+              row = by_id.get(agent["id"])
+              if row:
+                  agent["name"] = row.get("name") or agent["name"]
+                  agent["handle"] = row.get("handle") or agent["handle"]
+
+          ticket = "E2E-TECHNICAL-REALITY-001"
+          coord_message_id = send_message(
+              coord,
+              chat_id,
+              (
+                  f"@{impl['handle']} {ticket}: use the approved Codex Cloud relay to modify only "
+                  f"{target_path}, add exact marker {marker}, and return the resulting GitHub head SHA. "
+                  f"No human steering is permitted after this handoff."
+              ),
+              [impl],
+          )
+          if not coord_message_id:
+              raise RuntimeError("Coordinator handoff has no message id")
+
+          # Implementer identity receives the BAND handoff.
+          received = None
+          for _ in range(20):
+              code, payload = band_request(
+                  impl, "GET", f"/chats/{chat_id}/messages/next", expected=(200, 204)
+              )
+              if code == 200 and payload:
+                  candidate = (payload or {}).get("data") or payload
+                  content = str(candidate.get("content") or "")
+                  cid = str(candidate.get("id") or "")
+                  if ticket in content:
+                      received = candidate
+                      break
+                  if cid:
+                      band_request(impl, "POST", f"/chats/{chat_id}/messages/{cid}/processing", {})
+                      band_request(impl, "POST", f"/chats/{chat_id}/messages/{cid}/processed", {})
+              time.sleep(1)
+          if not received:
+              raise RuntimeError("Implementer did not receive BAND handoff")
+
+          received_id = str(received.get("id") or "")
+          band_request(impl, "POST", f"/chats/{chat_id}/messages/{received_id}/processing", {})
+
+          # The Implementer runtime turns the BAND task into a bounded Codex task.
+          codex_prompt = f"""@codex Execute ticket {ticket} as a bounded Technical Reality probe.
+
+          Modify only `{target_path}`.
+          Add the exact line `{marker}` immediately below the "Expected result" paragraph.
+          Do not commit. Do not push. Do not modify any other file.
+
+          At the end:
+          1. run `git diff --binary -- {target_path} | base64 -w0`;
+          2. return the single-line base64 payload between these exact markers, with no code fence:
+
+          CODEX_PATCH_B64_BEGIN
+          <base64 payload>
+          CODEX_PATCH_B64_END
+
+          Do not perform any other project work."""
+          subprocess.run(
+              [
+                  "gh", "api", f"repos/{repo}/issues/{pr_number}/comments",
+                  "--method", "POST",
+                  "-f", f"body={codex_prompt}",
+              ],
+              check=True,
+              text=True,
+              capture_output=True,
+              env=os.environ.copy(),
+          )
+          band_request(impl, "POST", f"/chats/{chat_id}/messages/{received_id}/processed", {})
+
+          # Wait for the official Codex connector to return a relay patch.
+          codex_comment_id = None
+          for _ in range(90):
+              comments = gh_json([f"repos/{repo}/issues/{pr_number}/comments", "--paginate"])
+              matches = [
+                  row for row in comments
+                  if (row.get("user") or {}).get("login") == "chatgpt-codex-connector[bot]"
+                  and "CODEX_PATCH_B64_BEGIN" in str(row.get("body") or "")
+                  and "CODEX_PATCH_B64_END" in str(row.get("body") or "")
+              ]
+              if matches:
+                  codex_comment_id = int(matches[-1]["id"])
+                  break
+              time.sleep(5)
+          if not codex_comment_id:
+              raise RuntimeError("Codex connector did not return the bounded patch in time")
+
+          # Wait for the separate relay workflow to push a new exact PR head.
+          final_sha = None
+          for _ in range(60):
+              pr = gh_json([f"repos/{repo}/pulls/{pr_number}"])
+              candidate_sha = str((pr.get("head") or {}).get("sha") or "")
+              if candidate_sha and candidate_sha != initial_sha:
+                  final_sha = candidate_sha
+                  break
+              time.sleep(5)
+          if not final_sha:
+              raise RuntimeError("Relay did not update PR head in time")
+
+          # Verify the published branch contains the exact marker.
+          content = gh_json([
+              f"repos/{repo}/contents/{target_path}",
+              "-f", f"ref={head_ref}",
+          ])
+          raw = base64.b64decode(content["content"]).decode("utf-8")
+          if marker not in raw:
+              raise RuntimeError("Published candidate is missing the expected marker")
+
+          # Implementer records the exact runtime receipt back into BAND.
+          receipt_message_id = send_message(
+              impl,
+              chat_id,
+              (
+                  f"@{coord['handle']} @{reviewer['handle']} {ticket} COMPLETE: "
+                  f"Codex patch comment={codex_comment_id}; relay published head={final_sha}; "
+                  f"marker={marker}."
+              ),
+              [coord, reviewer],
+          )
+          if not receipt_message_id:
+              raise RuntimeError("BAND runtime receipt message missing id")
+
+          # Reviewer independently sees the receipt and acknowledges the exact SHA.
+          review_received = None
+          for _ in range(20):
+              code, payload = band_request(
+                  reviewer, "GET", f"/chats/{chat_id}/messages/next", expected=(200, 204)
+              )
+              if code == 200 and payload:
+                  candidate = (payload or {}).get("data") or payload
+                  content_text = str(candidate.get("content") or "")
+                  cid = str(candidate.get("id") or "")
+                  if ticket in content_text and final_sha in content_text:
+                      review_received = candidate
+                      break
+                  if cid:
+                      band_request(reviewer, "POST", f"/chats/{chat_id}/messages/{cid}/processing", {})
+                      band_request(reviewer, "POST", f"/chats/{chat_id}/messages/{cid}/processed", {})
+              time.sleep(1)
+          if not review_received:
+              raise RuntimeError("Reviewer did not receive exact runtime receipt")
+
+          review_id = str(review_received.get("id") or "")
+          band_request(reviewer, "POST", f"/chats/{chat_id}/messages/{review_id}/processing", {})
+          reviewer_ack_id = send_message(
+              reviewer,
+              chat_id,
+              f"@{coord['handle']} {ticket} REVIEW-ACK exact head={final_sha}.",
+              [coord],
+          )
+          band_request(reviewer, "POST", f"/chats/{chat_id}/messages/{review_id}/processed", {})
+          if not reviewer_ack_id:
+              raise RuntimeError("Reviewer acknowledgement missing id")
+
+          evidence = {
+              "status": "PROVEN",
+              "ticket": ticket,
+              "band_chat_id": chat_id,
+              "coordinator_handoff_message_id": coord_message_id,
+              "implementer_received_message_id": received_id,
+              "codex_patch_comment_id": codex_comment_id,
+              "initial_head_sha": initial_sha,
+              "final_head_sha": final_sha,
+              "target_path": target_path,
+              "expected_marker": marker,
+              "implementer_receipt_message_id": receipt_message_id,
+              "reviewer_ack_message_id": reviewer_ack_id,
+              "human_steering_after_initial_pr_trigger": False,
+          }
+          out = Path("artifacts/band-codex-e2e")
+          out.mkdir(parents=True, exist_ok=True)
+          (out / "evidence.json").write_text(json.dumps(evidence, indent=2), encoding="utf-8")
+          print(json.dumps(evidence, indent=2))
+          PY
+
+      - name: Upload end-to-end evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: band-codex-end-to-end
+          path: artifacts/band-codex-e2e/**
+          if-no-files-found: warn
