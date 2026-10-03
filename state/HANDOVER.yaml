@@ -54,7 +54,6 @@ next_gate:
     - shared_BAND_room_creation_and_membership
     - reciprocal_Coordinator_Implementer_at_handle_exchange
     - Reviewer_room_access
-  proven_now:
     - Codex_GitHub_trigger_and_cloud_task_execution
     - Codex_machine_readable_patch_generation
     - GitHub_Actions_relay_scope_validation
