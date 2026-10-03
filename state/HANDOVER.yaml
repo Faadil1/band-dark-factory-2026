@@ -55,6 +55,8 @@ next_gate:
     - reciprocal_Coordinator_Implementer_at_handle_exchange
     - Reviewer_room_access
   remaining_pass_conditions:
+    - Codex_Cloud_environment_CREATED_but_first_task_not_yet_proven
+    - GitHub_at_codex_to_Cloud_commit_path_PENDING_first_successful_task
     - remote_runtime_is_scoped_only_to_dedicated_repo_for_real_coding_execution
     - mandate_harness_and_model_fields_are_real_not_TBD
     - primary_official_clarification_on_Remote_Agent_vs_Band_Desktop_seat_identity_or_unambiguous_Desktop_fallback

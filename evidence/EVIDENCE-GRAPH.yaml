@@ -107,6 +107,19 @@ claims:
         - submitted_run_autonomy
 
 missing_edges:
+  - claim_id: CODEX_CLOUD_RUNTIME_BRIDGE
+    status: PARTIAL
+    observed:
+      github_at_codex_trigger: PROVEN
+      Codex_Cloud_environment_created: true
+      environment_repo: Faadil1/band-dark-factory-2026
+      environment_image: universal
+      environment_agent_internet_access: OFF
+      environment_post_setup_caching: ON
+      probe_pr: 7
+      probe_after_environment_creation: no_bot_response_or_commit_observed_within_initial_window
+    missing: first_successful_Codex_Cloud_task_and_GitHub_commit
+    expected_next_evidence: bounded_task_runs_then_Codex_pushes_requested_one_line_commit_to_probe_PR
   - claim_id: SUBMISSION_SEAT_IDENTITY_ELIGIBILITY
     status: UNKNOWN
     expected_next_evidence: organizer_primary_clarification_or_unambiguous_Band_Desktop_seat_run
