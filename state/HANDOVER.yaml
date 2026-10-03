@@ -7,8 +7,10 @@ current_stage: TECHNICAL_REALITY_CHECK
 
 read_order:
   - state/CURRENT.yaml
+  - state/HANDOVER.yaml
   - FACTORY.md
   - docs/PRD-POINTER.md
+  - evidence/EVIDENCE-GRAPH.yaml
   - mandates/coordinator.md
   - mandates/implementer.md
   - mandates/reviewer.md
@@ -22,8 +24,17 @@ current_truth:
   coordinator_remote_agent_created: true
   dedicated_repo_created: true
   local_workstation_execution: intentionally_avoided
-  remote_linux_harness: proven_in_central_control_plane
+  remote_linux_harness: proven_in_operational_repo
+  dedicated_repo_actions_preflight: proven
+  evidence_graph: active
   toy_factory: not_started
+
+runtime_evidence:
+  workflow_run_id: 37087966392
+  job_id: 111102055177
+  artifact_id: 11260918352
+  head_commit: d72d29811e3b7a11c3488cf3c8fc2cf75c2ac592
+  official_kickoff_sha: 803560d2a678ace1414465c098eb0ab5380ffade
 
 do_not_start:
   - real_Pocketful_stage_run
@@ -33,11 +44,11 @@ do_not_start:
 
 next_gate:
   name: TECHNICAL_REALITY_CHECK
-  pass_conditions:
-    - dedicated_repo_GitHub_Actions_preflight_passes
+  remaining_pass_conditions:
     - remote_Coordinator_connects_to_BAND
-    - remote_runtime_has_only_dedicated_repo_scope
+    - remote_runtime_is_scoped_only_to_dedicated_repo
     - Implementer_and_Reviewer_remote_agents_created
+    - mandate_harness_and_model_fields_are_real_not_TBD
     - at_least_two_owned_seats_exchange_reciprocal_at_handle_messages
   after_pass:
     - TOY_FACTORY_REHEARSAL
