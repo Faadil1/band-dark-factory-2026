@@ -51,19 +51,29 @@ technical_reality:
     cloud_environment_for_repo: CREATED
     environment_repo: Faadil1/band-dark-factory-2026
     environment_image: universal
-    environment_agent_internet_access: OFF
-    environment_post_setup_caching: ON
     codex_task_execution: PROVEN
     bounded_file_change: PROVEN
-    local_commit_creation: PROVEN
-    local_commit: 2f32ad3
-    github_publish_back: BLOCKED_REQUIRES_HUMAN_OR_SECURE_WRITE_CREDENTIAL
-    probe_pr: 7
-    diagnostic:
-      git_remote: NONE
-      gh_auth: NOT_AUTHENTICATED
-      checkout_branch: work
-      product_level_auto_publish: NOT_SUPPORTED_IN_CURRENT_INTEGRATION
+    direct_local_commit_creation: PROVEN
+    direct_local_commit: 2f32ad3
+    direct_git_push: BLOCKED
+    direct_push_reason: >-
+      Codex setup-only secrets are removed before the agent phase; direct task checkout authentication
+      did not persist safely to the agent's git push path.
+    safe_comment_relay:
+      status: PROVEN
+      probe_pr: 15
+      codex_patch_comment_id: 5971844042
+      workflow: Codex Cloud Comment Relay Probe
+      workflow_run_id: 37142043495
+      job_id: 111258329837
+      input_head_sha: 27193859ddde25e51603bf6470b111b496e517e5
+      output_head_sha: 6ad6b55fcd0e27982315af41a01da4936818b70e
+      merged_proof_sha: c0d177136b71e04c80c14184dd9d432674ed77e7
+      write_authority: GITHUB_ACTIONS_BUILT_IN_REPO_SCOPED_TOKEN
+      codex_receives_github_write_credential: false
+      interpretation: >-
+        Codex emits a bounded machine-readable patch in its GitHub bot comment.
+        GitHub Actions validates the patch scope, applies it, commits it, and pushes the PR branch autonomously.
   reciprocal_handle_messaging: PROVEN_PREFLIGHT
   rehearsal_room_id: 599c34c3-62d4-4a24-bb45-361d2fee8bf2
   submission_remote_seat_eligibility: UNKNOWN_OFFICIAL_CLARIFICATION_REQUIRED
@@ -81,6 +91,7 @@ conditional_gateway_registry:
   PROJECT_AUTHORIZED: PROVEN
   LIVING_PRD: PROVEN
   TECHNICAL_REALITY_CHECK: ACTIVE
+  CODEX_COMMENT_RELAY_WRITE_PATH: PROVEN
   TOY_FACTORY_REHEARSAL: BLOCKED_BY_TECHNICAL_REALITY_CHECK
   TRACK_LOCK: BLOCKED_BY_TOY_FACTORY_REHEARSAL
   REAL_TRACK_BUILD: BLOCKED_BY_TRACK_LOCK
@@ -100,8 +111,8 @@ evidence_graph:
 
 exact_next_gate: TECHNICAL_REALITY_CHECK
 exact_next_action: >-
-  Do not use the current Codex Cloud GitHub-mention path as the submitted Dark Factory coding runtime because
-  autonomous publication is not proven and currently requires human action. Evaluate the narrowest safe way to
-  supply repository-scoped GitHub write authority to the cloud coding runtime, or select another no-OpenAI-API-key
-  runtime that can commit/push autonomously. Codex Cloud remains valid for development support and bounded
-  reasoning tasks.
+  Use the proven Codex comment-relay write path as the candidate coding transport for the Toy rehearsal.
+  Next prove one end-to-end seat turn in which a BAND remote seat causes a bounded Codex task, receives/records
+  the resulting evidence in BAND, and the relay publishes the exact candidate without human steering.
+  Then record real Harness/Model values in all three generic mandates. Keep Remote Agent versus required
+  Band Desktop seat eligibility as a separate UNKNOWN official gate.
