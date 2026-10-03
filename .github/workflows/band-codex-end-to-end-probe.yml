@@ -241,17 +241,23 @@ jobs:
           CODEX_PATCH_B64_END
 
           Do not perform any other project work."""
-          subprocess.run(
+          post = subprocess.run(
               [
                   "gh", "api", f"repos/{repo}/issues/{pr_number}/comments",
                   "--method", "POST",
-                  "-f", f"body={codex_prompt}",
+                  "--input", "-",
               ],
-              check=True,
+              input=json.dumps({"body": codex_prompt}),
+              check=False,
               text=True,
               capture_output=True,
               env=os.environ.copy(),
           )
+          if post.returncode != 0:
+              raise RuntimeError(
+                  "Implementer GitHub comment dispatch failed: "
+                  + (post.stderr[:1500] or post.stdout[:1500])
+              )
           band_request(impl, "POST", f"/chats/{chat_id}/messages/{received_id}/processed", {})
 
           # Wait for the official Codex connector to return a relay patch.
