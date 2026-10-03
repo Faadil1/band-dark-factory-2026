@@ -1,0 +1,115 @@
+name: Codex Cloud Comment Relay Probe
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  apply-patch:
+    if: >-
+      github.event.issue.pull_request &&
+      github.event.comment.user.login == 'chatgpt-codex-connector[bot]' &&
+      contains(github.event.comment.body, 'CODEX_PATCH_B64_BEGIN') &&
+      contains(github.event.comment.body, 'CODEX_PATCH_B64_END')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      EXPECTED_PATH: evidence/codex-cloud-comment-relay-probe.md
+
+    steps:
+      - name: Resolve pull request head
+        id: pr
+        shell: bash
+        run: |
+          set -euo pipefail
+          PR_NUMBER='${{ github.event.issue.number }}'
+          REPO='${{ github.repository }}'
+          JSON="$(gh api "repos/$REPO/pulls/$PR_NUMBER")"
+          HEAD_REPO="$(jq -r '.head.repo.full_name' <<<"$JSON")"
+          HEAD_REF="$(jq -r '.head.ref' <<<"$JSON")"
+          HEAD_SHA="$(jq -r '.head.sha' <<<"$JSON")"
+
+          if [ "$HEAD_REPO" != "$REPO" ]; then
+            echo "Refusing relay for fork PR."
+            exit 1
+          fi
+
+          echo "head_ref=$HEAD_REF" >> "$GITHUB_OUTPUT"
+          echo "head_sha=$HEAD_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout exact PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.pr.outputs.head_ref }}
+          fetch-depth: 0
+
+      - name: Extract Codex patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import base64, json, os, re
+          event = json.load(open(os.environ["GITHUB_EVENT_PATH"], encoding="utf-8"))
+          body = event["comment"]["body"]
+          m = re.search(
+              r"CODEX_PATCH_B64_BEGIN\s*([A-Za-z0-9+/=\r\n]+?)\s*CODEX_PATCH_B64_END",
+              body,
+              flags=re.S,
+          )
+          if not m:
+              raise SystemExit("Patch markers not found")
+          payload = re.sub(r"\s+", "", m.group(1))
+          patch = base64.b64decode(payload, validate=True)
+          if not patch.strip():
+              raise SystemExit("Decoded patch is empty")
+          open("/tmp/codex.patch", "wb").write(patch)
+          print(f"decoded_patch_bytes={len(patch)}")
+          PY
+
+      - name: Enforce probe scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          patch = Path("/tmp/codex.patch").read_text(encoding="utf-8", errors="strict")
+          paths = set()
+          for line in patch.splitlines():
+              if line.startswith("+++ b/"):
+                  paths.add(line[6:])
+              elif line.startswith("--- a/"):
+                  paths.add(line[6:])
+          expected = {"evidence/codex-cloud-comment-relay-probe.md"}
+          if paths != expected:
+              raise SystemExit(f"Patch scope mismatch: {sorted(paths)}")
+          print("Patch scope OK.")
+          PY
+
+      - name: Apply and verify patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git apply --check /tmp/codex.patch
+          git apply /tmp/codex.patch
+          git diff --check
+
+          CHANGED="$(git diff --name-only)"
+          test "$CHANGED" = "$EXPECTED_PATH"
+
+      - name: Commit and push exact candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "BAND Codex Relay"
+          git config user.email "band-codex-relay@users.noreply.github.com"
+          git add "$EXPECTED_PATH"
+          git commit -m "test: prove Codex Cloud comment relay"
+          git push origin "HEAD:${{ steps.pr.outputs.head_ref }}"
+
+          echo "CODEX_COMMENT_RELAY_AUTONOMOUS_PUSH=PROVEN"
