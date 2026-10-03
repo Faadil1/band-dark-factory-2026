@@ -53,9 +53,17 @@ technical_reality:
     environment_image: universal
     environment_agent_internet_access: OFF
     environment_post_setup_caching: ON
-    codex_task_execution: PENDING_FIRST_SUCCESSFUL_TASK
+    codex_task_execution: PROVEN
+    bounded_file_change: PROVEN
+    local_commit_creation: PROVEN
+    local_commit: 2f32ad3
+    github_publish_back: BLOCKED_REQUIRES_HUMAN_OR_SECURE_WRITE_CREDENTIAL
     probe_pr: 7
-    latest_probe_result: no_bot_response_or_commit_after_environment_creation
+    diagnostic:
+      git_remote: NONE
+      gh_auth: NOT_AUTHENTICATED
+      checkout_branch: work
+      product_level_auto_publish: NOT_SUPPORTED_IN_CURRENT_INTEGRATION
   reciprocal_handle_messaging: PROVEN_PREFLIGHT
   rehearsal_room_id: 599c34c3-62d4-4a24-bb45-361d2fee8bf2
   submission_remote_seat_eligibility: UNKNOWN_OFFICIAL_CLARIFICATION_REQUIRED
@@ -92,7 +100,8 @@ evidence_graph:
 
 exact_next_gate: TECHNICAL_REALITY_CHECK
 exact_next_action: >-
-  Initialize the newly created Codex Cloud environment with one bounded first task from the environment's Use this
-  flow, then re-trigger PR #7 with @codex and verify that Codex Cloud pushes the requested one-line commit without
-  an OpenAI API key. If the GitHub-triggered task still does not start, classify the direct @codex bridge as BLOCKED
-  for this account and use Codex Cloud manually only for non-submitted development support.
+  Do not use the current Codex Cloud GitHub-mention path as the submitted Dark Factory coding runtime because
+  autonomous publication is not proven and currently requires human action. Evaluate the narrowest safe way to
+  supply repository-scoped GitHub write authority to the cloud coding runtime, or select another no-OpenAI-API-key
+  runtime that can commit/push autonomously. Codex Cloud remains valid for development support and bounded
+  reasoning tasks.
