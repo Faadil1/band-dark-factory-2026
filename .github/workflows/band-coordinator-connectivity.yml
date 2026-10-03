@@ -56,23 +56,29 @@ jobs:
               headers={"X-API-Key": api_key, "Accept": "application/json"},
               method="GET",
           )
+          rest_ok = False
+          rest_error = None
           try:
               with urllib.request.urlopen(request, timeout=20) as response:
                   payload = json.loads(response.read().decode("utf-8"))
                   status = response.status
+              data = payload.get("data") or {}
+              returned_id = str(data.get("id") or "")
+              if status == 200 and returned_id == agent_id:
+                  safe_name = data.get("name") or "unknown"
+                  safe_handle = data.get("handle") or "unknown"
+                  print(f"REST identity OK: name={safe_name!r}, handle={safe_handle!r}")
+                  rest_ok = True
+              elif status == 200:
+                  rest_error = "HTTP 200 returned a different agent id"
           except urllib.error.HTTPError as exc:
-              raise SystemExit(f"REST identity probe failed with HTTP {exc.code}") from exc
+              body = exc.read().decode("utf-8", errors="replace")[:1000]
+              rest_error = f"HTTP {exc.code}: {body}"
+          except Exception as exc:
+              rest_error = f"{type(exc).__name__}: {exc}"
 
-          data = payload.get("data") or {}
-          returned_id = str(data.get("id") or "")
-          if status != 200:
-              raise SystemExit(f"REST identity probe returned unexpected HTTP {status}")
-          if returned_id != agent_id:
-              raise SystemExit("REST identity probe succeeded but returned a different agent id")
-
-          safe_name = data.get("name") or "unknown"
-          safe_handle = data.get("handle") or "unknown"
-          print(f"REST identity OK: name={safe_name!r}, handle={safe_handle!r}")
+          if not rest_ok:
+              print(f"REST identity diagnostic: {rest_error}")
 
           async def websocket_probe():
               # Do not print this URL: it contains the API key.
@@ -138,5 +144,7 @@ jobs:
                   print("Phoenix heartbeat OK.")
 
           asyncio.run(websocket_probe())
+          if not rest_ok:
+              raise SystemExit("WebSocket path was tested, but REST identity validation is still failing")
           print("BAND Coordinator remote connectivity: PROVEN")
           PY
