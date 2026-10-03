@@ -1,0 +1,26 @@
+version: 0.1.0
+project_id: band_dark_factory_wearedevelopers_2026
+claim_id: TR_BAND_DESKTOP_VERSION_001
+date: 2026-10-03
+status: COMPLETE
+proof_class: TECHNICAL_PROOF
+
+claim: >-
+  The user's installed Band Desktop satisfies the challenge requirement of Band Desktop 0.4.10 or newer.
+
+observed:
+  source: user-provided Band Desktop Settings > General screenshot
+  app_version: v0.4.12
+  daemon_version: v0.4.12
+  cli_version: v0.4.12
+  official_minimum_version: v0.4.10
+  result: PASS
+
+truth_boundary:
+  proves:
+    - Band_Desktop_app_version_requirement
+    - Band_daemon_and_cli_are_also_v0_4_12
+  does_not_prove:
+    - three_distinct_Band_Desktop_seat_identities
+    - Remote_Agent_equivalence_to_Band_Desktop_seat_identity
+    - autonomous_Toy_Factory
