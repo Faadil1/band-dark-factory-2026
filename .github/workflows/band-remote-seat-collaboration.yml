@@ -80,7 +80,7 @@ jobs:
         run: |
           set -euo pipefail
           OUT="$RUNNER_TEMP/band/create-room.json"
-          CODE="$(curl --silent --show-error             --user-agent "BAND-Dark-Factory-2026-GitHub-Actions/1.0"             --output "$OUT" --write-out "%{http_code}"             -X POST             -H "X-API-Key: $BAND_COORDINATOR_API_KEY"             -H "Accept: application/json"             -H "Content-Type: application/json"             -d '{}'             "https://app.band.ai/api/v1/agent/chats")"
+          CODE="$(curl --silent --show-error             --user-agent "BAND-Dark-Factory-2026-GitHub-Actions/1.0"             --output "$OUT" --write-out "%{http_code}"             -X POST             -H "X-API-Key: $BAND_COORDINATOR_API_KEY"             -H "Accept: application/json"             -H "Content-Type: application/json"             -d '{"chat":{}}'             "https://app.band.ai/api/v1/agent/chats")"
 
           if [ "$CODE" != "200" ] && [ "$CODE" != "201" ]; then
             echo "Create room failed with HTTP $CODE"
