@@ -107,6 +107,14 @@ claims:
         - submitted_run_autonomy
 
 missing_edges:
+  - claim_id: CODEX_CLOUD_RUNTIME_BRIDGE
+    status: PARTIAL
+    observed:
+      github_at_codex_trigger: PROVEN
+      bot_response: create_environment_for_this_repo
+      probe_pr: 7
+    missing: Codex_Cloud_environment_for_Faadil1_band_dark_factory_2026
+    expected_next_evidence: Codex_bot_reacts_then_pushes_bounded_commit_to_probe_PR
   - claim_id: SUBMISSION_SEAT_IDENTITY_ELIGIBILITY
     status: UNKNOWN
     expected_next_evidence: organizer_primary_clarification_or_unambiguous_Band_Desktop_seat_run
