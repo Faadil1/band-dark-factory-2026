@@ -54,13 +54,16 @@ The stage task/spec provides domain content.
 ## Current evidence boundary
 
 Proven:
-- remote Ubuntu runner can execute the official isolated harness;
-- untouched Toy scaffold reproduces the documented 2/8 baseline.
+- the dedicated repo's Ubuntu runner executes the official isolated harness;
+- untouched Toy scaffold reproduces the documented 2/8 baseline;
+- Coordinator, Implementer and Reviewer each authenticate over BAND REST + WebSocket from GitHub Actions;
+- all three can participate in one BAND room;
+- Coordinator and Implementer completed a reciprocal explicit @handle exchange;
+- Reviewer can access the same room.
 
 Not yet proven:
-- this repo's Actions workflow;
-- remote BAND agent connectivity;
-- reciprocal seat messaging;
+- actual coding-agent harness/model runtime for the three seats;
+- whether web-created Remote Agents satisfy the challenge's explicit "Band Desktop seat identities" wording;
 - autonomous Toy Factory;
 - real-track stage conformance;
 - hidden tests.
