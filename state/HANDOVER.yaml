@@ -54,8 +54,12 @@ next_gate:
     - shared_BAND_room_creation_and_membership
     - reciprocal_Coordinator_Implementer_at_handle_exchange
     - Reviewer_room_access
+    - Codex_GitHub_trigger_and_cloud_task_execution
+    - Codex_machine_readable_patch_generation
+    - GitHub_Actions_relay_scope_validation
+    - GitHub_Actions_autonomous_commit_and_push_without_Codex_write_credential
   remaining_pass_conditions:
-    - autonomous_cloud_coding_runtime_can_write_and_publish_to_dedicated_repo_without_human_intervention
+    - end_to_end_BAND_seat_to_Codex_relay_to_BAND_evidence_turn
     - remote_runtime_is_scoped_only_to_dedicated_repo_for_real_coding_execution
     - mandate_harness_and_model_fields_are_real_not_TBD
     - primary_official_clarification_on_Remote_Agent_vs_Band_Desktop_seat_identity_or_unambiguous_Desktop_fallback

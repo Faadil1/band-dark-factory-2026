@@ -108,24 +108,13 @@ claims:
 
 missing_edges:
   - claim_id: CODEX_CLOUD_RUNTIME_BRIDGE
-    status: PARTIAL
-    observed:
-      github_at_codex_trigger: PROVEN
-      Codex_Cloud_environment_created: true
-      environment_repo: Faadil1/band-dark-factory-2026
-      environment_image: universal
-      bounded_task_execution: PROVEN
-      bounded_change_created: PROVEN
-      local_commit_created: PROVEN
-      local_commit: 2f32ad3
-      push_to_GitHub: BLOCKED
-      diagnostic_git_remote: NONE
-      diagnostic_gh_auth: NOT_AUTHENTICATED
-      product_level_auto_publish: NOT_SUPPORTED_IN_CURRENT_INTEGRATION
-      bot_confirmation: human_action_required_to_publish
-      probe_pr: 7
-    missing: autonomous_publish_back_to_GitHub
-    expected_next_evidence: secure_repo_scoped_write_runtime_pushes_exact_candidate_without_human_action
+    status: COMPLETE_VIA_SAFE_COMMENT_RELAY
+    evidence: evidence/TR-CODEX-COMMENT-RELAY-001.yaml
+    direct_git_push_path: BLOCKED_RETAINED_AS_HISTORY
+    autonomous_publish_back_to_GitHub: PROVEN_VIA_GITHUB_ACTIONS_RELAY
+  - claim_id: BAND_TO_CODEX_END_TO_END
+    status: MISSING
+    expected_next_evidence: BAND_seat_task_to_Codex_patch_to_relay_commit_to_BAND_receipt
   - claim_id: SUBMISSION_SEAT_IDENTITY_ELIGIBILITY
     status: UNKNOWN
     expected_next_evidence: organizer_primary_clarification_or_unambiguous_Band_Desktop_seat_run
