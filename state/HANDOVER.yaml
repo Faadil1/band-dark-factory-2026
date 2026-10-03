@@ -60,10 +60,9 @@ next_gate:
     - GitHub_Actions_autonomous_commit_and_push_without_Codex_write_credential
     - BAND_remote_seat_to_Codex_relay_to_BAND_round_trip
     - repo_scoped_remote_coding_execution
-  proven_now:
     - mandate_harness_and_model_fields_are_real_not_TBD
+    - BAND_Desktop_v0_4_12_meets_v0_4_10_plus_requirement
   remaining_pass_conditions:
-    - BAND_Desktop_version_requirement_verified
     - primary_official_clarification_on_Remote_Agent_vs_Band_Desktop_seat_identity_or_unambiguous_Desktop_fallback
   after_pass:
     - TOY_FACTORY_REHEARSAL

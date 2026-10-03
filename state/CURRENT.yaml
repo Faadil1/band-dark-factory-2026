@@ -88,6 +88,13 @@ technical_reality:
     artifact_digest: sha256:a2c29c222206cf25e7531b3830e3dc365b528aca797ba32a8cf69c580aeadcf4
     human_steering_after_initial_pr_open: false
   rehearsal_room_id: 599c34c3-62d4-4a24-bb45-361d2fee8bf2
+  band_desktop_version:
+    status: PROVEN
+    app: v0.4.12
+    daemon: v0.4.12
+    cli: v0.4.12
+    official_minimum: v0.4.10
+    evidence: evidence/TR-BAND-DESKTOP-VERSION-001.yaml
   submission_remote_seat_eligibility: UNKNOWN_OFFICIAL_CLARIFICATION_REQUIRED
 
 factory:
@@ -101,8 +108,8 @@ factory:
   model_value: OpenAI Codex Cloud default model managed by ChatGPT plan; exact internal model ID not exposed by GitHub-triggered task
   mandate_runtime_values: PROVEN_FROM_PREFLIGHT
   submission_readiness_note: >-
-    Runtime fields are truthful and non-TBD. Final submission eligibility still depends on the official
-    Band Desktop seat-identity gate and Desktop version verification.
+    Runtime fields are truthful and non-TBD, and Band Desktop v0.4.12 satisfies the version requirement.
+    Final submission eligibility still depends on the official Band Desktop seat-identity gate.
 
 conditional_gateway_registry:
   PROJECT_AUTHORIZED: PROVEN
@@ -117,6 +124,7 @@ conditional_gateway_registry:
   RUNTIME_COMMIT_BINDING: ACTIVE
   BAND_THREE_SEAT_CONNECTIVITY: PROVEN_PREFLIGHT
   RECIPROCAL_HANDLE_MESSAGING: PROVEN_PREFLIGHT
+  BAND_DESKTOP_VERSION_REQUIREMENT: PROVEN
   SUBMISSION_SEAT_IDENTITY_ELIGIBILITY: UNKNOWN
   JUDGE_PERFORMANCE_ASSURANCE: BLOCKED_BY_BUILD_CANDIDATE
   SUBMISSION_INTEGRITY: BLOCKED_BY_BUILD_CANDIDATE
@@ -129,7 +137,7 @@ evidence_graph:
 
 exact_next_gate: TECHNICAL_REALITY_CHECK
 exact_next_action: >-
-  Harness/Model values are now truthfully recorded in all three generic mandates from the proven preflight runtime.
-  Next verify the installed BAND Desktop version meets the official requirement and resolve the Remote Agent
-  versus required Band Desktop seat-identity gate via primary organizer clarification or an unambiguous Desktop
-  fallback. After those pass, promote TECHNICAL_REALITY_CHECK and start the Toy Factory rehearsal.
+  Band Desktop v0.4.12 satisfies the official v0.4.10+ requirement, and Harness/Model values are truthfully
+  recorded in all three mandates. The only remaining Technical Reality blocker is the official requirement for
+  three distinct Band Desktop seat identities. Create and prove three Desktop seats (or obtain primary organizer
+  clarification that the existing External Remote Agents count) before promoting Technical Reality to Toy Factory.

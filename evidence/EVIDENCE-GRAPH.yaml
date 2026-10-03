@@ -115,16 +115,18 @@ missing_edges:
   - claim_id: BAND_TO_CODEX_END_TO_END
     status: COMPLETE
     evidence: evidence/TR-BAND-CODEX-E2E-001.yaml
+  - claim_id: BAND_DESKTOP_VERSION_REQUIREMENT
+    status: COMPLETE
+    evidence: evidence/TR-BAND-DESKTOP-VERSION-001.yaml
   - claim_id: SUBMISSION_SEAT_IDENTITY_ELIGIBILITY
     status: UNKNOWN
     expected_next_evidence: organizer_primary_clarification_or_unambiguous_Band_Desktop_seat_run
   - claim_id: CODING_AGENT_RUNTIME
-    status: PARTIAL
+    status: COMPLETE_FOR_PREFLIGHT
     observed:
       repo_scoped_execution: PROVEN
       BAND_to_Codex_transport: PROVEN
-      exact_harness_and_model_values_in_mandates: MISSING
-    expected_next_evidence: updated_generic_mandates_with_real_harness_model_values
+      exact_harness_and_model_values_in_mandates: PROVEN
   - claim_id: AUTONOMOUS_TOY_FACTORY
     status: MISSING
     expected_next_evidence: full_Toy_run_room_export_commits_and_harness
