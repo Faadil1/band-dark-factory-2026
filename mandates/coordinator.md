@@ -1,9 +1,9 @@
 # Coordinator mandate
 
-Status: TEMPLATE_NOT_SUBMISSION_READY
+Status: PREFLIGHT_RUNTIME_CONFIGURED
 
-Harness: TBD_REMOTE_RUNTIME
-Model: TBD
+Harness: BAND Remote Agent + Codex Cloud via GitHub comment relay + GitHub Actions safe publisher
+Model: OpenAI Codex Cloud default model (managed by ChatGPT plan; exact internal model ID not exposed by the GitHub-triggered task)
 
 ## Mission
 

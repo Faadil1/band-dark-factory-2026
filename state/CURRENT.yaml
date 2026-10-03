@@ -96,8 +96,13 @@ factory:
     - coordinator
     - implementer
     - reviewer
-  standing_mandates: TEMPLATE_NOT_SUBMISSION_READY
-  reason: actual_coding_harness_and_model_values_are_still_TBD
+  standing_mandates: PREFLIGHT_RUNTIME_CONFIGURED
+  harness_value: BAND Remote Agent + Codex Cloud via GitHub comment relay + GitHub Actions safe publisher
+  model_value: OpenAI Codex Cloud default model managed by ChatGPT plan; exact internal model ID not exposed by GitHub-triggered task
+  mandate_runtime_values: PROVEN_FROM_PREFLIGHT
+  submission_readiness_note: >-
+    Runtime fields are truthful and non-TBD. Final submission eligibility still depends on the official
+    Band Desktop seat-identity gate and Desktop version verification.
 
 conditional_gateway_registry:
   PROJECT_AUTHORIZED: PROVEN
@@ -124,7 +129,7 @@ evidence_graph:
 
 exact_next_gate: TECHNICAL_REALITY_CHECK
 exact_next_action: >-
-  The BAND -> Codex -> safe relay -> BAND round trip is PROVEN without human steering after the initial PR open.
-  Next record real Harness/Model values in all three generic mandates, verify the required BAND Desktop version,
-  and resolve the Remote Agent versus required Band Desktop seat-identity official gate. After those pass,
-  promote TECHNICAL_REALITY_CHECK and start the Toy Factory rehearsal.
+  Harness/Model values are now truthfully recorded in all three generic mandates from the proven preflight runtime.
+  Next verify the installed BAND Desktop version meets the official requirement and resolve the Remote Agent
+  versus required Band Desktop seat-identity gate via primary organizer clarification or an unambiguous Desktop
+  fallback. After those pass, promote TECHNICAL_REALITY_CHECK and start the Toy Factory rehearsal.
