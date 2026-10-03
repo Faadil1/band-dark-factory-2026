@@ -1,0 +1,44 @@
+version: 0.1.0
+project_id: band_dark_factory_wearedevelopers_2026
+date: 2026-10-02
+status: ACTIVE
+current_owner: PBPD
+current_stage: TECHNICAL_REALITY_CHECK
+
+read_order:
+  - state/CURRENT.yaml
+  - FACTORY.md
+  - docs/PRD-POINTER.md
+  - mandates/coordinator.md
+  - mandates/implementer.md
+  - mandates/reviewer.md
+
+last_proven_gate: PRD_READY
+
+current_truth:
+  project_authorized: true
+  pocketful_recommended: true
+  pocketful_locked: false
+  coordinator_remote_agent_created: true
+  dedicated_repo_created: true
+  local_workstation_execution: intentionally_avoided
+  remote_linux_harness: proven_in_central_control_plane
+  toy_factory: not_started
+
+do_not_start:
+  - real_Pocketful_stage_run
+  - human_steered_dark_factory_run
+  - track_specific_mandate_changes
+  - external_runtime_integrations_that_violate_no_outbound_rule
+
+next_gate:
+  name: TECHNICAL_REALITY_CHECK
+  pass_conditions:
+    - dedicated_repo_GitHub_Actions_preflight_passes
+    - remote_Coordinator_connects_to_BAND
+    - remote_runtime_has_only_dedicated_repo_scope
+    - Implementer_and_Reviewer_remote_agents_created
+    - at_least_two_owned_seats_exchange_reciprocal_at_handle_messages
+  after_pass:
+    - TOY_FACTORY_REHEARSAL
+    - TRACK_LOCK
