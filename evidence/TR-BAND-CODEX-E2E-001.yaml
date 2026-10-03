@@ -1,0 +1,71 @@
+version: 0.1.0
+project_id: band_dark_factory_wearedevelopers_2026
+claim_id: TR_BAND_CODEX_E2E_001
+date: 2026-10-03
+status: COMPLETE
+proof_class: TECHNICAL_PROOF
+
+claim: >-
+  A BAND remote seat can receive a bounded task, cause a Codex Cloud task through the GitHub bridge,
+  have GitHub Actions validate/commit/push the exact candidate, and record the resulting runtime receipt
+  back into BAND without human steering after the initial pull-request start action.
+
+scenario:
+  pull_request: 24
+  branch: test/band-codex-e2e-turn-v3
+  initial_head_sha: 45782a23776527fb8d856b307a8d016d0e50850e
+  output_head_sha: f77935b6080fa2de4d6df125c8d6d5d7464e496f
+  band_room_id: 599c34c3-62d4-4a24-bb45-361d2fee8bf2
+
+trigger:
+  workflow: BAND to Codex E2E Trigger
+  workflow_run_id: 37148593734
+  job_id: 111277530857
+  result: success
+  proven_steps:
+    - Coordinator_dispatches_bounded_task_in_BAND
+    - Implementer_observes_BAND_task
+    - Implementer_dispatches_Codex_task_through_GitHub
+
+codex:
+  bot_comment_id: 5972801989
+  bounded_patch: PASS
+  target_path: evidence/band-codex-e2e-turn-v3.md
+  expected_marker: BAND_CODEX_E2E_V3=PROVEN
+
+relay:
+  workflow: BAND Codex E2E Relay
+  workflow_run_id: 37148720903
+  job_id: 111277902855
+  conclusion: success
+  proven_steps:
+    - patch_scope_validation
+    - git_apply_check
+    - exact_candidate_commit
+    - exact_branch_push
+    - Implementer_receipt_posted_to_BAND
+    - Coordinator_full_round_trip_verification
+
+receipt:
+  artifact_id: 11282198522
+  artifact_name: band-codex-e2e-v3
+  artifact_digest: sha256:a2c29c222206cf25e7531b3830e3dc365b528aca797ba32a8cf69c580aeadcf4
+  artifact_contains_runtime_receipt: true
+
+human_intervention:
+  initial_action: open_probe_pull_request
+  steering_after_initial_action: false
+
+truth_boundary:
+  proves:
+    - BAND_remote_seat_to_Codex_trigger
+    - Codex_machine_readable_patch
+    - autonomous_GitHub_Actions_commit_and_push
+    - Implementer_runtime_receipt_back_in_BAND
+    - Coordinator_round_trip_observation
+    - repo_scoped_execution
+  does_not_prove:
+    - autonomous_Toy_Factory
+    - Remote_Agent_equivalence_to_required_Band_Desktop_seat_identity
+    - exact_submission_model_name_for_each_seat
+    - Pocketful_stage_conformance
