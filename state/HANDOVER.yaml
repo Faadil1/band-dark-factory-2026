@@ -55,6 +55,8 @@ next_gate:
     - reciprocal_Coordinator_Implementer_at_handle_exchange
     - Reviewer_room_access
   remaining_pass_conditions:
+    - Codex_Cloud_environment_for_dedicated_repo_MISSING
+    - GitHub_at_codex_to_Cloud_commit_path_BLOCKED_BY_MISSING_ENVIRONMENT
     - remote_runtime_is_scoped_only_to_dedicated_repo_for_real_coding_execution
     - mandate_harness_and_model_fields_are_real_not_TBD
     - primary_official_clarification_on_Remote_Agent_vs_Band_Desktop_seat_identity_or_unambiguous_Desktop_fallback
