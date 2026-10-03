@@ -1,0 +1,86 @@
+version: 0.1.0
+project_id: band_dark_factory_wearedevelopers_2026
+date: 2026-10-03
+claim_id: TR_BAND_THREE_SEAT_001
+status: COMPLETE
+proof_class: TECHNICAL_PROOF
+
+claim: >-
+  Three distinct BAND remote-agent identities owned by the project can authenticate from the
+  dedicated GitHub Actions runtime, join their BAND agent channels, participate in one shared
+  BAND room, and exchange an explicit reciprocal @handle handoff between two seats.
+
+runtime_execution:
+  repository: Faadil1/band-dark-factory-2026
+  platform: GitHub Actions
+  workflow: BAND Three-Seat Preflight
+  workflow_run_id: 37123547256
+  job_id: 111204236054
+  head_sha: 13a7ed7679bbbab56f70da01ce2342b2cd6242ef
+  runner: ubuntu-24.04
+  llm_invoked: false
+  product_code_started: false
+
+agents:
+  coordinator:
+    handle: "@bfaadil/coordinator"
+    rest_identity: PASS
+    websocket_agent_rooms: PASS
+    phoenix_heartbeat: PASS
+  implementer:
+    handle: "@bfaadil/implementer"
+    rest_identity: PASS
+    websocket_agent_rooms: PASS
+    phoenix_heartbeat: PASS
+  reviewer:
+    handle: "@bfaadil/reviewer"
+    rest_identity: PASS
+    websocket_agent_rooms: PASS
+    phoenix_heartbeat: PASS
+
+band_room:
+  chat_id: 599c34c3-62d4-4a24-bb45-361d2fee8bf2
+  implementer_added: PASS
+  reviewer_added: PASS
+  reviewer_room_access: PASS
+
+reciprocal_handoff:
+  coordinator_to_implementer:
+    status: PASS
+    message_id: 3440b207-d534-4c8e-af48-ca0b708e90fb
+  implementer_to_coordinator:
+    status: PASS
+    message_id: 9ef292a0-76cb-46cb-b166-700deb34331b
+  interpretation: >-
+    This proves the BAND communication mechanism and an actual reciprocal @handle exchange.
+    It is a Technical Reality preflight, not evidence that the submitted dark-factory run has
+    already satisfied the competition's teamwork gate.
+
+receipt:
+  artifact_id: 11273483465
+  artifact_name: band-three-seat-preflight
+  artifact_digest: sha256:ab0394b5c639ef2f87ac10a0af37291ec13343dd0d767b446920d58be9e63631
+  expires_at: 2027-01-01T12:38:55Z
+
+truth_boundary:
+  proves:
+    - three_remote_agent_credentials_are_valid
+    - REST_agent_identity_path_works_from_GitHub_Actions
+    - WebSocket_agent_rooms_and_heartbeat_work_for_all_three
+    - Coordinator_can_create_a_BAND_room
+    - Coordinator_can_add_Implementer_and_Reviewer
+    - directed_at_handle_message_delivery_works
+    - reciprocal_at_handle_reply_works
+    - Reviewer_can_access_the_room
+  does_not_prove:
+    - Remote_Agents_satisfy_the_challenge_wording_Band_Desktop_seat_identity
+    - any_seat_has_a_real_coding_model_or_harness_configured
+    - autonomous_Toy_Factory_completion
+    - submitted_run_autonomy
+    - Pocketful_stage_conformance
+    - hidden_test_success
+
+remaining_gate_requirements:
+  - select_and_prove_real_coding_runtime_and_model_for_each_seat
+  - update_generic_mandates_with_real_harness_and_model_values
+  - obtain_primary_official_clarification_or_use_unambiguous_Band_Desktop_seats_for_final_submission
