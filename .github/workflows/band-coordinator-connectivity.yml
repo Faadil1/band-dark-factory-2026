@@ -1,0 +1,142 @@
+name: BAND Coordinator Connectivity
+
+on:
+  pull_request:
+    paths:
+      - "state/REMOTE-AGENT-CONNECTIVITY-TRIGGER.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      BAND_AGENT_ID: ${{ secrets.BAND_COORDINATOR_AGENT_ID }}
+      BAND_API_KEY: ${{ secrets.BAND_COORDINATOR_API_KEY }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install WebSocket client
+        run: python -m pip install "websockets==15.0.1"
+
+      - name: Validate required secrets are present
+        shell: bash
+        run: |
+          test -n "$BAND_AGENT_ID"
+          test -n "$BAND_API_KEY"
+          echo "BAND Coordinator credentials are present."
+
+      - name: Probe BAND REST identity and WebSocket channel
+        shell: bash
+        run: |
+          python - <<'PY'
+          import asyncio
+          import json
+          import os
+          import urllib.request
+          import urllib.error
+          import websockets
+
+          agent_id = os.environ["BAND_AGENT_ID"].strip()
+          api_key = os.environ["BAND_API_KEY"].strip()
+
+          # REST identity validation.
+          request = urllib.request.Request(
+              "https://app.band.ai/api/v1/agent/me",
+              headers={"X-API-Key": api_key, "Accept": "application/json"},
+              method="GET",
+          )
+          try:
+              with urllib.request.urlopen(request, timeout=20) as response:
+                  payload = json.loads(response.read().decode("utf-8"))
+                  status = response.status
+          except urllib.error.HTTPError as exc:
+              raise SystemExit(f"REST identity probe failed with HTTP {exc.code}") from exc
+
+          data = payload.get("data") or {}
+          returned_id = str(data.get("id") or "")
+          if status != 200:
+              raise SystemExit(f"REST identity probe returned unexpected HTTP {status}")
+          if returned_id != agent_id:
+              raise SystemExit("REST identity probe succeeded but returned a different agent id")
+
+          safe_name = data.get("name") or "unknown"
+          safe_handle = data.get("handle") or "unknown"
+          print(f"REST identity OK: name={safe_name!r}, handle={safe_handle!r}")
+
+          async def websocket_probe():
+              # Do not print this URL: it contains the API key.
+              ws_url = (
+                  "wss://app.band.ai/api/v1/socket/websocket"
+                  f"?api_key={api_key}&agent_id={agent_id}&vsn=2.0.0"
+              )
+              async with websockets.connect(
+                  ws_url,
+                  open_timeout=20,
+                  close_timeout=10,
+                  ping_interval=None,
+                  max_size=2**20,
+              ) as ws:
+                  join_ref = "1"
+                  ref = "1"
+                  topic = f"agent_rooms:{agent_id}"
+                  await ws.send(json.dumps([join_ref, ref, topic, "phx_join", {}]))
+
+                  deadline = asyncio.get_running_loop().time() + 20
+                  joined = False
+                  while asyncio.get_running_loop().time() < deadline:
+                      remaining = max(0.1, deadline - asyncio.get_running_loop().time())
+                      raw = await asyncio.wait_for(ws.recv(), timeout=remaining)
+                      message = json.loads(raw)
+                      if not isinstance(message, list) or len(message) != 5:
+                          continue
+                      msg_join_ref, msg_ref, msg_topic, event, event_payload = message
+                      if msg_topic == topic and event == "phx_reply" and msg_ref == ref:
+                          status_value = (event_payload or {}).get("status")
+                          if status_value != "ok":
+                              raise SystemExit(
+                                  f"WebSocket channel join rejected with status={status_value!r}"
+                              )
+                          joined = True
+                          break
+
+                  if not joined:
+                      raise SystemExit("WebSocket connected but agent_rooms channel did not join successfully")
+
+                  # Confirm Phoenix heartbeat path too.
+                  await ws.send(json.dumps([None, "2", "phoenix", "heartbeat", {}]))
+                  heartbeat_deadline = asyncio.get_running_loop().time() + 10
+                  heartbeat_ok = False
+                  while asyncio.get_running_loop().time() < heartbeat_deadline:
+                      remaining = max(0.1, heartbeat_deadline - asyncio.get_running_loop().time())
+                      raw = await asyncio.wait_for(ws.recv(), timeout=remaining)
+                      message = json.loads(raw)
+                      if (
+                          isinstance(message, list)
+                          and len(message) == 5
+                          and message[2] == "phoenix"
+                          and message[3] == "phx_reply"
+                          and message[1] == "2"
+                      ):
+                          heartbeat_ok = (message[4] or {}).get("status") == "ok"
+                          break
+
+                  if not heartbeat_ok:
+                      raise SystemExit("WebSocket joined but heartbeat acknowledgement was not confirmed")
+
+                  print("WebSocket agent_rooms join OK.")
+                  print("Phoenix heartbeat OK.")
+
+          asyncio.run(websocket_probe())
+          print("BAND Coordinator remote connectivity: PROVEN")
+          PY
