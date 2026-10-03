@@ -75,6 +75,18 @@ technical_reality:
         Codex emits a bounded machine-readable patch in its GitHub bot comment.
         GitHub Actions validates the patch scope, applies it, commits it, and pushes the PR branch autonomously.
   reciprocal_handle_messaging: PROVEN_PREFLIGHT
+  band_to_codex_end_to_end:
+    status: PROVEN
+    probe_pr: 24
+    trigger_run_id: 37148593734
+    trigger_job_id: 111277530857
+    codex_comment_id: 5972801989
+    relay_run_id: 37148720903
+    relay_job_id: 111277902855
+    output_head_sha: f77935b6080fa2de4d6df125c8d6d5d7464e496f
+    artifact_id: 11282198522
+    artifact_digest: sha256:a2c29c222206cf25e7531b3830e3dc365b528aca797ba32a8cf69c580aeadcf4
+    human_steering_after_initial_pr_open: false
   rehearsal_room_id: 599c34c3-62d4-4a24-bb45-361d2fee8bf2
   submission_remote_seat_eligibility: UNKNOWN_OFFICIAL_CLARIFICATION_REQUIRED
 
@@ -92,6 +104,7 @@ conditional_gateway_registry:
   LIVING_PRD: PROVEN
   TECHNICAL_REALITY_CHECK: ACTIVE
   CODEX_COMMENT_RELAY_WRITE_PATH: PROVEN
+  BAND_TO_CODEX_END_TO_END: PROVEN
   TOY_FACTORY_REHEARSAL: BLOCKED_BY_TECHNICAL_REALITY_CHECK
   TRACK_LOCK: BLOCKED_BY_TOY_FACTORY_REHEARSAL
   REAL_TRACK_BUILD: BLOCKED_BY_TRACK_LOCK
@@ -111,8 +124,7 @@ evidence_graph:
 
 exact_next_gate: TECHNICAL_REALITY_CHECK
 exact_next_action: >-
-  Use the proven Codex comment-relay write path as the candidate coding transport for the Toy rehearsal.
-  Next prove one end-to-end seat turn in which a BAND remote seat causes a bounded Codex task, receives/records
-  the resulting evidence in BAND, and the relay publishes the exact candidate without human steering.
-  Then record real Harness/Model values in all three generic mandates. Keep Remote Agent versus required
-  Band Desktop seat eligibility as a separate UNKNOWN official gate.
+  The BAND -> Codex -> safe relay -> BAND round trip is PROVEN without human steering after the initial PR open.
+  Next record real Harness/Model values in all three generic mandates, verify the required BAND Desktop version,
+  and resolve the Remote Agent versus required Band Desktop seat-identity official gate. After those pass,
+  promote TECHNICAL_REALITY_CHECK and start the Toy Factory rehearsal.
