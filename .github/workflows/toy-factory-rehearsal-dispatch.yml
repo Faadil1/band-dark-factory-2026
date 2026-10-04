@@ -1,0 +1,54 @@
+name: Toy Factory Rehearsal Dispatch
+
+on:
+  pull_request:
+    types: [opened]
+    paths:
+      - "state/TOY-FACTORY-REHEARSAL-TRIGGER.md"
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  dispatch:
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'toy/rehearsal-1'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      KICKOFF: ${{ runner.temp }}/dark-factory-wearedevs
+      BAND_COORDINATOR_AGENT_ID: ${{ secrets.BAND_COORDINATOR_AGENT_ID }}
+      BAND_COORDINATOR_API_KEY: ${{ secrets.BAND_COORDINATOR_API_KEY }}
+      BAND_IMPLEMENTER_AGENT_ID: ${{ secrets.BAND_IMPLEMENTER_AGENT_ID }}
+      BAND_IMPLEMENTER_API_KEY: ${{ secrets.BAND_IMPLEMENTER_API_KEY }}
+      BAND_REVIEWER_AGENT_ID: ${{ secrets.BAND_REVIEWER_AGENT_ID }}
+      BAND_REVIEWER_API_KEY: ${{ secrets.BAND_REVIEWER_API_KEY }}
+
+    steps:
+      - name: Checkout operational repository
+        uses: actions/checkout@v4
+
+      - name: Clone official kickoff
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --depth 1 https://github.com/band-ai/dark-factory-wearedevs.git "$KICKOFF"
+          test "$(git -C "$KICKOFF" rev-parse HEAD)" = "803560d2a678ace1414465c098eb0ab5380ffade"
+
+      - name: Validate credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$BAND_COORDINATOR_AGENT_ID"
+          test -n "$BAND_COORDINATOR_API_KEY"
+          test -n "$BAND_IMPLEMENTER_AGENT_ID"
+          test -n "$BAND_IMPLEMENTER_API_KEY"
+          test -n "$BAND_REVIEWER_AGENT_ID"
+          test -n "$BAND_REVIEWER_API_KEY"
+
+      - name: Dispatch fresh Toy room and Codex task
+        run: python infra/toy-rehearsal/dispatch.py
