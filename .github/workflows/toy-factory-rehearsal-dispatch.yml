@@ -2,7 +2,7 @@ name: Toy Factory Rehearsal Dispatch
 
 on:
   pull_request:
-    types: [opened]
+    types: [opened, synchronize, reopened]
     paths:
       - "state/TOY-FACTORY-REHEARSAL-TRIGGER.md"
 
@@ -20,7 +20,6 @@ jobs:
     timeout-minutes: 10
     env:
       GH_TOKEN: ${{ github.token }}
-      KICKOFF: ${{ runner.temp }}/dark-factory-wearedevs
       BAND_COORDINATOR_AGENT_ID: ${{ secrets.BAND_COORDINATOR_AGENT_ID }}
       BAND_COORDINATOR_API_KEY: ${{ secrets.BAND_COORDINATOR_API_KEY }}
       BAND_IMPLEMENTER_AGENT_ID: ${{ secrets.BAND_IMPLEMENTER_AGENT_ID }}
@@ -36,6 +35,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          KICKOFF="$RUNNER_TEMP/dark-factory-wearedevs"
+          echo "KICKOFF=$KICKOFF" >> "$GITHUB_ENV"
           git clone --depth 1 https://github.com/band-ai/dark-factory-wearedevs.git "$KICKOFF"
           test "$(git -C "$KICKOFF" rev-parse HEAD)" = "803560d2a678ace1414465c098eb0ab5380ffade"
 
