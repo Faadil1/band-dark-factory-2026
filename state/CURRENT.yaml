@@ -133,8 +133,10 @@ toy_factory_rehearsal:
     user_authored_codex_dispatch: PENDING_SECRET_AND_REHEARSAL_4
     root_cause_evidence:
       bot_authored_mentions_35_36_38: NO_CODEX_REACTION_OR_REPLY
-      user_authored_probe_pr_39: CODEX_EYES_REACTION_OBSERVED
-      interpretation: CODEX_CONNECTOR_ACTIVE_BUT_BOT_AUTHORED_MENTIONS_NOT_ACCEPTED
+      user_authored_probe_pr_39: CODEX_TASK_COMPLETED_WITH_TWO_BOT_REPLIES
+      user_authored_probe_comment_id: 5983795312
+      codex_reply_comment_ids: [5983809519, 5983810255]
+      interpretation: CODEX_CONNECTOR_ACTIVE_FOR_USER_AUTHORED_MENTIONS_BUT_BOT_AUTHORED_MENTIONS_NOT_OBSERVED
   next_fresh_rehearsal: 4
   reuse_rehearsal_1_or_2: false
 
