@@ -10,8 +10,8 @@ BAND_BASE = "https://app.band.ai/api/v1/agent"
 CODEX_BOT = "chatgpt-codex-connector[bot]"
 
 
-def run(cmd, *, input_text=None, check=True):
-    p = subprocess.run(cmd, input=input_text, text=True, capture_output=True)
+def run(cmd, *, input_text=None, check=True, env=None):
+    p = subprocess.run(cmd, input=input_text, text=True, capture_output=True, env=env)
     if check and p.returncode != 0:
         raise SystemExit(f"command failed: {' '.join(cmd)}\n{p.stdout}\n{p.stderr}")
     return p
@@ -66,15 +66,34 @@ def post_message(room_id, sender_key, content, mentions):
     return curl_json("POST", f"{BAND_BASE}/chats/{room_id}/messages", sender_key, payload)
 
 
-def gh_comment(repo, pr, body):
+def gh_comment(repo, pr, body, *, token=None):
     payload = json.dumps({"body": body})
+    env = None
+    if token is not None:
+        env = os.environ.copy()
+        env["GH_TOKEN"] = token
     p = run([
         "gh", "api", "--method", "POST",
         "-H", "Accept: application/vnd.github+json",
         f"repos/{repo}/issues/{pr}/comments",
         "--input", "-"
-    ], input_text=payload)
+    ], input_text=payload, env=env)
     return json.loads(p.stdout)
+
+
+def validate_codex_user_token(repo, token):
+    if not token:
+        raise SystemExit("CODEX_GITHUB_USER_TOKEN is required for user-authored @codex dispatch")
+    env = os.environ.copy()
+    env["GH_TOKEN"] = token
+    p = run(["gh", "api", "user"], env=env)
+    login = str(json.loads(p.stdout).get("login") or "")
+    expected = repo.split("/", 1)[0]
+    if login != expected:
+        raise SystemExit(
+            f"CODEX_GITHUB_USER_TOKEN authenticates as {login!r}; expected repository owner {expected!r}"
+        )
+    return login
 
 
 def gh_comments(repo, pr):
@@ -163,6 +182,8 @@ def main():
     event = json.loads(Path(os.environ["GITHUB_EVENT_PATH"]).read_text())
     pr, branch, rehearsal, token = rehearsal_identity(event)
     kickoff = Path(os.environ["KICKOFF"])
+    codex_user_token = os.environ.get("CODEX_GITHUB_USER_TOKEN", "").strip()
+    codex_user_login = validate_codex_user_token(repo, codex_user_token)
 
     first_window = int(os.getenv("CODEX_FIRST_WINDOW_SECONDS", "480"))
     retry_window = int(os.getenv("CODEX_RETRY_WINDOW_SECONDS", "720"))
@@ -231,7 +252,9 @@ def main():
         ),
     )
 
-    first_prompt = gh_comment(repo, pr, codex_prompt(token, branch, rehearsal))
+    first_prompt = gh_comment(
+        repo, pr, codex_prompt(token, branch, rehearsal), token=codex_user_token
+    )
     reply = wait_for_codex(
         repo,
         pr,
@@ -247,11 +270,14 @@ def main():
             "branch": branch,
             "run_token": token,
             "attempts": 1,
+            "codex_dispatch_login": codex_user_login,
             "codex_comment_id": reply["id"],
         }))
         return
 
-    retry_prompt = gh_comment(repo, pr, codex_prompt(token, branch, rehearsal, retry=True))
+    retry_prompt = gh_comment(
+        repo, pr, codex_prompt(token, branch, rehearsal, retry=True), token=codex_user_token
+    )
     reply = wait_for_codex(
         repo,
         pr,
@@ -267,6 +293,7 @@ def main():
             "branch": branch,
             "run_token": token,
             "attempts": 2,
+            "codex_dispatch_login": codex_user_login,
             "retry_comment_id": retry_prompt["id"],
             "codex_comment_id": reply["id"],
         }))
