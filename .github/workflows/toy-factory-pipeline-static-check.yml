@@ -1,0 +1,60 @@
+name: Toy Factory Pipeline Static Check
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/toy-factory-rehearsal-*.yml"
+      - "infra/toy-rehearsal/**"
+      - "state/CURRENT.yaml"
+      - "state/HANDOVER.yaml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout candidate
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Compile Toy transport scripts
+        run: |
+          python -m py_compile             infra/toy-rehearsal/dispatch.py             infra/toy-rehearsal/review.py
+
+      - name: Assert transport invariants
+        shell: python
+        run: |
+          from pathlib import Path
+
+          dispatch_workflow = Path(".github/workflows/toy-factory-rehearsal-dispatch.yml").read_text()
+          review_workflow = Path(".github/workflows/toy-factory-rehearsal-review.yml").read_text()
+          dispatch = Path("infra/toy-rehearsal/dispatch.py").read_text()
+          review = Path("infra/toy-rehearsal/review.py").read_text()
+          current = Path("state/CURRENT.yaml").read_text()
+          handover = Path("state/HANDOVER.yaml").read_text()
+
+          assert "types: [opened, reopened]" in dispatch_workflow
+          assert "synchronize" not in dispatch_workflow
+          assert "CODEX_FIRST_WINDOW_SECONDS" in dispatch_workflow
+          assert "CODEX_RETRY_WINDOW_SECONDS" in dispatch_workflow
+
+          assert "toy/rehearsal-1" not in review_workflow
+          assert "toy/rehearsal-[0-9]*" in review_workflow
+          assert "cancel-in-progress: false" in review_workflow
+
+          assert "CODEX_TRANSPORT_TIMEOUT" in dispatch
+          assert "attempt 2/2" in dispatch
+          assert 're.fullmatch(r"toy/rehearsal-(\\d+)", branch)' in dispatch
+
+          assert 'f"HEAD:{branch}"' in review
+          assert "NOOP_ALREADY_TERMINAL" in review
+          assert "TOY_REHEARSAL_TERMINAL" in review
+
+          assert "next_fresh_rehearsal: 3" in current
+          assert "transport_hardening_pr: 37" in handover
