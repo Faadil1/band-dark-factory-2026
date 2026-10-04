@@ -2,9 +2,7 @@ name: Toy Factory Rehearsal Dispatch
 
 on:
   pull_request:
-    types: [opened]
-    paths:
-      - "state/TOY-FACTORY-REHEARSAL-TRIGGER.md"
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: read
