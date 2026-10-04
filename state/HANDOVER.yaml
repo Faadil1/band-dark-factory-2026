@@ -31,8 +31,9 @@ current_truth:
   remote_linux_harness: proven_in_operational_repo
   dedicated_repo_actions_preflight: proven
   evidence_graph: active
-  toy_factory: rehearsals_1_and_2_blocked_before_implementation
-  toy_transport_hardening: implemented_in_pr_37_pending_runtime_proof
+  toy_factory: rehearsals_1_2_3_blocked_before_implementation
+  toy_transport_hardening: pr_37_fail_closed_behavior_proven_on_rehearsal_3
+  codex_transport_actor_finding: user_authored_mentions_accepted_bot_authored_mentions_not_observed
 
 toy_rehearsal_history:
   - pr: 35
@@ -41,8 +42,14 @@ toy_rehearsal_history:
   - pr: 36
     room_id: ca610561-d3da-46db-8f2c-fbb530eaa25a
     result: BLOCKED_CODEX_TRANSPORT
+  - pr: 38
+    room_id: e97af8a4-c28e-4731-bcc7-459012937bed
+    run_token: toy-r3-pr38-e6462fdd4ac4
+    result: BLOCKED_CODEX_TRANSPORT_TIMEOUT_AFTER_BOUNDED_RETRY
   transport_hardening_pr: 37
-  next_fresh_rehearsal: 3
+  codex_user_probe_pr: 39
+  codex_user_probe_signal: CODEX_EYES_REACTION_OBSERVED
+  next_fresh_rehearsal: 4
 
 runtime_evidence:
   workflow_run_id: 37087966392
@@ -75,7 +82,8 @@ next_gate:
     - mandate_harness_and_model_fields_are_real_not_TBD
     - BAND_Desktop_v0_4_12_meets_v0_4_10_plus_requirement
   remaining_pass_conditions:
-    - hardened_Codex_transport_runtime_proven_on_fresh_rehearsal_3
+    - CODEX_GITHUB_USER_TOKEN_secret_installed_with_minimum_repo_scope
+    - user_authored_Codex_dispatch_runtime_proven_on_fresh_rehearsal_4
     - autonomous_Toy_Factory_room_run
     - toy_result_commits_and_review_repair_trace
     - toy_harness_green
@@ -85,7 +93,7 @@ next_gate:
     - TRACK_LOCK
 
 next_action: >-
-  After PR #37 is verified and merged, open only a fresh toy/rehearsal-3 PR. Preserve zero human steering after
-  initial dispatch. Require bounded Codex transport observation, at most one autonomous retry, explicit fail-closed
-  BLOCKED on timeout, dynamic rehearsal-N review routing, independent Toy harness execution, terminal ACCEPT/REJECT,
-  and full evidence binding before Track Lock.
+  Add the CODEX_GITHUB_USER_TOKEN Actions secret using a fine-grained PAT owned by Faadil1, restricted to this
+  repository and minimum Issues read/write permission. Merge the user-authored dispatch fix only after static/CI
+  checks pass. Then open only a fresh toy/rehearsal-4 PR. Preserve zero human steering after initial dispatch and
+  require terminal ACCEPT/REJECT/BLOCKED plus full evidence binding before Track Lock.
