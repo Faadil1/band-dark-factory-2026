@@ -2,7 +2,7 @@ version: 0.1.0
 project_id: band_dark_factory_wearedevelopers_2026
 date: 2026-10-02
 status: ACTIVE
-lifecycle_state: TECHNICAL_REALITY_CHECK
+lifecycle_state: TOY_FACTORY_REHEARSAL
 
 source_of_truth:
   central_control_plane: Faadil1/faadil-agent-system@main
@@ -95,7 +95,10 @@ technical_reality:
     cli: v0.4.12
     official_minimum: v0.4.10
     evidence: evidence/TR-BAND-DESKTOP-VERSION-001.yaml
-  submission_remote_seat_eligibility: UNKNOWN_OFFICIAL_CLARIFICATION_REQUIRED
+  submission_remote_seat_eligibility:
+    status: PROVEN_BY_PUBLIC_ORGANIZER_CLARIFICATION
+    evidence: evidence/TR-REMOTE-SEAT-ELIGIBILITY-001.yaml
+    interpretation: remote_agents_do_not_need_to_run_locally_on_same_machine
 
 factory:
   minimum_submission_seats: 3
@@ -108,16 +111,16 @@ factory:
   model_value: OpenAI Codex Cloud default model managed by ChatGPT plan; exact internal model ID not exposed by GitHub-triggered task
   mandate_runtime_values: PROVEN_FROM_PREFLIGHT
   submission_readiness_note: >-
-    Runtime fields are truthful and non-TBD, and Band Desktop v0.4.12 satisfies the version requirement.
-    Final submission eligibility still depends on the official Band Desktop seat-identity gate.
+    Runtime fields are truthful and non-TBD, Band Desktop v0.4.12 satisfies the version requirement, and the
+    official public clarification removes the local-seat-runtime ambiguity. Toy rehearsal is now the next gate.
 
 conditional_gateway_registry:
   PROJECT_AUTHORIZED: PROVEN
   LIVING_PRD: PROVEN
-  TECHNICAL_REALITY_CHECK: ACTIVE
+  TECHNICAL_REALITY_CHECK: PROVEN
   CODEX_COMMENT_RELAY_WRITE_PATH: PROVEN
   BAND_TO_CODEX_END_TO_END: PROVEN
-  TOY_FACTORY_REHEARSAL: BLOCKED_BY_TECHNICAL_REALITY_CHECK
+  TOY_FACTORY_REHEARSAL: ACTIVE
   TRACK_LOCK: BLOCKED_BY_TOY_FACTORY_REHEARSAL
   REAL_TRACK_BUILD: BLOCKED_BY_TRACK_LOCK
   EVIDENCE_GRAPH: ACTIVE
@@ -125,7 +128,7 @@ conditional_gateway_registry:
   BAND_THREE_SEAT_CONNECTIVITY: PROVEN_PREFLIGHT
   RECIPROCAL_HANDLE_MESSAGING: PROVEN_PREFLIGHT
   BAND_DESKTOP_VERSION_REQUIREMENT: PROVEN
-  SUBMISSION_SEAT_IDENTITY_ELIGIBILITY: UNKNOWN
+  SUBMISSION_SEAT_IDENTITY_ELIGIBILITY: PROVEN
   JUDGE_PERFORMANCE_ASSURANCE: BLOCKED_BY_BUILD_CANDIDATE
   SUBMISSION_INTEGRITY: BLOCKED_BY_BUILD_CANDIDATE
   PROTECTED_HUMAN_SUBMISSION: BLOCKED_BY_SUBMISSION_READY
@@ -135,9 +138,9 @@ evidence_graph:
   path: evidence/EVIDENCE-GRAPH.yaml
   first_material_claim: TR_REMOTE_HARNESS_001
 
-exact_next_gate: TECHNICAL_REALITY_CHECK
+exact_next_gate: TOY_FACTORY_REHEARSAL
 exact_next_action: >-
-  Band Desktop v0.4.12 satisfies the official v0.4.10+ requirement, and Harness/Model values are truthfully
-  recorded in all three mandates. The only remaining Technical Reality blocker is the official requirement for
-  three distinct Band Desktop seat identities. Create and prove three Desktop seats (or obtain primary organizer
-  clarification that the existing External Remote Agents count) before promoting Technical Reality to Toy Factory.
+  Technical Reality is PROVEN, including the official public clarification that the dark-factory agents do not
+  need to run locally on the same machine. Start the Toy Factory rehearsal in a fresh BAND room and fresh toy
+  result repository using Coordinator, Implementer, and Reviewer; preserve the full autonomous handoff/review/
+  repair trail, export room.json, run the Toy harness and harness check, and bind all receipts before Track Lock.

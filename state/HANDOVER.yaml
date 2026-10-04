@@ -3,7 +3,7 @@ project_id: band_dark_factory_wearedevelopers_2026
 date: 2026-10-02
 status: ACTIVE
 current_owner: PBPD
-current_stage: TECHNICAL_REALITY_CHECK
+current_stage: TOY_FACTORY_REHEARSAL
 
 read_order:
   - state/CURRENT.yaml
@@ -47,7 +47,8 @@ do_not_start:
   - external_runtime_integrations_that_violate_no_outbound_rule
 
 next_gate:
-  name: TECHNICAL_REALITY_CHECK
+  name: TOY_FACTORY_REHEARSAL
+  technical_reality: PROVEN
   proven_now:
     - Coordinator_Implementer_Reviewer_REST_identity
     - Coordinator_Implementer_Reviewer_WebSocket_and_heartbeat
@@ -63,7 +64,10 @@ next_gate:
     - mandate_harness_and_model_fields_are_real_not_TBD
     - BAND_Desktop_v0_4_12_meets_v0_4_10_plus_requirement
   remaining_pass_conditions:
-    - primary_official_clarification_on_Remote_Agent_vs_Band_Desktop_seat_identity_or_unambiguous_Desktop_fallback
+    - autonomous_Toy_Factory_room_run
+    - toy_result_commits_and_review_repair_trace
+    - toy_harness_green
+    - toy_harness_check_gate_1_and_gate_2_green
+    - room_json_export_and_binding
   after_pass:
-    - TOY_FACTORY_REHEARSAL
     - TRACK_LOCK

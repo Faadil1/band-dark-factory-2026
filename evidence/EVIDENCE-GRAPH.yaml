@@ -119,14 +119,21 @@ missing_edges:
     status: COMPLETE
     evidence: evidence/TR-BAND-DESKTOP-VERSION-001.yaml
   - claim_id: SUBMISSION_SEAT_IDENTITY_ELIGIBILITY
-    status: UNKNOWN
-    expected_next_evidence: organizer_primary_clarification_or_unambiguous_Band_Desktop_seat_run
+    status: COMPLETE
+    evidence: evidence/TR-REMOTE-SEAT-ELIGIBILITY-001.yaml
   - claim_id: CODING_AGENT_RUNTIME
     status: COMPLETE_FOR_PREFLIGHT
     observed:
       repo_scoped_execution: PROVEN
       BAND_to_Codex_transport: PROVEN
       exact_harness_and_model_values_in_mandates: PROVEN
+  - claim_id: TECHNICAL_REALITY_CHECK
+    status: COMPLETE
+    evidence:
+      - evidence/TR-BAND-DESKTOP-VERSION-001.yaml
+      - evidence/TR-REMOTE-SEAT-ELIGIBILITY-001.yaml
+      - evidence/TR-BAND-CODEX-E2E-001.yaml
+      - evidence/TR-CODEX-COMMENT-RELAY-001.yaml
   - claim_id: AUTONOMOUS_TOY_FACTORY
-    status: MISSING
-    expected_next_evidence: full_Toy_run_room_export_commits_and_harness
+    status: ACTIVE
+    expected_next_evidence: full_Toy_run_room_export_commits_harness_and_harness_check

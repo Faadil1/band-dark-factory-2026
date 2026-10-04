@@ -1,0 +1,43 @@
+version: 0.1.0
+project_id: band_dark_factory_wearedevelopers_2026
+claim_id: TR_REMOTE_SEAT_ELIGIBILITY_001
+date: 2026-10-03
+status: COMPLETE
+proof_class: OFFICIAL_PUBLIC_CLARIFICATION
+
+claim: >-
+  External/remote agents used in the dark factory do not need to run locally on the same machine;
+  the submission must clearly articulate each agent mandate and show room activity in room.json and the video.
+
+source:
+  channel: BAND Discord
+  context: participants-chat-wearedevelopers-hackathon
+  user_question: >-
+    Do External Remote Agents visible in Band Desktop, with distinct identities/handles and reciprocal
+    @handle messages, count as the required Band Desktop seat identities, or must the 3 seats be local
+    agents created and run directly by Band Desktop?
+  organizer_response:
+    responder: ofermend
+    summary: >-
+      All agents included in the dark factory do not have to run locally on the same machine.
+      Agent mandates must be clearly articulated and room activity must be shown.
+  admin_confirmation:
+    responder: LabLab Admin
+    summary: >-
+      That's correct. Agents do not need to run on the same local machine; mandates and room activity,
+      including room.json and the video recording, are crucial.
+
+interpretation: >-
+  Because the clarification was posted directly in response to the exact Remote-Agent-versus-local-seat
+  question, the existing three distinct External Remote Agents are accepted as satisfying the seat-runtime
+  locality ambiguity for Gate 1. No additional local coding runtimes are required on the user's work computer.
+
+truth_boundary:
+  proves:
+    - remote_agents_do_not_need_to_run_locally_on_same_machine
+    - existing_external_remote_agents_are_not_disqualified_for_being_remote
+    - mandate_and_room_evidence_requirements_are_explicitly_reaffirmed
+  does_not_prove:
+    - Toy_Factory_completion
+    - submitted_run_teamwork_quality
+    - Pocketful_stage_conformance
