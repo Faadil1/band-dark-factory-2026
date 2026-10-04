@@ -1,4 +1,4 @@
-# BAND Dark Factory — Toy Rehearsal 1
+# BAND Dark Factory — Toy Rehearsal 2
 
 Unscored rehearsal of the official four-stage `toy` track.
 
