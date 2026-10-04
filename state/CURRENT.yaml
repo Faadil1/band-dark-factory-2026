@@ -1,6 +1,6 @@
 version: 0.1.0
 project_id: band_dark_factory_wearedevelopers_2026
-date: 2026-10-02
+date: 2026-10-04
 status: ACTIVE
 lifecycle_state: TOY_FACTORY_REHEARSAL
 
@@ -100,6 +100,31 @@ technical_reality:
     evidence: evidence/TR-REMOTE-SEAT-ELIGIBILITY-001.yaml
     interpretation: remote_agents_do_not_need_to_run_locally_on_same_machine
 
+toy_factory_rehearsal:
+  status: ACTIVE
+  rehearsal_1:
+    pr: 35
+    room_id: 1851e664-a13a-41cf-a0d0-de6a31f312f3
+    result: STALLED_NO_CODEX_RESPONSE
+    implementation_produced: false
+  rehearsal_2:
+    pr: 36
+    room_id: ca610561-d3da-46db-8f2c-fbb530eaa25a
+    result: BLOCKED_CODEX_TRANSPORT
+    implementation_produced: false
+  transport_hardening:
+    code_status: IMPLEMENTED_IN_PR_37
+    runtime_status: PENDING_REHEARSAL_3
+    bounded_response_observation: true
+    automatic_retry_count: 1
+    fail_closed_terminal_blocker: true
+    numbered_rehearsal_branch_support: true
+    synchronize_redispatch_removed: true
+    late_duplicate_reply_guard: true
+    review_terminal_markers: true
+  next_fresh_rehearsal: 3
+  reuse_rehearsal_1_or_2: false
+
 factory:
   minimum_submission_seats: 3
   current_target_seats:
@@ -121,6 +146,7 @@ conditional_gateway_registry:
   CODEX_COMMENT_RELAY_WRITE_PATH: PROVEN
   BAND_TO_CODEX_END_TO_END: PROVEN
   TOY_FACTORY_REHEARSAL: ACTIVE
+  TOY_CODEX_TRANSPORT_HARDENING: ACTIVE
   TRACK_LOCK: BLOCKED_BY_TOY_FACTORY_REHEARSAL
   REAL_TRACK_BUILD: BLOCKED_BY_TRACK_LOCK
   EVIDENCE_GRAPH: ACTIVE
@@ -140,7 +166,8 @@ evidence_graph:
 
 exact_next_gate: TOY_FACTORY_REHEARSAL
 exact_next_action: >-
-  Technical Reality is PROVEN, including the official public clarification that the dark-factory agents do not
-  need to run locally on the same machine. Start the Toy Factory rehearsal in a fresh BAND room and fresh toy
-  result repository using Coordinator, Implementer, and Reviewer; preserve the full autonomous handoff/review/
-  repair trail, export room.json, run the Toy harness and harness check, and bind all receipts before Track Lock.
+  Merge PR #37 only after its static/CI verification is green, then launch a fresh Toy Factory Rehearsal #3
+  on branch toy/rehearsal-3 in a fresh BAND room. Do not reuse PR #35 or #36, do not inject Toy code manually,
+  and keep TRACK_LOCK plus the real Pocketful build blocked until the hardened transport produces a Codex patch,
+  the independent Reviewer completes, the official isolated Toy harness is green, room evidence is exported,
+  and the exact accepted revision is bound to the receipts.
