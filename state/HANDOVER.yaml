@@ -1,6 +1,6 @@
 version: 0.1.0
 project_id: band_dark_factory_wearedevelopers_2026
-date: 2026-10-02
+date: 2026-10-04
 status: ACTIVE
 current_owner: PBPD
 current_stage: TOY_FACTORY_REHEARSAL
@@ -15,7 +15,7 @@ read_order:
   - mandates/implementer.md
   - mandates/reviewer.md
 
-last_proven_gate: PRD_READY
+last_proven_gate: TECHNICAL_REALITY_CHECK
 
 current_truth:
   project_authorized: true
@@ -31,7 +31,18 @@ current_truth:
   remote_linux_harness: proven_in_operational_repo
   dedicated_repo_actions_preflight: proven
   evidence_graph: active
-  toy_factory: not_started
+  toy_factory: rehearsals_1_and_2_blocked_before_implementation
+  toy_transport_hardening: implemented_in_pr_37_pending_runtime_proof
+
+toy_rehearsal_history:
+  - pr: 35
+    room_id: 1851e664-a13a-41cf-a0d0-de6a31f312f3
+    result: STALLED_NO_CODEX_RESPONSE
+  - pr: 36
+    room_id: ca610561-d3da-46db-8f2c-fbb530eaa25a
+    result: BLOCKED_CODEX_TRANSPORT
+  transport_hardening_pr: 37
+  next_fresh_rehearsal: 3
 
 runtime_evidence:
   workflow_run_id: 37087966392
@@ -64,6 +75,7 @@ next_gate:
     - mandate_harness_and_model_fields_are_real_not_TBD
     - BAND_Desktop_v0_4_12_meets_v0_4_10_plus_requirement
   remaining_pass_conditions:
+    - hardened_Codex_transport_runtime_proven_on_fresh_rehearsal_3
     - autonomous_Toy_Factory_room_run
     - toy_result_commits_and_review_repair_trace
     - toy_harness_green
@@ -71,3 +83,9 @@ next_gate:
     - room_json_export_and_binding
   after_pass:
     - TRACK_LOCK
+
+next_action: >-
+  After PR #37 is verified and merged, open only a fresh toy/rehearsal-3 PR. Preserve zero human steering after
+  initial dispatch. Require bounded Codex transport observation, at most one autonomous retry, explicit fail-closed
+  BLOCKED on timeout, dynamic rehearsal-N review routing, independent Toy harness execution, terminal ACCEPT/REJECT,
+  and full evidence binding before Track Lock.
