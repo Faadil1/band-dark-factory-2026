@@ -2,6 +2,7 @@
 import json
 import os
 import subprocess
+import time
 from pathlib import Path
 
 BAND_BASE = "https://app.band.ai/api/v1/agent"
@@ -65,12 +66,39 @@ def post_message(room_id, sender_key, content, mentions):
 
 def gh_comment(repo, pr, body):
     payload = json.dumps({"body": body})
-    run([
+    p = run([
         "gh", "api", "--method", "POST",
         "-H", "Accept: application/vnd.github+json",
         f"repos/{repo}/issues/{pr}/comments",
         "--input", "-"
     ], input_text=payload)
+    return json.loads(p.stdout)
+
+
+def gh_comments(repo, pr):
+    p = run(["gh", "api", "--paginate", f"repos/{repo}/issues/{pr}/comments"])
+    return json.loads(p.stdout)
+
+
+def wait_for_codex(repo, pr, after_comment_id, timeout_s):
+    deadline = time.monotonic() + timeout_s
+    while time.monotonic() < deadline:
+        for item in gh_comments(repo, pr):
+            if int(item.get("id") or 0) <= int(after_comment_id):
+                continue
+            if (item.get("user") or {}).get("login") != "chatgpt-codex-connector[bot]":
+                continue
+            body = str(item.get("body") or "")
+            return {
+                "comment_id": int(item["id"]),
+                "has_patch": (
+                    "TOY_IMPL_PATCH_B64_BEGIN" in body
+                    and "TOY_IMPL_PATCH_B64_END" in body
+                ),
+                "body": body,
+            }
+        time.sleep(10)
+    return None
 
 
 def main():
@@ -107,7 +135,7 @@ def main():
         specs.append(f"\n\n===== TOY STAGE {n} SPEC =====\n{text}")
 
     task = (
-        f"@{impl['handle']} TOY_FACTORY_REHEARSAL_1. Build the shared-counter service one stage at a time. "
+        f"@{impl['handle']} TOY_FACTORY_REHEARSAL. Build the shared-counter service one stage at a time. "
         "The result repository is the current GitHub branch under toy-result/. Stage 1 goes in "
         "toy-result/stage-1/; when complete, copy it forward to stage-2 and extend it, then stage-3 and stage-4. "
         "Each stage must contain source, Dockerfile and RUN.md and preserve all inherited behavior. "
@@ -133,7 +161,7 @@ def main():
         f"TOY_REHEARSAL_CONTEXT\nTOY_ROOM_ID={room_id}\nTOY_COORDINATOR_HANDOFF_ID={msg_id}\n",
     )
 
-    codex_prompt = """@codex Act as the Implementer seat for Toy Factory Rehearsal 1.
+    codex_prompt = """@codex Act as the Implementer seat for the current Toy Factory Rehearsal.
 
 Read the four official practice specs committed at:
 - toy-input/stage-1.md
@@ -157,8 +185,48 @@ TOY_IMPL_PATCH_B64_BEGIN
 <base64 payload>
 TOY_IMPL_PATCH_B64_END
 """
-    gh_comment(repo, pr, codex_prompt)
-    print(json.dumps({"status": "DISPATCHED", "room_id": room_id, "pr": pr}))
+    first = gh_comment(repo, pr, codex_prompt)
+    first_id = int(first["id"])
+    result = wait_for_codex(repo, pr, first_id, timeout_s=300)
+
+    if result is None:
+        retry_prompt = (
+            codex_prompt
+            + "\nAUTONOMOUS_RETRY=1\n"
+            + "This is an automatic retry by the factory because the first Codex transport "
+              "produced no connector response within five minutes. Execute the same task exactly once."
+        )
+        retry = gh_comment(repo, pr, retry_prompt)
+        retry_id = int(retry["id"])
+        result = wait_for_codex(repo, pr, retry_id, timeout_s=240)
+    else:
+        retry_id = None
+
+    if result is None:
+        blocker = (
+            "TOY_FACTORY_BLOCKED: Codex transport produced no connector response after the "
+            "initial dispatch and one autonomous bounded retry. No stage implementation was accepted."
+        )
+        post_message(room_id, coord_key, blocker, [])
+        raise SystemExit("Codex connector did not respond after autonomous bounded retry")
+
+    if not result["has_patch"]:
+        blocker = (
+            "TOY_FACTORY_BLOCKED: Codex returned a response but did not provide the required "
+            "machine-readable Toy implementation patch. No stage implementation was accepted. "
+            f"codex_comment_id={result['comment_id']}"
+        )
+        post_message(room_id, coord_key, blocker, [])
+        raise SystemExit("Codex response did not contain required Toy patch markers")
+
+    print(json.dumps({
+        "status": "CODEX_PATCH_READY",
+        "room_id": room_id,
+        "pr": pr,
+        "first_codex_dispatch_comment_id": first_id,
+        "retry_codex_dispatch_comment_id": retry_id,
+        "codex_result_comment_id": result["comment_id"],
+    }))
 
 
 if __name__ == "__main__":
