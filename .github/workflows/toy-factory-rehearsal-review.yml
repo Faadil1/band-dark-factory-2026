@@ -9,6 +9,10 @@ permissions:
   issues: write
   pull-requests: read
 
+concurrency:
+  group: toy-review-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
 jobs:
   review:
     if: >-
@@ -17,7 +21,7 @@ jobs:
       contains(github.event.comment.body, 'TOY_IMPL_PATCH_B64_BEGIN') &&
       contains(github.event.comment.body, 'TOY_IMPL_PATCH_B64_END')
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 50
     env:
       GH_TOKEN: ${{ github.token }}
       KICKOFF: ${{ runner.temp }}/dark-factory-wearedevs
@@ -37,8 +41,12 @@ jobs:
           PR='${{ github.event.issue.number }}'
           JSON="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR")"
           test "$(jq -r '.head.repo.full_name' <<<"$JSON")" = "$GITHUB_REPOSITORY"
-          test "$(jq -r '.head.ref' <<<"$JSON")" = "toy/rehearsal-1"
-          echo "ref=toy/rehearsal-1" >> "$GITHUB_OUTPUT"
+          REF="$(jq -r '.head.ref' <<<"$JSON")"
+          case "$REF" in
+            toy/rehearsal-[0-9]*) ;;
+            *) echo "Unexpected Toy branch: $REF" >&2; exit 1 ;;
+          esac
+          echo "ref=$REF" >> "$GITHUB_OUTPUT"
 
       - name: Checkout Toy branch
         uses: actions/checkout@v4
