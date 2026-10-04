@@ -1,4 +1,4 @@
-# Toy Factory Rehearsal 1 Trigger
+# Toy Factory Rehearsal 2 Trigger
 
 Opening the rehearsal pull request with this file triggers the fresh-room autonomous Toy Factory run.
 
