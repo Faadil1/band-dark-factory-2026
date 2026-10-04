@@ -18,6 +18,7 @@ jobs:
     timeout-minutes: 30
     env:
       GH_TOKEN: ${{ github.token }}
+      CODEX_GITHUB_USER_TOKEN: ${{ secrets.CODEX_GITHUB_USER_TOKEN }}
       BAND_COORDINATOR_AGENT_ID: ${{ secrets.BAND_COORDINATOR_AGENT_ID }}
       BAND_COORDINATOR_API_KEY: ${{ secrets.BAND_COORDINATOR_API_KEY }}
       BAND_IMPLEMENTER_AGENT_ID: ${{ secrets.BAND_IMPLEMENTER_AGENT_ID }}
@@ -51,6 +52,7 @@ jobs:
           test -n "$BAND_IMPLEMENTER_API_KEY"
           test -n "$BAND_REVIEWER_AGENT_ID"
           test -n "$BAND_REVIEWER_API_KEY"
+          test -n "$CODEX_GITHUB_USER_TOKEN"
 
       - name: Dispatch fresh Toy room and supervise Codex transport
         run: python infra/toy-rehearsal/dispatch.py
