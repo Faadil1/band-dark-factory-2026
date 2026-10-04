@@ -112,9 +112,17 @@ toy_factory_rehearsal:
     room_id: ca610561-d3da-46db-8f2c-fbb530eaa25a
     result: BLOCKED_CODEX_TRANSPORT
     implementation_produced: false
+  rehearsal_3:
+    pr: 38
+    room_id: e97af8a4-c28e-4731-bcc7-459012937bed
+    run_token: toy-r3-pr38-e6462fdd4ac4
+    result: BLOCKED_CODEX_TRANSPORT_TIMEOUT_AFTER_BOUNDED_RETRY
+    implementation_produced: false
+    first_attempt_seconds: 480
+    retry_attempt_seconds: 720
   transport_hardening:
     code_status: IMPLEMENTED_IN_PR_37
-    runtime_status: PENDING_REHEARSAL_3
+    runtime_status: PROVEN_FAIL_CLOSED_ON_REHEARSAL_3
     bounded_response_observation: true
     automatic_retry_count: 1
     fail_closed_terminal_blocker: true
@@ -122,7 +130,12 @@ toy_factory_rehearsal:
     synchronize_redispatch_removed: true
     late_duplicate_reply_guard: true
     review_terminal_markers: true
-  next_fresh_rehearsal: 3
+    user_authored_codex_dispatch: PENDING_SECRET_AND_REHEARSAL_4
+    root_cause_evidence:
+      bot_authored_mentions_35_36_38: NO_CODEX_REACTION_OR_REPLY
+      user_authored_probe_pr_39: CODEX_EYES_REACTION_OBSERVED
+      interpretation: CODEX_CONNECTOR_ACTIVE_BUT_BOT_AUTHORED_MENTIONS_NOT_ACCEPTED
+  next_fresh_rehearsal: 4
   reuse_rehearsal_1_or_2: false
 
 factory:
@@ -147,6 +160,7 @@ conditional_gateway_registry:
   BAND_TO_CODEX_END_TO_END: PROVEN
   TOY_FACTORY_REHEARSAL: ACTIVE
   TOY_CODEX_TRANSPORT_HARDENING: ACTIVE
+  CODEX_USER_AUTHORED_DISPATCH_IDENTITY: BLOCKED_BY_MISSING_USER_TOKEN_SECRET
   TRACK_LOCK: BLOCKED_BY_TOY_FACTORY_REHEARSAL
   REAL_TRACK_BUILD: BLOCKED_BY_TRACK_LOCK
   EVIDENCE_GRAPH: ACTIVE
@@ -166,8 +180,9 @@ evidence_graph:
 
 exact_next_gate: TOY_FACTORY_REHEARSAL
 exact_next_action: >-
-  Merge PR #37 only after its static/CI verification is green, then launch a fresh Toy Factory Rehearsal #3
-  on branch toy/rehearsal-3 in a fresh BAND room. Do not reuse PR #35 or #36, do not inject Toy code manually,
-  and keep TRACK_LOCK plus the real Pocketful build blocked until the hardened transport produces a Codex patch,
-  the independent Reviewer completes, the official isolated Toy harness is green, room evidence is exported,
-  and the exact accepted revision is bound to the receipts.
+  Install a repository-scoped fine-grained GitHub PAT as Actions secret CODEX_GITHUB_USER_TOKEN so workflow
+  comments addressed to @codex are authored by Faadil1 rather than github-actions[bot]. The token must be limited
+  to this repository and only the minimum Issues read/write permission needed to create PR conversation comments.
+  After the secret is present and the user-authored dispatch patch is merged, launch only a fresh toy/rehearsal-4
+  PR. Keep TRACK_LOCK and Pocketful blocked until Codex responds, Reviewer completes, the official isolated Toy
+  harness is green, room evidence is exported, and the exact accepted revision is bound to receipts.
