@@ -1,0 +1,79 @@
+name: Toy Factory Rehearsal Review
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: read
+
+jobs:
+  review:
+    if: >-
+      github.event.issue.pull_request &&
+      github.event.comment.user.login == 'chatgpt-codex-connector[bot]' &&
+      contains(github.event.comment.body, 'TOY_IMPL_PATCH_B64_BEGIN') &&
+      contains(github.event.comment.body, 'TOY_IMPL_PATCH_B64_END')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      KICKOFF: ${{ runner.temp }}/dark-factory-wearedevs
+      BAND_COORDINATOR_AGENT_ID: ${{ secrets.BAND_COORDINATOR_AGENT_ID }}
+      BAND_COORDINATOR_API_KEY: ${{ secrets.BAND_COORDINATOR_API_KEY }}
+      BAND_IMPLEMENTER_AGENT_ID: ${{ secrets.BAND_IMPLEMENTER_AGENT_ID }}
+      BAND_IMPLEMENTER_API_KEY: ${{ secrets.BAND_IMPLEMENTER_API_KEY }}
+      BAND_REVIEWER_AGENT_ID: ${{ secrets.BAND_REVIEWER_AGENT_ID }}
+      BAND_REVIEWER_API_KEY: ${{ secrets.BAND_REVIEWER_API_KEY }}
+
+    steps:
+      - name: Resolve PR branch
+        id: pr
+        shell: bash
+        run: |
+          set -euo pipefail
+          PR='${{ github.event.issue.number }}'
+          JSON="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR")"
+          test "$(jq -r '.head.repo.full_name' <<<"$JSON")" = "$GITHUB_REPOSITORY"
+          test "$(jq -r '.head.ref' <<<"$JSON")" = "toy/rehearsal-1"
+          echo "ref=toy/rehearsal-1" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout Toy branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.pr.outputs.ref }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Clone official kickoff
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --depth 1 https://github.com/band-ai/dark-factory-wearedevs.git "$KICKOFF"
+          test "$(git -C "$KICKOFF" rev-parse HEAD)" = "803560d2a678ace1414465c098eb0ab5380ffade"
+
+      - name: Install official harness
+        shell: bash
+        run: |
+          python -m pip install -r "$KICKOFF/harness/requirements.txt"
+
+      - name: Apply Implementer patch and run independent Reviewer harness
+        run: python infra/toy-rehearsal/review.py
+
+      - name: Upload Toy harness evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: toy-factory-rehearsal
+          path: |
+            artifacts/toy-rehearsal/**
+            ${{ runner.temp }}/toy-all/**
+            ${{ runner.temp }}/toy-harness.stdout
+            ${{ runner.temp }}/toy-harness.stderr
+          if-no-files-found: warn
