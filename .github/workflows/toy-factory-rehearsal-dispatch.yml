@@ -2,7 +2,7 @@ name: Toy Factory Rehearsal Dispatch
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, reopened]
 
 permissions:
   contents: read
@@ -15,7 +15,7 @@ jobs:
       github.event.pull_request.head.repo.full_name == github.repository &&
       startsWith(github.event.pull_request.head.ref, 'toy/rehearsal-')
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 30
     env:
       GH_TOKEN: ${{ github.token }}
       BAND_COORDINATOR_AGENT_ID: ${{ secrets.BAND_COORDINATOR_AGENT_ID }}
@@ -24,6 +24,9 @@ jobs:
       BAND_IMPLEMENTER_API_KEY: ${{ secrets.BAND_IMPLEMENTER_API_KEY }}
       BAND_REVIEWER_AGENT_ID: ${{ secrets.BAND_REVIEWER_AGENT_ID }}
       BAND_REVIEWER_API_KEY: ${{ secrets.BAND_REVIEWER_API_KEY }}
+      CODEX_FIRST_WINDOW_SECONDS: "480"
+      CODEX_RETRY_WINDOW_SECONDS: "720"
+      CODEX_POLL_SECONDS: "60"
 
     steps:
       - name: Checkout operational repository
@@ -49,5 +52,5 @@ jobs:
           test -n "$BAND_REVIEWER_AGENT_ID"
           test -n "$BAND_REVIEWER_API_KEY"
 
-      - name: Dispatch fresh Toy room and Codex task
+      - name: Dispatch fresh Toy room and supervise Codex transport
         run: python infra/toy-rehearsal/dispatch.py
