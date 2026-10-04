@@ -48,7 +48,9 @@ toy_rehearsal_history:
     result: BLOCKED_CODEX_TRANSPORT_TIMEOUT_AFTER_BOUNDED_RETRY
   transport_hardening_pr: 37
   codex_user_probe_pr: 39
-  codex_user_probe_signal: CODEX_EYES_REACTION_OBSERVED
+  codex_user_probe_signal: CODEX_TASK_COMPLETED_WITH_TWO_BOT_REPLIES
+  codex_user_probe_comment_id: 5983795312
+  codex_reply_comment_ids: [5983809519, 5983810255]
   next_fresh_rehearsal: 4
 
 runtime_evidence:
