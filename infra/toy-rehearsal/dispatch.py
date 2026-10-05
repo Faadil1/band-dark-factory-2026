@@ -105,7 +105,14 @@ def gh_comments(repo, pr):
     return json.loads(p.stdout)
 
 
-def codex_patch_reply(repo, pr, *, after_comment_id):
+CODEX_EXPLICIT_FAILURE_MARKERS = (
+    "Codex couldn't complete this request. Try again later.",
+    "Codex couldn’t complete this request. Try again later.",
+)
+
+
+def codex_attempt_result(repo, pr, *, after_comment_id):
+    failures = []
     for item in gh_comments(repo, pr):
         if int(item.get("id") or 0) <= int(after_comment_id):
             continue
@@ -113,19 +120,23 @@ def codex_patch_reply(repo, pr, *, after_comment_id):
             continue
         body = str(item.get("body") or "")
         if "TOY_IMPL_PATCH_B64_BEGIN" in body and "TOY_IMPL_PATCH_B64_END" in body:
-            return item
+            return {"status": "PATCH", "comment": item}
+        if any(marker in body for marker in CODEX_EXPLICIT_FAILURE_MARKERS):
+            failures.append(item)
+    if failures:
+        return {"status": "EXPLICIT_FAILURE", "comment": failures[-1]}
     return None
 
 
 def wait_for_codex(repo, pr, *, after_comment_id, timeout_seconds, poll_seconds):
     deadline = time.monotonic() + timeout_seconds
     while True:
-        reply = codex_patch_reply(repo, pr, after_comment_id=after_comment_id)
-        if reply is not None:
-            return reply
+        result = codex_attempt_result(repo, pr, after_comment_id=after_comment_id)
+        if result is not None:
+            return result
         remaining = deadline - time.monotonic()
         if remaining <= 0:
-            return None
+            return {"status": "TIMEOUT", "comment": None}
         time.sleep(min(poll_seconds, max(1, int(remaining))))
 
 
@@ -255,14 +266,15 @@ def main():
     first_prompt = gh_comment(
         repo, pr, codex_prompt(token, branch, rehearsal), token=codex_user_token
     )
-    reply = wait_for_codex(
+    first_result = wait_for_codex(
         repo,
         pr,
         after_comment_id=first_prompt["id"],
         timeout_seconds=first_window,
         poll_seconds=poll_seconds,
     )
-    if reply is not None:
+    if first_result["status"] == "PATCH":
+        reply = first_result["comment"]
         print(json.dumps({
             "status": "CODEX_RESPONSE_OBSERVED",
             "room_id": room_id,
@@ -275,17 +287,19 @@ def main():
         }))
         return
 
+    retry_reason = first_result["status"]
     retry_prompt = gh_comment(
         repo, pr, codex_prompt(token, branch, rehearsal, retry=True), token=codex_user_token
     )
-    reply = wait_for_codex(
+    retry_result = wait_for_codex(
         repo,
         pr,
-        after_comment_id=first_prompt["id"],
+        after_comment_id=retry_prompt["id"],
         timeout_seconds=retry_window,
         poll_seconds=poll_seconds,
     )
-    if reply is not None:
+    if retry_result["status"] == "PATCH":
+        reply = retry_result["comment"]
         print(json.dumps({
             "status": "CODEX_RESPONSE_OBSERVED_AFTER_RETRY",
             "room_id": room_id,
@@ -294,15 +308,22 @@ def main():
             "run_token": token,
             "attempts": 2,
             "codex_dispatch_login": codex_user_login,
+            "retry_reason": retry_reason,
             "retry_comment_id": retry_prompt["id"],
             "codex_comment_id": reply["id"],
         }))
         return
 
+    terminal_reason = (
+        "CODEX_EXECUTION_FAILURE"
+        if retry_result["status"] == "EXPLICIT_FAILURE"
+        else "CODEX_TRANSPORT_TIMEOUT"
+    )
     blocker = (
         "TOY_REHEARSAL_TERMINAL "
-        f"status=BLOCKED reason=CODEX_TRANSPORT_TIMEOUT run_token={token} "
-        f"branch={branch} attempts=2 first_window_seconds={first_window} "
+        f"status=BLOCKED reason={terminal_reason} run_token={token} "
+        f"branch={branch} attempts=2 first_attempt={retry_reason} "
+        f"second_attempt={retry_result['status']} first_window_seconds={first_window} "
         f"retry_window_seconds={retry_window}"
     )
     gh_comment(repo, pr, blocker)
@@ -319,6 +340,8 @@ def main():
             {"id": reviewer["id"], "name": reviewer["name"], "handle": reviewer["handle"]},
         ],
     )
+    if terminal_reason == "CODEX_EXECUTION_FAILURE":
+        raise SystemExit("Codex explicitly failed after the single bounded retry")
     raise SystemExit("Codex transport timed out after the single bounded retry")
 
 
