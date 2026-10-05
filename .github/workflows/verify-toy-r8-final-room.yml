@@ -1,0 +1,91 @@
+name: Verify Toy R8 Final Room Binding
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: read
+
+jobs:
+  final-check:
+    if: github.head_ref == 'verify/toy-r8-final-room-check-v1'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout verifier branch
+        uses: actions/checkout@v6
+        with:
+          path: verifier
+
+      - name: Checkout exact accepted Toy candidate
+        uses: actions/checkout@v6
+        with:
+          ref: 7679ba2f5d1937ebeed4b1e04449918ac8a7ecc8
+          path: candidate
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Clone pinned official harness
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone https://github.com/band-ai/dark-factory-wearedevs.git "$RUNNER_TEMP/kickoff"
+          git -C "$RUNNER_TEMP/kickoff" checkout 803560d2a678ace1414465c098eb0ab5380ffade
+          python -m pip install -r "$RUNNER_TEMP/kickoff/harness/requirements.txt"
+
+      - name: Build immutable Toy submission shape
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/submission"
+          mkdir -p "$OUT"
+          cp candidate/toy-result/README.md "$OUT/README.md"
+          cp candidate/toy-result/FACTORY.md "$OUT/FACTORY.md"
+          cp -R candidate/toy-result/mandates "$OUT/mandates"
+          for n in 1 2 3 4; do cp -R "candidate/toy-result/stage-$n" "$OUT/stage-$n"; done
+          cp verifier/evidence/toy-rehearsal-8/room.json "$OUT/room.json"
+          echo "7679ba2f5d1937ebeed4b1e04449918ac8a7ecc8  ACCEPTED_REVISION"
+          sha256sum "$OUT/room.json"
+
+      - name: Verify exact BAND export binding
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(sha256sum "$RUNNER_TEMP/submission/room.json" | awk '{print $1}')" = "679852b4eda5285b7659f033235dd8e94fba2c90a3f8c7605e66062c69f71103"
+          python - <<'PY'
+          import json, os, pathlib
+          p=pathlib.Path(os.environ["RUNNER_TEMP"])/"submission"/"room.json"
+          d=json.loads(p.read_text())
+          assert d["room"]["id"]=="bee3fb3e-6f4a-4f96-8a32-b72ac1a4f0f5"
+          assert d.get("scope")=="full"
+          text="\n".join(str(m.get("content","")) for m in d.get("messages",[]))
+          assert "toy-r8-pr71-337369dc6327" in text
+          assert "7679ba2f5d1937ebeed4b1e04449918ac8a7ecc8" in text
+          assert "ACCEPT 7679ba2f5d1937ebeed4b1e04449918ac8a7ecc8" in text
+          print("ROOM_BINDING=PROVEN")
+          PY
+
+      - name: Run official offline submission check
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/kickoff"
+          python -m harness check "$RUNNER_TEMP/submission" --track toy
+
+      - name: Run official isolated all-stage check
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/kickoff"
+          python -m harness run --track toy --repo "$RUNNER_TEMP/submission" --all --mode isolated --out "$RUNNER_TEMP/toy-r8-final"
+
+      - name: Upload final Toy verification evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: toy-r8-final-room-check
+          path: |
+            ${{ runner.temp }}/toy-r8-final/**
+            ${{ runner.temp }}/submission/room.json
