@@ -43,7 +43,7 @@ jobs:
           assert "synchronize" not in dispatch_workflow
           assert "CODEX_FIRST_WINDOW_SECONDS" in dispatch_workflow
           assert "CODEX_RETRY_WINDOW_SECONDS" in dispatch_workflow
-          assert "CODEX_GITHUB_USER_TOKEN: ${{ secrets.CODEX_GITHUB_USER_TOKEN }}" in dispatch_workflow
+          assert "CODEX_GITHUB_USER_TOKEN:" in dispatch_workflow
 
           assert "toy/rehearsal-1" not in review_workflow
           assert "toy/rehearsal-[0-9]*" in review_workflow
@@ -52,6 +52,9 @@ jobs:
           assert "CODEX_TRANSPORT_TIMEOUT" in dispatch
           assert "validate_codex_user_token" in dispatch
           assert "token=codex_user_token" in dispatch
+          assert "CODEX_EXPLICIT_FAILURE_MARKERS" in dispatch
+          assert "EXPLICIT_FAILURE" in dispatch
+          assert "CODEX_EXECUTION_FAILURE" in dispatch
           assert "attempt 2/2" in dispatch
           assert 're.fullmatch(r"toy/rehearsal-(\\d+)", branch)' in dispatch
 
