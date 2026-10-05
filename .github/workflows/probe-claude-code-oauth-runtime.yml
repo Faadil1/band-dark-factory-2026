@@ -1,0 +1,42 @@
+name: Probe Claude Code OAuth Runtime
+
+on:
+  pull_request:
+    types: [opened]
+    paths:
+      - "evidence/claude-code-oauth-runtime-probe.md"
+      - ".github/workflows/probe-claude-code-oauth-runtime.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    if: startsWith(github.head_ref, 'probe/claude-code-oauth-runtime-')
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout candidate
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Run Claude Code micro probe
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Diagnostic micro probe only.
+            Modify ONLY evidence/claude-code-oauth-runtime-probe.md.
+            Add exactly this line immediately after "Expected marker:":
+            CLAUDE_CODE_RUNTIME=PROVEN
+            Do not modify any other file.
+          claude_args: "--max-turns 4"
+
+      - name: Verify bounded result
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fxq 'CLAUDE_CODE_RUNTIME=PROVEN' evidence/claude-code-oauth-runtime-probe.md
+          changed="$(git diff --name-only)"
+          test "$changed" = "evidence/claude-code-oauth-runtime-probe.md"
+          echo "CLAUDE_CODE_RUNTIME_PROBE=PROVEN"
