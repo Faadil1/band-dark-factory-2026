@@ -200,3 +200,31 @@ missing_edges:
     track: POCKETFUL
     concept: REMOTE_EVIDENCE_BOUND_FACTORY_WITH_POCKETFUL_CONSEQUENCE_DEPTH
     truth_boundary: pre_real_track_slice
+
+  - claim_id: POCKETFUL_STAGE_1_VERTICAL_SLICE
+    status: PROVEN_WITH_REMAINING_ASSURANCE_GAP
+    evidence: evidence/POCKETFUL-STAGE-1-POST-SLICE-DEPTH-REVIEW-2026-10-05.yaml
+    observed:
+      pr: 83
+      room_id: e14bd176-f625-4250-86b9-11312d6556ae
+      run_token: pocketful-s1-r2-pr83-5cee856f2d0e
+      accepted_revision: b27a7dcc627637be4cad037cb59c369c36181b63
+      promotion_merge_sha: 5d090cf8753f75aec30584303e87ff64529c77fa
+      workflow_run_id: 37284926331
+      workflow_job_id: 111681444450
+      official_isolated_harness_exit: 0
+      artifact_id: 11334032388
+      artifact_digest: sha256:d86433473019c095b37fed529130a305a4a83cdaeab6e25c74c6ee8a264f7c6c
+      human_steering_after_pr_open: false
+    truth_boundary:
+      proves:
+        - first_real_Pocketful_Stage_1_vertical_slice
+        - exact_candidate_commit_binding
+        - pinned_official_isolated_public_harness_pass
+        - real_wallet_state_consequence_in_isolated_runtime
+      does_not_prove:
+        - hidden_test_success
+        - exhaustive_normative_spec_conformance
+        - independent_spec_derived_adversarial_assurance_beyond_shipped_harness
+        - Stage_2_or_later_depth
+        - production_banking_readiness

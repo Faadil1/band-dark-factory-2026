@@ -1,0 +1,135 @@
+version: 1.0
+project_id: band_dark_factory_wearedevelopers_2026
+date: 2026-10-05
+review: POST_VERTICAL_SLICE_DEPTH_GAP_REVIEW
+scope: POCKETFUL_STAGE_1
+accepted_revision: b27a7dcc627637be4cad037cb59c369c36181b63
+promotion_merge_sha: 5d090cf8753f75aec30584303e87ff64529c77fa
+pr: 83
+workflow_run_id: 37284926331
+workflow_job_id: 111681444450
+room_id: e14bd176-f625-4250-86b9-11312d6556ae
+run_token: pocketful-s1-r2-pr83-5cee856f2d0e
+official_kickoff_sha: 803560d2a678ace1414465c098eb0ab5380ffade
+artifact_id: 11334032388
+artifact_digest: sha256:d86433473019c095b37fed529130a305a4a83cdaeab6e25c74c6ee8a264f7c6c
+
+truth_boundary:
+  observed:
+    - Claude_Code_implemented_Stage_1_after_single_initial_dispatch
+    - exact_revision_b27a7dcc627637be4cad037cb59c369c36181b63_was_published
+    - independent_Reviewer_step_ran_the_pinned_official_isolated_Stage_1_harness
+    - official_isolated_harness_exit_0
+    - no_human_steering_after_PR_open
+    - Stage_1_container_source_Dockerfile_and_RUN_md_are_present
+  inferred:
+    - accepted_Stage_1_is_a_valid_first_real_track_vertical_slice_for_Product_Reality_routing
+  unknown:
+    - hidden_test_success
+    - exhaustive_conformance_to_every_normative_Stage_1_requirement
+    - provider_cost_dollars_for_this_run
+
+material_user_capability_delta_since_previous_milestone:
+  status: MATERIAL_DELTA
+  capability: >-
+    A real Pocketful Stage 1 service now exists and runs in the pinned isolated challenge runtime with authenticated
+    wallet operations, payments, requests, splits, settlements, idempotency, conservation-oriented state transitions,
+    and export/import behavior. At the previous milestone no real Pocketful product implementation existed.
+  evidence_revision: b27a7dcc627637be4cad037cb59c369c36181b63
+
+depth_review:
+  live_core_loop:
+    status: PROVEN_IN_PINNED_OFFICIAL_ISOLATED_RUNTIME
+    note: authenticated wallet/payment/request/split/settlement API behavior executes in the Stage 1 service
+  load_bearing_integrations:
+    status: N/A_AT_STAGE_1
+    reason: official Stage 1 is a self-contained single-container API with no outbound runtime network; forcing an external integration would violate scope
+  real_consequence:
+    status: PROVEN
+    note: successful calls mutate actual wallet/request/payment/settlement state and balance conservation is exercised by the official suite
+  representative_success_negative_boundary_recovery:
+    status: PARTIAL
+    proven:
+      - shipped_official_Stage_1_suite_passes
+      - auth_and_money_movement_paths_execute
+      - idempotency_and_state_control_surfaces_are_implemented
+    remaining:
+      - independent_spec_derived_adversarial_black_box_assurance_beyond_shipped_tests
+      - hidden_test_behavior_UNKNOWN
+  failure_and_recovery:
+    status: PARTIAL
+    note: idempotent retry and export/import recovery surfaces exist and shipped checks pass; broader spec-derived adversarial recovery coverage remains unproven
+  real_user_surface:
+    status: N/A_AT_STAGE_1_OFFICIAL_SCOPE
+    reason: official Stage 1 explicitly requires HTTP API only; browser wallet/product surface activates in Stage 2
+  external_user_or_operator_evidence:
+    status: N/A_AT_STAGE_1
+    reason: challenge Stage 1 validation is through isolated evaluator/runtime behavior; no adoption claim is made
+  time_to_first_value:
+    status: OBSERVED
+    room_context_to_accept_seconds_approx: 285
+    pr_open_to_accept_seconds_approx: 301
+  operational_economics:
+    status: UNKNOWN_PROVIDER_COST
+    observed_basis: Claude_Code_subscription_runtime_plus_GitHub_hosted_runner
+  shared_product_core:
+    status: PROVEN_INITIAL_STAGE_1_CORE
+    note: one coherent Stage 1 service implements the wallet domain; cumulative reuse into later stages is not yet proven
+  reality_ledger:
+    status: ACTIVE
+    evidence:
+      - PR_83
+      - workflow_run_37284926331
+      - room_e14bd176-f625-4250-86b9-11312d6556ae
+      - accepted_revision_b27a7dcc627637be4cad037cb59c369c36181b63
+      - artifact_11334032388
+  observability_and_receipts:
+    status: PROVEN_FOR_FACTORY_PARTIAL_FOR_PRODUCT
+    note: commit/room/harness receipts are bound; browser/user receipt comprehension is Stage 2+
+  judge_or_operator_self_serve:
+    status: PARTIAL
+    note: RUN.md plus container API are reproducible; evaluator-facing browser flow is not applicable until Stage 2
+  setup_and_reproducibility:
+    status: PROVEN_FOR_STAGE_1
+    note: pinned official isolated harness built and exercised the submitted Dockerfile successfully
+  clean_room_core_path:
+    status: PROVEN_FOR_STAGE_1
+  external_dependency_failure:
+    status: N/A_AT_STAGE_1
+    reason: runtime intentionally has no outbound dependency
+  production_like_behavior:
+    status: N/A
+    reason: hackathon isolated service; no production banking claim
+
+material_gap_assessment:
+  - id: STAGE_1_SPEC_DERIVED_INDEPENDENT_ASSURANCE
+    severity: MATERIAL
+    status: MISSING
+    reason: >-
+      The automated Reviewer executed the official shipped harness only. The PRD requires independent verification
+      derived from the written specification, with the harness as one evidence source rather than acceptance authority.
+  - id: STAGE_1_AUTHENTIC_FULL_ROOM_EXPORT_BINDING
+    severity: MATERIAL_FOR_FINAL_SUBMISSION_EVIDENCE
+    status: MISSING
+  - id: STAGE_2_BROWSER_AND_RECOVERY
+    severity: MATERIAL_PRODUCT_DEPTH
+    status: NOT_STARTED
+  - id: STAGE_3_TEMPORAL_CORRECTIONS
+    severity: MATERIAL_PRODUCT_DEPTH
+    status: NOT_STARTED
+  - id: STAGE_4_REFUNDS_AND_BATCH_CORRECTIONS
+    severity: MATERIAL_PRODUCT_DEPTH
+    status: NOT_STARTED
+  - id: HIDDEN_TEST_SUCCESS
+    severity: MATERIAL_UNKNOWN
+    status: UNKNOWN
+
+workstream:
+  current_primary_workstream: PRODUCT_EXPLOITATION
+  demo_packaging_allowed: false
+  workstream_drift_status: NO_DRIFT_OBSERVED
+  valid_stop_condition: null
+  next_highest_value_depth_delta: STAGE_1_SPEC_DERIVED_INDEPENDENT_ASSURANCE
+  rationale: >-
+    Close the Stage 1 verification-depth gap without changing product code unless a real counterexample is found;
+    then proceed immediately to Stage 2 browser/recovery depth if Stage 1 remains accepted.
