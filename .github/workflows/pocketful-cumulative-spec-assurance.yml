@@ -5,6 +5,7 @@ on:
     types: [opened, reopened, synchronize]
     paths:
       - "assurance/pocketful-stage4/**"
+      - "pocketful-result/stage-4/**"
       - ".github/workflows/pocketful-cumulative-spec-assurance.yml"
 
 permissions:
@@ -25,18 +26,27 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Materialize exact accepted Stage 4 candidate
+      - name: Clone pinned official kickoff
         shell: bash
         run: |
           set -euo pipefail
-          git worktree add "$RUNNER_TEMP/candidate" f2744a48d31987732b830c02f77fcf086bae2683
-          test "$(git -C "$RUNNER_TEMP/candidate" rev-parse HEAD)" = "f2744a48d31987732b830c02f77fcf086bae2683"
+          git clone https://github.com/band-ai/dark-factory-wearedevs.git "$RUNNER_TEMP/kickoff"
+          git -C "$RUNNER_TEMP/kickoff" checkout 803560d2a678ace1414465c098eb0ab5380ffade
+          test "$(git -C "$RUNNER_TEMP/kickoff" rev-parse HEAD)" = "803560d2a678ace1414465c098eb0ab5380ffade"
+          python -m pip install -r "$RUNNER_TEMP/kickoff/harness/requirements.txt"
 
-      - name: Build accepted Stage 4 and inherited Stage 3 images
+      - name: Run pinned official Stage 4 harness on repair candidate
         shell: bash
         run: |
-          docker build -t pocketful-stage4-assurance "$RUNNER_TEMP/candidate/pocketful-result/stage-4"
-          docker build -t pocketful-stage3-migration-source "$RUNNER_TEMP/candidate/pocketful-result/stage-3"
+          mkdir -p artifacts/pocketful-cumulative-assurance/official-stage4
+          python -m harness run             --track pocketful             --repo "$GITHUB_WORKSPACE/pocketful-result"             --stage 4             --mode isolated             --out "$GITHUB_WORKSPACE/artifacts/pocketful-cumulative-assurance/official-stage4"
+        working-directory: ${{ runner.temp }}/kickoff
+
+      - name: Build repair candidate Stage 4 and inherited Stage 3 images
+        shell: bash
+        run: |
+          docker build -t pocketful-stage4-assurance "$GITHUB_WORKSPACE/pocketful-result/stage-4"
+          docker build -t pocketful-stage3-migration-source "$GITHUB_WORKSPACE/pocketful-result/stage-3"
 
       - name: Start assurance services
         shell: bash
