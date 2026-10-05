@@ -24,7 +24,6 @@ jobs:
     timeout-minutes: 50
     env:
       GH_TOKEN: ${{ github.token }}
-      KICKOFF: ${{ runner.temp }}/dark-factory-wearedevs
       BAND_COORDINATOR_AGENT_ID: ${{ secrets.BAND_COORDINATOR_AGENT_ID }}
       BAND_COORDINATOR_API_KEY: ${{ secrets.BAND_COORDINATOR_API_KEY }}
       BAND_IMPLEMENTER_AGENT_ID: ${{ secrets.BAND_IMPLEMENTER_AGENT_ID }}
@@ -53,6 +52,10 @@ jobs:
         with:
           ref: ${{ steps.pr.outputs.ref }}
           fetch-depth: 0
+
+      - name: Initialize runtime paths
+        shell: bash
+        run: echo "KICKOFF=$RUNNER_TEMP/dark-factory-wearedevs" >> "$GITHUB_ENV"
 
       - name: Set up Python
         uses: actions/setup-python@v5
