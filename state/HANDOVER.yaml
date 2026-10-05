@@ -24,6 +24,12 @@ canonical_baseline:
     LIVE/COMPLETE, release, or submission-readiness state. Do not treat demo, seed, replay, receipts, story, or judge
     flow as product progress if material product-depth gaps later exist without a real user-capability delta.
 
+pbpd_workspace:
+  repository: Faadil1/pbpd-cowork-system
+  merge_sha: ff035d80c02620ce9b36755a9759d89946f5f475
+  living_prd_version: 0.2.0
+  living_prd_state: TRACK_LOCKED_READY_FOR_REAL_STAGE_1
+
 read_order:
   - state/CURRENT.yaml
   - state/HANDOVER.yaml
