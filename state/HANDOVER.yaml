@@ -12,7 +12,7 @@ canonical_baseline:
   project_state_commit_at_reconciliation_start: a1260bd53695e04c7615316e464593d28fa4df39
   delta_status: NON_MATERIAL_DELTA
   delta_reason: governance_control_update_only_while_project_remains_pre_slice
-  first_live_slice_proven: false
+  first_live_slice_proven: true
   material_user_capability_delta_since_previous_milestone: NONE
   central_main_reconciliation_wave: fb062d6cd792cab8e27c342120824f285120bc2f
   product_reality_version: "1.5.0"
@@ -174,19 +174,20 @@ next_gate:
     - TRACK_LOCK
 
 product_workstream_priority:
-  first_live_slice_proven: false
-  current_primary_workstream: REAL_TRACK_VERTICAL_SLICE_IMPLEMENTATION
+  first_live_slice_proven: true
+  current_primary_workstream: PRODUCT_EXPLOITATION
   remaining_material_depth_gaps:
-    - no_real_track_vertical_slice_exists
-    - Pocketful_stage_1_live_core_loop_not_proven
-    - Pocketful_stage_1_real_user_surface_not_proven
-    - Pocketful_stage_1_failure_and_recovery_depth_not_proven
-    - later_official_stage_depth_pending
-  next_highest_value_depth_delta: BUILD_POCKETFUL_STAGE_1_THROUGH_REMOTE_EVIDENCE_BOUND_FACTORY
+    - Pocketful_stage_1_independent_spec_derived_assurance_missing
+    - Pocketful_stage_1_authentic_full_room_export_binding_missing
+    - Pocketful_stage_2_browser_and_recovery_not_started
+    - Pocketful_stage_3_temporal_corrections_not_started
+    - Pocketful_stage_4_refunds_and_batch_corrections_not_started
+    - hidden_test_success_UNKNOWN
+  next_highest_value_depth_delta: STAGE_1_SPEC_DERIVED_INDEPENDENT_ASSURANCE
   valid_stop_condition: null
   demo_packaging_allowed: false
   workstream_drift_status: NO_DRIFT_OBSERVED
-  material_user_capability_delta_since_previous_milestone: NONE
+  material_user_capability_delta_since_previous_milestone: MATERIAL_DELTA
 
 repair_path_proof:
   status: PROVEN
@@ -218,11 +219,27 @@ pocketful_stage_1_runs:
     implementation_produced: false
     reviewer_ran: false
     root_cause: CLAUDE_WORKFLOW_MUST_EXIST_IDENTICALLY_ON_DEFAULT_BRANCH
-  next_fresh_run: 2
+  run_2:
+    pr: 83
+    branch: pocketful/stage-1-run-2
+    room_id: e14bd176-f625-4250-86b9-11312d6556ae
+    run_token: pocketful-s1-r2-pr83-5cee856f2d0e
+    result: ACCEPT_ATTEMPT_1
+    accepted_revision: b27a7dcc627637be4cad037cb59c369c36181b63
+    promotion_merge_sha: 5d090cf8753f75aec30584303e87ff64529c77fa
+    workflow_run_id: 37284926331
+    workflow_job_id: 111681444450
+    artifact_id: 11334032388
+    artifact_digest: sha256:d86433473019c095b37fed529130a305a4a83cdaeab6e25c74c6ee8a264f7c6c
+    official_isolated_harness_exit: 0
+    human_steering_after_pr_open: false
+    hidden_test_success: UNKNOWN
+    independent_spec_derived_assurance: MISSING
+  next_fresh_run: NONE_UNLESS_REPAIR_OR_REVALIDATION_IS_JUSTIFIED
 
 next_action: >-
-  Bootstrap the Pocketful Stage 1 Claude workflow on main, then open fresh pocketful/stage-1-run-2. Run 1 is terminal
-  BLOCKED before Claude execution because the action requires its workflow file to already exist identically on the
-  default branch. Run 2 must preserve one initial task, zero human steering after dispatch, exact revision binding and
-  independent pinned official isolated verification. After the first valid real-track vertical slice, run the
-  Post-Vertical-Slice Depth Gap Review before any demo or submission packaging.
+  Preserve accepted Stage 1 revision b27a7dcc627637be4cad037cb59c369c36181b63 and run an independent
+  spec-derived adversarial black-box assurance pass. The shipped public harness remains one evidence source, not the
+  acceptance authority. Do not change product code unless a real counterexample is reproduced. If Stage 1 survives,
+  bind the assurance result and proceed directly to Stage 2 browser/recovery product depth. Demo/story packaging
+  remains blocked.
