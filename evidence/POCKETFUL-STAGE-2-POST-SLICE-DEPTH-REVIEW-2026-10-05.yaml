@@ -1,0 +1,84 @@
+project: band_dark_factory_wearedevelopers_2026
+milestone: POCKETFUL_STAGE_2_ACCEPTED_DEPTH_REVIEW
+date: 2026-10-05
+canonical_baseline_version: 0.1.56-canonical-baseline-drift-tripwire-promoted
+canonical_baseline_sha: 8a7e8a4ff5461641c595e2cf052a95fdc32a6340
+product_reality_version: 1.5.0
+
+accepted_candidate:
+  pr: 90
+  branch: pocketful/stage-2-run-2
+  room_id: f036d266-b2ec-4edd-aa95-9ca35dd96770
+  run_token: pocketful-s2-r2-pr90-b6586ab6f5a1
+  revision: 3b46422054dee1aa65379bd5efbca33988084fd2
+  promotion_merge_sha: 068fe2c70c83b55ad6ec7469d1d60b6dfb1eea99
+  workflow_run_id: 37299342044
+  workflow_job_id: 111728076908
+  artifact_id: 11340956631
+  artifact_digest: sha256:cf410aec7081dc472ff4a0fbb307dd4591203b6d13bab7e2a7d1cba20fc89681
+  reviewer_selector: "--stage 2"
+  official_isolated_harness_exit: 0
+  human_steering_after_pr_open: false
+
+observed_public_harness:
+  stage_1:
+    collected: 147
+    passed: 147
+    failed: 0
+    errors: 0
+  stage_2:
+    collected: 35
+    passed: 35
+    failed: 0
+    errors: 0
+  highest_contiguous: 2
+  claimed_stage: "2"
+  share: 1.0
+  overshoot: null
+
+material_user_capability_delta_since_previous_milestone:
+  status: MATERIAL_DELTA
+  observed:
+    - browser_wallet_surface_exists
+    - wallet_refresh_and_browser_navigation_surface_exists
+    - authorization_and_capture_server_paths_exist
+    - available_and_held_wallet_fields_exist
+    - stage_2_public_harness_claims_stage_2_on_exact_candidate
+  truth_boundary: >-
+    The shipped public harness and repository inspection prove a real Stage 2 candidate with browser and
+    authorization/capture surfaces. They do not prove hidden-test success or exhaustive conformance to every
+    normative Stage 2 requirement.
+
+depth_review:
+  first_live_slice_proven: true
+  current_primary_workstream: PRODUCT_EXPLOITATION
+  remaining_material_depth_gaps:
+    - Pocketful_stage_1_authentic_full_room_export_binding_missing
+    - Pocketful_stage_2_hidden_and_full_normative_conformance_UNKNOWN
+    - Pocketful_stage_3_statements_and_payment_corrections_not_started
+    - Pocketful_stage_4_refunds_and_batch_corrections_not_started
+  next_highest_value_depth_delta: POCKETFUL_STAGE_3_STATEMENTS_AND_PAYMENT_CORRECTIONS
+  valid_stop_condition: null
+  demo_packaging_allowed: false
+  workstream_drift_status: NO_DRIFT_OBSERVED
+
+truth_boundary:
+  OBSERVED:
+    - exact_revision_bound_to_BAND_run
+    - reviewer_used_pinned_official_harness_stage_2
+    - stage_1_147_of_147_public_checks_passed
+    - stage_2_35_of_35_public_checks_passed
+    - no_public_harness_overshoot
+    - candidate_promoted_to_main
+  UNKNOWN:
+    - hidden_test_success
+    - exhaustive_normative_Stage_2_conformance_beyond_shipped_checks
+    - production_banking_readiness
+
+exact_next_gate: POCKETFUL_STAGE_3_PRODUCT_DEPTH
+exact_next_owner: PBPD
+exact_next_action: >-
+  Preserve the accepted Stage 2 candidate and begin Stage 3 product exploitation from the pinned official
+  specification: statements, historical/as-of balances, effective-vs-recorded-time revisions, corrections,
+  stable statement snapshots, settlement/capture immutability and historical hold semantics. Keep evidence and
+  demo packaging secondary while Stage 3 and Stage 4 product-depth gaps remain.

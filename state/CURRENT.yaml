@@ -334,22 +334,23 @@ product_workstream_priority:
   first_live_slice_proven: true
   remaining_material_depth_gaps:
     - Pocketful_stage_1_authentic_full_room_export_binding_missing
-    - Pocketful_stage_2_correct_reviewer_stage_verification_not_yet_proven
-    - Pocketful_stage_3_temporal_corrections_not_started
+    - Pocketful_stage_2_hidden_and_full_normative_conformance_UNKNOWN
+    - Pocketful_stage_3_statements_and_payment_corrections_not_started
     - Pocketful_stage_4_refunds_and_batch_corrections_not_started
     - hidden_test_success_UNKNOWN
   current_primary_workstream: PRODUCT_EXPLOITATION
-  next_highest_value_depth_delta: POCKETFUL_STAGE_2_BROWSER_RECOVERY_HOLDS_PARTIAL_CAPTURE
+  next_highest_value_depth_delta: POCKETFUL_STAGE_3_STATEMENTS_AND_PAYMENT_CORRECTIONS
   valid_stop_condition: null
   demo_packaging_allowed: false
   workstream_drift_status: NO_DRIFT_OBSERVED
   material_user_capability_delta_since_previous_milestone: MATERIAL_DELTA
   material_user_capability_delta_reason: >-
-    Pocketful Stage 1 now exists as a real accepted service in the pinned official isolated runtime. Authenticated
-    wallet operations, payments, requests, splits, settlements, idempotency and export/import can execute where no
-    real Pocketful implementation existed at the previous milestone.
+    Pocketful Stage 2 now exists as a real accepted candidate in the pinned official isolated runtime. The product
+    adds a browser wallet surface plus authorization/capture and available/held wallet behavior on top of Stage 1.
+    Public harness evidence is complete for shipped Stage 1 and Stage 2 checks; hidden/full normative conformance
+    remains UNKNOWN.
 
-exact_next_gate: POCKETFUL_STAGE_2_PRODUCT_DEPTH
+exact_next_gate: POCKETFUL_STAGE_3_PRODUCT_DEPTH
 exact_next_owner: PBPD
 repair_path_proof:
   status: PROVEN
@@ -433,7 +434,27 @@ pocketful_stage_2_runs:
       Claude produced a Stage 2 candidate and the workflow emitted ACCEPT, but Reviewer verification invoked
       the pinned official Pocketful harness with --stage 1. Therefore the ACCEPT cannot prove Stage 2 and the
       candidate must not be promoted from this run.
-  next_fresh_run: 2
+  run_2:
+    pr: 90
+    branch: pocketful/stage-2-run-2
+    room_id: f036d266-b2ec-4edd-aa95-9ca35dd96770
+    run_token: pocketful-s2-r2-pr90-b6586ab6f5a1
+    result: ACCEPT_ATTEMPT_1_VALID_STAGE_2_REVIEW
+    accepted_revision: 3b46422054dee1aa65379bd5efbca33988084fd2
+    promotion_merge_sha: 068fe2c70c83b55ad6ec7469d1d60b6dfb1eea99
+    workflow_run_id: 37299342044
+    workflow_job_id: 111728076908
+    artifact_id: 11340956631
+    artifact_digest: sha256:cf410aec7081dc472ff4a0fbb307dd4591203b6d13bab7e2a7d1cba20fc89681
+    reviewer_selector: "--stage 2"
+    official_isolated_harness_exit: 0
+    stage_1_public_checks: 147_of_147
+    stage_2_public_checks: 35_of_35
+    highest_contiguous: 2
+    overshoot: null
+    human_steering_after_pr_open: false
+    hidden_test_success: UNKNOWN
+  next_fresh_run: NONE_UNLESS_REPAIR_OR_REVALIDATION_IS_JUSTIFIED
 
 stage_1_spec_assurance:
   status: PROVEN
@@ -452,7 +473,7 @@ stage_1_spec_assurance:
     hidden-test success or convert the hackathon service into production banking software.
 
 exact_next_action: >-
-  Preserve the accepted and independently assured Stage 1 revision. Correct the Stage 2 Reviewer to invoke the pinned
-  official Pocketful harness with --stage 2, prove the correction statically, then run fresh Pocketful Stage 2 run 2
-  from main with no pre-seeded Stage 2 implementation, one initial dispatch, zero human steering, exact revision
-  binding and independent Stage 2 verification. Do not promote PR 88 and do not begin demo/story packaging.
+  Preserve the accepted Stage 2 candidate and begin Pocketful Stage 3 product exploitation from the pinned official
+  specification: statements, historical/as-of balances, effective-vs-recorded-time revisions, corrections, stable
+  statement snapshots, settlement/capture immutability and historical hold semantics. Keep evidence and demo
+  packaging secondary while Stage 3 and Stage 4 product-depth gaps remain.
