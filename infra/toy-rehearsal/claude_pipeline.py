@@ -153,7 +153,7 @@ def cmd_prepare():
         write_output(k,v)
 
 def changed_paths():
-    p=run(["git","status","--porcelain=v1"], check=True)
+    p=run(["git","status","--porcelain=v1","--untracked-files=all"], check=True)
     paths=[]
     for raw in p.stdout.splitlines():
         if not raw.strip(): continue
