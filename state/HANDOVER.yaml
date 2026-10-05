@@ -14,6 +14,9 @@ canonical_baseline:
   delta_reason: governance_control_update_only_while_project_remains_pre_slice
   first_live_slice_proven: false
   material_user_capability_delta_since_previous_milestone: NONE
+  central_main_reconciliation_wave: fb062d6cd792cab8e27c342120824f285120bc2f
+  product_reality_version: "1.5.0"
+  central_advance_materiality: NON_MATERIAL_DELTA
   affected_transition_blocked: false
   rule: >-
     Re-resolve the current central version and exact merged-main commit at the next material project touch.
@@ -47,7 +50,7 @@ current_truth:
   remote_linux_harness: proven_in_operational_repo
   dedicated_repo_actions_preflight: proven
   evidence_graph: active
-  toy_factory: rehearsals_1_2_3_4_5_6_blocked_before_review
+  toy_factory: rehearsals_1_2_3_4_5_6_7_blocked_before_review
   toy_transport_hardening: user_authored_dispatch_proven_and_fast_fail_patch_merged
   codex_transport_actor_finding: user_authored_mentions_accepted_bot_authored_mentions_not_observed
   codex_cloud_task_execution_current: blocked_external_unknown
@@ -90,7 +93,15 @@ toy_rehearsal_history:
   codex_user_probe_signal: CODEX_TASK_COMPLETED_WITH_TWO_BOT_REPLIES
   codex_user_probe_comment_id: 5983795312
   codex_reply_comment_ids: [5983809519, 5983810255]
-  next_fresh_rehearsal: 7
+  - pr: 69
+    room_id: 832ab029-5411-4a04-bb7f-afdc4b5cd3ed
+    run_token: toy-r7-pr69-8caa37aa28f4
+    result: BLOCKED_SCOPE_VALIDATOR_FALSE_POSITIVE
+    claude_attempt_1: SUCCESS
+    implementation_committed: false
+    reviewer_ran: false
+    root_cause: GIT_STATUS_COLLAPSED_UNTRACKED_DIRECTORIES_WITHOUT_UNTRACKED_FILES_ALL
+  next_fresh_rehearsal: 8
 
 runtime_evidence:
   workflow_run_id: 37087966392
@@ -135,10 +146,27 @@ next_gate:
   after_pass:
     - TRACK_LOCK
 
+product_workstream_priority:
+  first_live_slice_proven: false
+  current_primary_workstream: PRE_SLICE_BUILD_AND_TECHNICAL_REALITY
+  remaining_material_depth_gaps:
+    - autonomous_Toy_Factory_end_to_end_not_proven
+    - exact_candidate_publish_then_independent_review_not_proven
+    - autonomous_REJECT_repair_rereview_not_proven
+    - Toy_official_harness_green_not_proven
+    - room_export_and_runtime_commit_evidence_binding_not_proven
+    - Track_Lock_not_proven
+    - no_real_track_vertical_slice_exists
+  next_highest_value_depth_delta: PROVE_FRESH_TOY_REHEARSAL_END_TO_END_WITH_CORRECTED_PUBLISH_SCOPE
+  valid_stop_condition: null
+  demo_packaging_allowed: false
+  workstream_drift_status: NO_DRIFT_OBSERVED
+  material_user_capability_delta_since_previous_milestone: NONE
+
 next_action: >-
-  Rehearsal 6 is terminal BLOCKED after Claude returned success on turn 25 while the action limit was 24; no
-  implementation commit or Reviewer pass occurred. The initial Claude budget is now 40 turns and repair budget 32.
-  Open only a fresh toy/rehearsal-7 PR from corrected main. From PR open to terminal result, do not steer manually.
-  Require Claude implementation, bounded commit/push, independent official Reviewer harness, autonomous repair plus
-  re-review on first REJECT, and terminal ACCEPT/REJECT/BLOCKED. Track Lock remains blocked until ACCEPT and full
-  evidence binding.
+  Rehearsal 7 is terminal BLOCKED because Claude succeeded but the bounded publisher misclassified Git's collapsed
+  untracked stage-directory entries as out of scope. Correct changed-path enumeration without widening the allowed
+  implementation boundary, prove the static gate, merge the correction, close PR 69 unmerged, and open only a fresh
+  toy/rehearsal-8 PR. From PR open to terminal result, do not steer manually. Require Claude implementation, bounded
+  commit/push, independent official Reviewer harness, autonomous repair plus re-review on first REJECT, and terminal
+  ACCEPT/REJECT/BLOCKED. Track Lock remains blocked until ACCEPT and full evidence binding.
