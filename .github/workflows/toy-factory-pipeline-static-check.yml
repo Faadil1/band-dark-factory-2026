@@ -149,6 +149,8 @@ jobs:
           assert 'room.json").write_text' not in final_pipe
           assert "room.json is missing" in final_pipe
           assert "human_steering_after_trigger" in final_pipe
+          assert 'if mentions:' in final_pipe
+          assert 'message["mentions"]=mentions' in final_pipe
           assert not Path("submission-final-runtime/result").exists()
           assert "next_fresh_rehearsal:" in current
           assert "transport_hardening_pr: 37" in handover
