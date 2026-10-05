@@ -242,7 +242,31 @@ toy_factory_rehearsal:
       - toy-result/stage-4/
     root_cause: GIT_STATUS_COLLAPSED_UNTRACKED_DIRECTORIES_WITHOUT_UNTRACKED_FILES_ALL
     truth_boundary: OBSERVED
-  next_fresh_rehearsal: 8
+  rehearsal_8:
+    pr: 71
+    room_id: bee3fb3e-6f4a-4f96-8a32-b72ac1a4f0f5
+    run_token: toy-r8-pr71-337369dc6327
+    result: ACCEPT_ATTEMPT_1_PENDING_FINAL_ROOM_BINDING
+    initial_head_sha: 337369dc6327735fe789334db6c4d864d361c8d9
+    accepted_revision: 7679ba2f5d1937ebeed4b1e04449918ac8a7ecc8
+    claude_attempt_1: SUCCESS
+    bounded_publish: SUCCESS
+    reviewer_attempt_1: ACCEPT
+    official_isolated_harness_exit: 0
+    workflow_run_id: 37262382681
+    workflow_job_id: 111612125945
+    evidence_artifact_id: 11324712845
+    evidence_artifact_digest: sha256:3af57b1205637ce5e8f439ba5acb6eb1dbd216830238284ed210473b5f9c01de
+    human_steering_after_pr_open: false
+    repair_attempt_2: SKIPPED_NOT_NEEDED
+    room_json_binding: BLOCKED_PENDING_UNCHANGED_BAND_FULL_SESSION_DOWNLOAD
+    offline_submission_check:
+      workflow_run_id: 37262872054
+      job_id: 111613560000
+      non_room_checks: PROVEN
+      only_reported_problem: ROOM_JSON_MISSING
+    truth_boundary: OBSERVED
+  next_fresh_rehearsal: NONE_UNLESS_NEW_RUNTIME_REHEARSAL_IS_JUSTIFIED
   reuse_rehearsal_1_or_2: false
 
 factory:
@@ -265,24 +289,24 @@ conditional_gateway_registry:
   TECHNICAL_REALITY_CHECK: PROVEN
   CODEX_COMMENT_RELAY_WRITE_PATH: PROVEN
   BAND_TO_CODEX_END_TO_END: PROVEN
-  TOY_FACTORY_REHEARSAL: ACTIVE_WITH_CLAUDE_IMPLEMENTER_RUNTIME
+  TOY_FACTORY_REHEARSAL: ACTIVE
   TOY_CODEX_TRANSPORT_HARDENING: PROVEN_LEGACY_FALLBACK
   CODEX_USER_AUTHORED_DISPATCH_IDENTITY: PROVEN
-  CODEX_CLOUD_TASK_EXECUTION_CURRENT: BLOCKED_EXTERNAL_UNKNOWN
+  CODEX_CLOUD_TASK_EXECUTION_CURRENT: BLOCKED
   CLAUDE_CODE_OAUTH_IMPLEMENTER_RUNTIME: PROVEN
   CLAUDE_BOUNDED_VERIFIED_PUBLISHER: PROVEN
-  AUTONOMOUS_REJECT_REPAIR_REREVIEW_LOOP: ACTIVE_PENDING_REHEARSAL_8
-  TRACK_LOCK: BLOCKED_BY_TOY_FACTORY_REHEARSAL
-  REAL_TRACK_BUILD: BLOCKED_BY_TRACK_LOCK
+  AUTONOMOUS_REJECT_REPAIR_REREVIEW_LOOP: ACTIVE
+  TRACK_LOCK: BLOCKED
+  REAL_TRACK_BUILD: BLOCKED
   EVIDENCE_GRAPH: ACTIVE
   RUNTIME_COMMIT_BINDING: ACTIVE
-  BAND_THREE_SEAT_CONNECTIVITY: PROVEN_PREFLIGHT
-  RECIPROCAL_HANDLE_MESSAGING: PROVEN_PREFLIGHT
+  BAND_THREE_SEAT_CONNECTIVITY: PROVEN
+  RECIPROCAL_HANDLE_MESSAGING: PROVEN
   BAND_DESKTOP_VERSION_REQUIREMENT: PROVEN
   SUBMISSION_SEAT_IDENTITY_ELIGIBILITY: PROVEN
-  JUDGE_PERFORMANCE_ASSURANCE: BLOCKED_BY_BUILD_CANDIDATE
-  SUBMISSION_INTEGRITY: BLOCKED_BY_BUILD_CANDIDATE
-  PROTECTED_HUMAN_SUBMISSION: BLOCKED_BY_SUBMISSION_READY
+  JUDGE_PERFORMANCE_ASSURANCE: BLOCKED
+  SUBMISSION_INTEGRITY: BLOCKED
+  PROTECTED_HUMAN_SUBMISSION: BLOCKED
 
 evidence_graph:
   status: ACTIVE
@@ -292,29 +316,26 @@ evidence_graph:
 product_workstream_priority:
   first_live_slice_proven: false
   remaining_material_depth_gaps:
-    - autonomous_Toy_Factory_end_to_end_not_proven
-    - exact_candidate_publish_then_independent_review_not_proven
-    - autonomous_REJECT_repair_rereview_not_proven
-    - Toy_official_harness_green_not_proven
-    - room_export_and_runtime_commit_evidence_binding_not_proven
+    - unchanged_BAND_full_session_room_json_export_and_binding
+    - autonomous_REJECT_repair_rereview_runtime_path_not_yet_proven
     - Track_Lock_not_proven
     - no_real_track_vertical_slice_exists
   current_primary_workstream: PRE_SLICE_BUILD_AND_TECHNICAL_REALITY
-  next_highest_value_depth_delta: PROVE_FRESH_TOY_REHEARSAL_END_TO_END_WITH_CORRECTED_PUBLISH_SCOPE
+  next_highest_value_depth_delta: PROVE_AUTONOMOUS_REJECT_REPAIR_REREVIEW_RUNTIME_PATH
   valid_stop_condition: null
   demo_packaging_allowed: false
   workstream_drift_status: NO_DRIFT_OBSERVED
   material_user_capability_delta_since_previous_milestone: NONE
   material_user_capability_delta_reason: >-
-    Rehearsal 7 improved runtime evidence but added no real external user/operator product capability.
-    The project remains pre-slice and the Toy gate is a required prebuild gate, not demo-first work.
+    Rehearsal 8 proves the autonomous Toy factory success path, exact publish binding and independent official
+    harness acceptance, but it adds no real external-user product capability because the real track is still locked.
 
 exact_next_gate: TOY_FACTORY_REHEARSAL
 exact_next_owner: PBPD
 exact_next_action: >-
-  Rehearsal 7 is terminal BLOCKED after Claude Implementer attempt 1 succeeded but the bounded publisher rejected
-  Git's collapsed untracked-directory status entries for the four expected toy-result/stage-N directories. Correct
-  changed-path enumeration to expose untracked files while preserving the existing toy-result/stage-1..4 scope
-  boundary, prove static assurance, merge the correction, close Rehearsal 7 unmerged, then open exactly one fresh
-  toy/rehearsal-8 PR. Preserve zero human steering after initial PR dispatch and keep TRACK_LOCK/Pocketful blocked
-  until terminal ACCEPT plus room/export/evidence binding checks are proven.
+  Preserve Rehearsal 8 accepted revision 7679ba2f5d1937ebeed4b1e04449918ac8a7ecc8 unchanged. Run one bounded
+  development-only negative-path proof that exercises Reviewer REJECT -> autonomous Claude repair -> exact repaired
+  revision -> independent re-review, without representing the injected defect as product behavior. In parallel the
+  human must download the Rehearsal 8 BAND room as an unchanged full-session room.json. After both are bound, rerun
+  the pinned official harness check with the authentic room export. Do not promote TRACK_LOCK before all remaining
+  Toy evidence edges are PROVEN.
