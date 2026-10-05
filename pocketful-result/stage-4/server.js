@@ -1037,10 +1037,13 @@ function createRefund(user, req, raw, id) {
 }
 
 // ---------- statements ----------
-function entryJson(row) {
+function entryJson(row, legacyPaymentShape) {
   const p = X.payments.get(row[0]);
   const r = p.revisions[row[1] - 1];
   const pj = paymentJson(p);
+  // Stage 3 snapshots predate the Stage 4 refund_of field. When such a snapshot is
+  // imported, preserve its original serialized payment shape instead of upgrading it.
+  if (legacyPaymentShape) delete pj.refund_of;
   pj.amount = r.amount;
   return { payment: pj, delta: row[2], balance_after: row[3], revision: r.revision, effective_at: r.effectiveAt, recorded_at: r.recordedAt };
 }
@@ -1048,7 +1051,7 @@ function entryJson(row) {
 function snapshotBody(token, sn, limit, offset) {
   const body = {
     opening_balance: sn.opening,
-    entries: sn.rows.slice(offset, offset + limit).map(entryJson),
+    entries: sn.rows.slice(offset, offset + limit).map((row) => entryJson(row, sn.legacyPaymentShape === true)),
     closing_balance: sn.closing,
     has_more: offset + limit < sn.rows.length,
     snapshot: token,
@@ -1094,7 +1097,7 @@ function statement(user, q) {
   if (from) echo.from = from.raw;
   if (to) echo.to = to.raw;
   if (known) echo.known_at = known.raw;
-  const sn = { uid: user.id, opening, closing: bal, rows, echo };
+  const sn = { uid: user.id, opening, closing: bal, rows, echo, legacyPaymentShape: false };
   const token = 'snap_' + crypto.randomBytes(12).toString('hex');
   S.snapshots.set(token, sn);
   if (S.snapshots.size > MAX_SNAPSHOTS) S.snapshots.delete(S.snapshots.keys().next().value);
@@ -1412,6 +1415,9 @@ function buildImported(s) {
   need(s.authorizations === undefined || Array.isArray(s.authorizations), 'authorizations');
   need(s.snapshots === undefined || Array.isArray(s.snapshots), 'snapshots');
   need(isObj(s.counters), 'counters');
+  // Stage 4 introduced the batch counter. Its presence lets us distinguish a Stage 4
+  // export from a Stage 3 export without changing the public export format version.
+  const sourceHasStage4Shape = isInt(s.counters.batch);
   const ns = emptyState();
   ns.currency = s.currency;
   ns.minorUnits = s.minorUnits;
@@ -1571,7 +1577,17 @@ function buildImported(s) {
     need(Array.isArray(e) && typeof e[0] === 'string' && isObj(e[1]) && uids.has(e[1].uid) && isInt(e[1].opening) && isInt(e[1].closing) && isObj(e[1].echo));
     need(Array.isArray(e[1].rows) && e[1].rows.every((r) => Array.isArray(r) && r.length === 4 && paymentsById.has(r[0]) && isInt(r[1]) && isInt(r[2]) && isInt(r[3]) &&
       r[1] >= 1 && r[1] <= paymentsById.get(r[0]).revisions.length), 'snapshot rows');
-    ns.snapshots.set(e[0], { uid: e[1].uid, opening: e[1].opening, closing: e[1].closing, rows: e[1].rows, echo: e[1].echo });
+    need(e[1].legacyPaymentShape === undefined || typeof e[1].legacyPaymentShape === 'boolean', 'snapshot legacy shape');
+    const legacyPaymentShape = e[1].legacyPaymentShape === true ||
+      (e[1].legacyPaymentShape === undefined && !sourceHasStage4Shape);
+    ns.snapshots.set(e[0], {
+      uid: e[1].uid,
+      opening: e[1].opening,
+      closing: e[1].closing,
+      rows: e[1].rows,
+      echo: e[1].echo,
+      legacyPaymentShape,
+    });
   }
   need(s.operators.every((o) => typeof o === 'string'));
   ns.operators = s.operators.slice();

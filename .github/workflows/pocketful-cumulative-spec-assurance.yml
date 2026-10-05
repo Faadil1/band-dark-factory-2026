@@ -1,0 +1,98 @@
+name: Pocketful Cumulative Spec-Derived Assurance
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    paths:
+      - "assurance/pocketful-stage4/**"
+      - "pocketful-result/stage-4/**"
+      - ".github/workflows/pocketful-cumulative-spec-assurance.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  cumulative-black-box:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - name: Checkout exact PR head
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Clone pinned official kickoff
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone https://github.com/band-ai/dark-factory-wearedevs.git "$RUNNER_TEMP/kickoff"
+          git -C "$RUNNER_TEMP/kickoff" checkout 803560d2a678ace1414465c098eb0ab5380ffade
+          test "$(git -C "$RUNNER_TEMP/kickoff" rev-parse HEAD)" = "803560d2a678ace1414465c098eb0ab5380ffade"
+          python -m pip install -r "$RUNNER_TEMP/kickoff/harness/requirements.txt"
+
+      - name: Run pinned official Stage 4 harness on repair candidate
+        shell: bash
+        run: |
+          mkdir -p artifacts/pocketful-cumulative-assurance/official-stage4
+          python -m harness run             --track pocketful             --repo "$GITHUB_WORKSPACE/pocketful-result"             --stage 4             --mode isolated             --out "$GITHUB_WORKSPACE/artifacts/pocketful-cumulative-assurance/official-stage4"
+        working-directory: ${{ runner.temp }}/kickoff
+
+      - name: Build repair candidate Stage 4 and inherited Stage 3 images
+        shell: bash
+        run: |
+          docker build -t pocketful-stage4-assurance "$GITHUB_WORKSPACE/pocketful-result/stage-4"
+          docker build -t pocketful-stage3-migration-source "$GITHUB_WORKSPACE/pocketful-result/stage-3"
+
+      - name: Start assurance services
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run -d --rm --name pocketful-stage4-assurance -e PORT=8080 -p 127.0.0.1:18080:8080 pocketful-stage4-assurance
+          docker run -d --rm --name pocketful-stage3-migration-source -e PORT=8080 -p 127.0.0.1:18081:8080 pocketful-stage3-migration-source
+          for port in 18080 18081; do
+            for i in $(seq 1 60); do
+              if curl -fsS "http://127.0.0.1:$port/health" >/dev/null; then break; fi
+              sleep 1
+            done
+            curl -fsS "http://127.0.0.1:$port/health" >/dev/null
+          done
+
+      - name: Re-run independent Stage 1 assurance against Stage 4 candidate
+        shell: bash
+        run: |
+          mkdir -p artifacts/pocketful-cumulative-assurance
+          python assurance/pocketful-stage1/spec_assurance.py             http://127.0.0.1:18080             artifacts/pocketful-cumulative-assurance/stage1-report.json
+
+      - name: Run independent Stage 2-4 cumulative black-box assurance
+        shell: bash
+        run: |
+          python assurance/pocketful-stage4/cumulative_assurance.py             http://127.0.0.1:18080             http://127.0.0.1:18081             artifacts/pocketful-cumulative-assurance/stage2-4-report.json
+
+      - name: Capture service logs
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p artifacts/pocketful-cumulative-assurance
+          docker logs pocketful-stage4-assurance > artifacts/pocketful-cumulative-assurance/stage4-service.log 2>&1 || true
+          docker logs pocketful-stage3-migration-source > artifacts/pocketful-cumulative-assurance/stage3-service.log 2>&1 || true
+
+      - name: Stop services
+        if: always()
+        shell: bash
+        run: |
+          docker stop pocketful-stage4-assurance || true
+          docker stop pocketful-stage3-migration-source || true
+
+      - name: Upload cumulative assurance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pocketful-cumulative-spec-assurance
+          path: artifacts/pocketful-cumulative-assurance/**
+          if-no-files-found: error
