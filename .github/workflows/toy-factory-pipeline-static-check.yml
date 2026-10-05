@@ -11,6 +11,9 @@ on:
       - "infra/pocketful-stage3/**"
       - ".github/workflows/pocketful-stage-4-dispatch.yml"
       - "infra/pocketful-stage4/**"
+      - ".github/workflows/pocketful-final-submission-run.yml"
+      - "infra/pocketful-final-run/**"
+      - "submission-final/templates/**"
       - "state/CURRENT.yaml"
       - "state/HANDOVER.yaml"
 
@@ -34,7 +37,7 @@ jobs:
         run: |
           set -euo pipefail
           bash <(curl -fsSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash) 1.7.12
-          ./actionlint -color .github/workflows/toy-factory-rehearsal-dispatch.yml .github/workflows/toy-factory-rehearsal-review.yml .github/workflows/pocketful-stage-2-dispatch.yml .github/workflows/pocketful-stage-3-dispatch.yml .github/workflows/pocketful-stage-4-dispatch.yml
+          ./actionlint -color .github/workflows/toy-factory-rehearsal-dispatch.yml .github/workflows/toy-factory-rehearsal-review.yml .github/workflows/pocketful-stage-2-dispatch.yml .github/workflows/pocketful-stage-3-dispatch.yml .github/workflows/pocketful-stage-4-dispatch.yml .github/workflows/pocketful-final-submission-run.yml
 
       - name: Compile Toy transport scripts
         run: |
@@ -44,7 +47,8 @@ jobs:
             infra/toy-rehearsal/claude_pipeline.py \
             infra/pocketful-stage2/claude_pipeline.py \
             infra/pocketful-stage3/claude_pipeline.py \
-            infra/pocketful-stage4/claude_pipeline.py
+            infra/pocketful-stage4/claude_pipeline.py \
+            infra/pocketful-final-run/pipeline.py
 
       - name: Assert transport invariants
         shell: python
@@ -124,6 +128,28 @@ jobs:
           assert "pocketful/stage-4-run-" in stage4_workflow
           assert "steps.review1.outputs.verdict == 'REJECT'" in stage4_workflow
           assert "Claude repair attempt 2" in stage4_workflow
+
+          final_pipe = Path("infra/pocketful-final-run/pipeline.py").read_text()
+          final_workflow = Path(".github/workflows/pocketful-final-submission-run.yml").read_text()
+          assert "Pocketful Final One-Room Four-Stage Run" in final_workflow
+          assert "submission/pocketful-final-run-" in final_workflow
+          assert ("ref: $" + "{{ github.event.pull_request.head.sha }}") in final_workflow
+          assert "rm -rf pocketful-result submission-final-runtime" in final_workflow
+          assert "Prepare one fresh room and one fresh result repository" in final_workflow
+          for stage in range(1, 5):
+              assert f"Begin Stage {stage}" in final_workflow
+              assert f"Claude Stage {stage} attempt 1" in final_workflow
+              assert f"Gate Stage {stage}" in final_workflow
+          assert 'git("init","-b","main")' in final_pipe
+          assert 'curl_json("POST",f"{BAND_BASE}/chats"' in final_pipe
+          assert 'submission-final-runtime' in final_pipe
+          assert 'fresh-result-before-room.bundle' in final_pipe
+          assert "PRODUCT_COMPLETE_AWAITING_AUTHENTIC_ROOM_JSON" in final_pipe
+          assert 'room.json").write' not in final_pipe
+          assert 'room.json").write_text' not in final_pipe
+          assert "room.json is missing" in final_pipe
+          assert "human_steering_after_trigger" in final_pipe
+          assert not Path("submission-final-runtime/result").exists()
           assert "next_fresh_rehearsal:" in current
           assert "transport_hardening_pr: 37" in handover
           assert "user_authored_codex_dispatch: PROVEN_IN_REHEARSAL_4" in current
