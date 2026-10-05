@@ -50,7 +50,11 @@ current_truth:
   toy_factory: rehearsals_1_2_3_4_blocked_before_implementation
   toy_transport_hardening: user_authored_dispatch_proven_and_fast_fail_patch_merged
   codex_transport_actor_finding: user_authored_mentions_accepted_bot_authored_mentions_not_observed
-  codex_cloud_task_execution_current: blocked_external_unknown_or_account_allowance
+  codex_cloud_task_execution_current: blocked_external_unknown
+  claude_code_oauth_runtime: proven_remote_github_actions
+  claude_probe_pr: 53
+  claude_probe_run_id: 37257591394
+  claude_probe_output_head: 78fad542df1cf5cced4c5e23df7ed72625101488
 
 toy_rehearsal_history:
   - pr: 35
@@ -107,8 +111,8 @@ next_gate:
   remaining_pass_conditions:
     - CODEX_GITHUB_USER_TOKEN_secret_installed_with_minimum_repo_scope
     - user_authored_Codex_dispatch_runtime_proven_on_rehearsal_4
-    - Codex_Cloud_task_execution_restored_or_alternate_Implementer_runtime_proven
-    - fresh_rehearsal_5_after_execution_runtime_recovery
+    - Claude_Code_OAuth_Implementer_runtime_proven
+    - fresh_rehearsal_5_with_Claude_Implementer
     - autonomous_Toy_Factory_room_run
     - toy_result_commits_and_review_repair_trace
     - toy_harness_green
@@ -118,7 +122,7 @@ next_gate:
     - TRACK_LOCK
 
 next_action: >-
-  Check ChatGPT Settings > Usage for the account-level Codex allowance and reset time. Do not launch another full
-  Toy rehearsal while even the micro probe is failing. When Codex execution recovers, prove one tiny user-authored
-  task first and then open only a fresh toy/rehearsal-5. If Codex remains unavailable, switch the Implementer seat
-  to another challenge-compliant runtime and prove that runtime before Rehearsal 5. Track Lock remains blocked.
+  Merge the Claude Implementer pipeline after CI/preflight. Then open only a fresh toy/rehearsal-5 PR.
+  From PR open to terminal result, do not steer manually. Require Claude implementation, bounded commit/push,
+  independent official Reviewer harness, autonomous repair plus re-review on first REJECT, and terminal
+  ACCEPT/REJECT/BLOCKED. Track Lock remains blocked until ACCEPT and full evidence binding.

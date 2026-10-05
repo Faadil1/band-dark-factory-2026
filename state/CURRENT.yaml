@@ -94,6 +94,22 @@ technical_reality:
       interpretation: >-
         Codex emits a bounded machine-readable patch in its GitHub bot comment.
         GitHub Actions validates the patch scope, applies it, commits it, and pushes the PR branch autonomously.
+  claude_code_runtime:
+    status: PROVEN_REMOTE_GITHUB_ACTIONS
+    auth: CLAUDE_CODE_OAUTH_TOKEN
+    probe_pr: 53
+    workflow_run_id: 37257591394
+    job_id: 111597890559
+    input_head_sha: 3c6c4102626bc059e4c607b28c57b1ffe879aa59
+    output_head_sha: 78fad542df1cf5cced4c5e23df7ed72625101488
+    observed_model: claude-sonnet-5-5
+    bounded_scope: PROVEN_ONE_FILE
+    verified_publish: PROVEN
+    human_steering_after_dispatch: false
+    interpretation: >-
+      Claude Code OAuth executed successfully in GitHub Actions, modified only the bounded target,
+      and the verified publisher advanced the probe branch. This is an alternate Implementer runtime proof,
+      not a Toy Factory completion claim.
   reciprocal_handle_messaging: PROVEN_PREFLIGHT
   band_to_codex_end_to_end:
     status: PROVEN
@@ -203,8 +219,8 @@ factory:
     - implementer
     - reviewer
   standing_mandates: PREFLIGHT_RUNTIME_CONFIGURED
-  harness_value: BAND Remote Agent + Codex Cloud via GitHub comment relay + GitHub Actions safe publisher
-  model_value: OpenAI Codex Cloud default model managed by ChatGPT plan; exact internal model ID not exposed by GitHub-triggered task
+  harness_value: BAND Remote Agent + Claude Code OAuth in GitHub Actions + bounded verified publisher + independent official Reviewer harness
+  model_value: Claude Code subscription runtime; probe observed claude-sonnet-5-5
   mandate_runtime_values: PROVEN_FROM_PREFLIGHT
   submission_readiness_note: >-
     Runtime fields are truthful and non-TBD, Band Desktop v0.4.12 satisfies the version requirement, and the
@@ -216,10 +232,13 @@ conditional_gateway_registry:
   TECHNICAL_REALITY_CHECK: PROVEN
   CODEX_COMMENT_RELAY_WRITE_PATH: PROVEN
   BAND_TO_CODEX_END_TO_END: PROVEN
-  TOY_FACTORY_REHEARSAL: BLOCKED_BY_CODEX_CLOUD_TASK_EXECUTION_CURRENT
-  TOY_CODEX_TRANSPORT_HARDENING: ACTIVE
+  TOY_FACTORY_REHEARSAL: ACTIVE_WITH_CLAUDE_IMPLEMENTER_RUNTIME
+  TOY_CODEX_TRANSPORT_HARDENING: PROVEN_LEGACY_FALLBACK
   CODEX_USER_AUTHORED_DISPATCH_IDENTITY: PROVEN
-  CODEX_CLOUD_TASK_EXECUTION_CURRENT: BLOCKED_EXTERNAL_UNKNOWN_OR_ACCOUNT_ALLOWANCE
+  CODEX_CLOUD_TASK_EXECUTION_CURRENT: BLOCKED_EXTERNAL_UNKNOWN
+  CLAUDE_CODE_OAUTH_IMPLEMENTER_RUNTIME: PROVEN
+  CLAUDE_BOUNDED_VERIFIED_PUBLISHER: PROVEN
+  AUTONOMOUS_REJECT_REPAIR_REREVIEW_LOOP: ACTIVE_PENDING_REHEARSAL_5
   TRACK_LOCK: BLOCKED_BY_TOY_FACTORY_REHEARSAL
   REAL_TRACK_BUILD: BLOCKED_BY_TRACK_LOCK
   EVIDENCE_GRAPH: ACTIVE
@@ -239,8 +258,8 @@ evidence_graph:
 
 exact_next_gate: TOY_FACTORY_REHEARSAL
 exact_next_action: >-
-  Check the account-level Codex allowance/reset state in ChatGPT Settings > Usage. If Codex execution becomes
-  available again, prove it first with one minimal user-authored micro task, then launch only a fresh
-  toy/rehearsal-5 using the hardened fast-fail transport. If account allowance is exhausted or execution remains
-  unavailable, activate and prove an alternate challenge-compliant Implementer runtime before Rehearsal 5.
-  Keep TRACK_LOCK and Pocketful blocked until a full Toy rehearsal reaches ACCEPT with bound evidence.
+  Merge the Claude Implementer runtime hardening only after static and technical preflight checks pass, then open
+  exactly one fresh toy/rehearsal-5 PR. Preserve zero human steering after initial PR dispatch. Claude Code must
+  implement the four Toy stages, the independent Reviewer must run the official isolated harness, and any first
+  REJECT must autonomously return to Claude for repair and re-review. Keep TRACK_LOCK and Pocketful blocked until
+  terminal ACCEPT plus remaining room/export/evidence binding checks are proven.

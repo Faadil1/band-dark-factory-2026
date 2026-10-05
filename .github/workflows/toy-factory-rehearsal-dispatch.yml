@@ -5,9 +5,14 @@ on:
     types: [opened, reopened]
 
 permissions:
-  contents: read
+  contents: write
   issues: write
   pull-requests: write
+  id-token: write
+
+concurrency:
+  group: toy-rehearsal-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
 
 jobs:
   dispatch:
@@ -15,35 +20,44 @@ jobs:
       github.event.pull_request.head.repo.full_name == github.repository &&
       startsWith(github.event.pull_request.head.ref, 'toy/rehearsal-')
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 55
     env:
       GH_TOKEN: ${{ github.token }}
-      CODEX_GITHUB_USER_TOKEN: ${{ secrets.CODEX_GITHUB_USER_TOKEN }}
+      KICKOFF: ${{ runner.temp }}/dark-factory-wearedevs
       BAND_COORDINATOR_AGENT_ID: ${{ secrets.BAND_COORDINATOR_AGENT_ID }}
       BAND_COORDINATOR_API_KEY: ${{ secrets.BAND_COORDINATOR_API_KEY }}
       BAND_IMPLEMENTER_AGENT_ID: ${{ secrets.BAND_IMPLEMENTER_AGENT_ID }}
       BAND_IMPLEMENTER_API_KEY: ${{ secrets.BAND_IMPLEMENTER_API_KEY }}
       BAND_REVIEWER_AGENT_ID: ${{ secrets.BAND_REVIEWER_AGENT_ID }}
       BAND_REVIEWER_API_KEY: ${{ secrets.BAND_REVIEWER_API_KEY }}
-      CODEX_FIRST_WINDOW_SECONDS: "480"
-      CODEX_RETRY_WINDOW_SECONDS: "720"
-      CODEX_POLL_SECONDS: "60"
 
     steps:
-      - name: Checkout operational repository
-        uses: actions/checkout@v4
+      - name: Checkout Toy candidate
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
 
       - name: Clone official kickoff
         shell: bash
         run: |
           set -euo pipefail
-          KICKOFF="$RUNNER_TEMP/dark-factory-wearedevs"
-          echo "KICKOFF=$KICKOFF" >> "$GITHUB_ENV"
           git clone --depth 1 https://github.com/band-ai/dark-factory-wearedevs.git "$KICKOFF"
           test "$(git -C "$KICKOFF" rev-parse HEAD)" = "803560d2a678ace1414465c098eb0ab5380ffade"
 
-      - name: Validate credentials
+      - name: Install official harness
         shell: bash
+        run: python -m pip install -r "$KICKOFF/harness/requirements.txt"
+
+      - name: Validate BAND and Claude credentials
+        shell: bash
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
         run: |
           set -euo pipefail
           test -n "$BAND_COORDINATOR_AGENT_ID"
@@ -52,7 +66,84 @@ jobs:
           test -n "$BAND_IMPLEMENTER_API_KEY"
           test -n "$BAND_REVIEWER_AGENT_ID"
           test -n "$BAND_REVIEWER_API_KEY"
-          test -n "$CODEX_GITHUB_USER_TOKEN"
+          test -n "$CLAUDE_CODE_OAUTH_TOKEN"
 
-      - name: Dispatch fresh Toy room and supervise Codex transport
-        run: python infra/toy-rehearsal/dispatch.py
+      - name: Prepare fresh BAND room
+        id: prepare
+        run: python infra/toy-rehearsal/claude_pipeline.py prepare
+
+      - name: Claude Implementer attempt 1
+        uses: anthropics/claude-code-action@cab360f6565aa35a51d6ce9e43f1f4287c0a32ea
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Act as the Implementer seat for Toy Factory Rehearsal.
+            Run token: ${{ steps.prepare.outputs.run_token }}
+            Branch: ${{ steps.prepare.outputs.branch }}
+
+            Read all four complete requirements in:
+            - toy-input/stage-1.md
+            - toy-input/stage-2.md
+            - toy-input/stage-3.md
+            - toy-input/stage-4.md
+
+            Implement them sequentially under:
+            - toy-result/stage-1/
+            - toy-result/stage-2/
+            - toy-result/stage-3/
+            - toy-result/stage-4/
+
+            Each stage must be a complete standalone service and preserve every inherited requirement.
+            Build to the written specs, not merely the tests.
+            Include source files, Dockerfile, and RUN.md in every stage.
+            Modify ONLY toy-result/stage-1/ through toy-result/stage-4/.
+            Do not modify toy-input, state, evidence, workflows, mandates, or any other path.
+            Do not commit or push. Do not ask the human for clarification.
+            Run lightweight local checks when useful.
+          claude_args: |
+            --max-turns 24
+            --allowedTools "Read,Edit,Write,Glob,Grep,Bash(python:*),Bash(git diff:*),Bash(git status:*),Bash(find:*),Bash(cp:*),Bash(mkdir:*)"
+
+      - name: Validate and publish attempt 1
+        id: publish1
+        run: python infra/toy-rehearsal/claude_pipeline.py publish 1 "${{ steps.prepare.outputs.initial_sha }}"
+
+      - name: Independent Reviewer attempt 1
+        id: review1
+        run: python infra/toy-rehearsal/claude_pipeline.py review 1 "${{ steps.publish1.outputs.revision }}"
+
+      - name: Claude repair attempt 2
+        if: steps.review1.outputs.verdict == 'REJECT'
+        uses: anthropics/claude-code-action@cab360f6565aa35a51d6ce9e43f1f4287c0a32ea
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            ${{ steps.review1.outputs.repair_context }}
+          claude_args: |
+            --max-turns 18
+            --allowedTools "Read,Edit,Write,Glob,Grep,Bash(python:*),Bash(git diff:*),Bash(git status:*),Bash(find:*)"
+
+      - name: Validate and publish attempt 2
+        if: steps.review1.outputs.verdict == 'REJECT'
+        id: publish2
+        run: python infra/toy-rehearsal/claude_pipeline.py publish 2 "${{ steps.publish1.outputs.revision }}"
+
+      - name: Independent Reviewer attempt 2
+        if: steps.review1.outputs.verdict == 'REJECT'
+        id: review2
+        run: python infra/toy-rehearsal/claude_pipeline.py review 2 "${{ steps.publish2.outputs.revision }}"
+
+      - name: Fail closed on unexpected pipeline failure
+        if: failure()
+        run: python infra/toy-rehearsal/claude_pipeline.py block CLAUDE_PIPELINE_FAILURE
+
+      - name: Upload Toy rehearsal evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: toy-factory-rehearsal-${{ github.event.pull_request.number }}
+          path: |
+            artifacts/toy-rehearsal/**
+            ${{ runner.temp }}/toy-all-attempt-1/**
+            ${{ runner.temp }}/toy-all-attempt-2/**
+          if-no-files-found: warn
