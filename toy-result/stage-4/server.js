@@ -51,7 +51,7 @@ const server = http.createServer((req, res) => {
       }
       let by = 1;
       if ('by' in p.value) by = p.value.by;
-      if (typeof by !== 'number' || !Number.isInteger(by) || by < 0) {
+      if (typeof by !== 'number' || !Number.isInteger(by) || by < 1) {
         return send(res, 400, { error: 'by must be an integer >= 1' });
       }
       // Validate first, then one synchronous read-modify-write (atomic:
