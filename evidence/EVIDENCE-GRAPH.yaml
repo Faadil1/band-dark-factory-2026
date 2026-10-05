@@ -136,4 +136,23 @@ missing_edges:
       - evidence/TR-CODEX-COMMENT-RELAY-001.yaml
   - claim_id: AUTONOMOUS_TOY_FACTORY
     status: ACTIVE
-    expected_next_evidence: full_Toy_run_room_export_commits_harness_and_harness_check
+    observed:
+      rehearsal_pr: 71
+      run_token: toy-r8-pr71-337369dc6327
+      room_id: bee3fb3e-6f4a-4f96-8a32-b72ac1a4f0f5
+      accepted_revision: 7679ba2f5d1937ebeed4b1e04449918ac8a7ecc8
+      workflow_run_id: 37262382681
+      workflow_job_id: 111612125945
+      official_isolated_harness_exit: 0
+      human_steering_after_pr_open: false
+      evidence_artifact_id: 11324712845
+      evidence_artifact_digest: sha256:3af57b1205637ce5e8f439ba5acb6eb1dbd216830238284ed210473b5f9c01de
+    offline_submission_shape_check:
+      workflow_run_id: 37262872054
+      job_id: 111613560000
+      result: NON_ROOM_OFFLINE_CHECKS_PROVEN
+      remaining_problem: room.json_missing
+    remaining_edges:
+      - unchanged_BAND_full_session_room_json_export_and_binding
+      - autonomous_REJECT_repair_rereview_runtime_path
+      - final_full_offline_harness_check_with_authentic_room_json
