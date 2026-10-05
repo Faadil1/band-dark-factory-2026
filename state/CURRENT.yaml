@@ -166,6 +166,13 @@ toy_factory_rehearsal:
     first_failure_comment_ids: [5986556226, 5986557702]
     retry_prompt_comment_id: 5986615299
     retry_failure_comment_id: 5986622621
+  rehearsal_5:
+    pr: 61
+    result: BLOCKED_BEFORE_DISPATCH_WORKFLOW_LOAD
+    implementation_produced: false
+    band_room_created: false
+    cause: GITHUB_WORKFLOW_VALIDATION_ERROR_RUNNER_CONTEXT_IN_JOB_ENV
+    correction_merge: dd98e8a89f7aad6a4770a296ab810b5b5ad07eef
   codex_execution_diagnostics:
     status: BLOCKED_EXTERNAL_OR_ACCOUNT_SPECIFIC
     root_cause: UNKNOWN
@@ -209,7 +216,7 @@ toy_factory_rehearsal:
       user_authored_probe_comment_id: 5983795312
       codex_reply_comment_ids: [5983809519, 5983810255]
       interpretation: CODEX_CONNECTOR_ACTIVE_FOR_USER_AUTHORED_MENTIONS_BUT_BOT_AUTHORED_MENTIONS_NOT_OBSERVED
-  next_fresh_rehearsal: 5
+  next_fresh_rehearsal: 6
   reuse_rehearsal_1_or_2: false
 
 factory:
@@ -238,7 +245,7 @@ conditional_gateway_registry:
   CODEX_CLOUD_TASK_EXECUTION_CURRENT: BLOCKED_EXTERNAL_UNKNOWN
   CLAUDE_CODE_OAUTH_IMPLEMENTER_RUNTIME: PROVEN
   CLAUDE_BOUNDED_VERIFIED_PUBLISHER: PROVEN
-  AUTONOMOUS_REJECT_REPAIR_REREVIEW_LOOP: ACTIVE_PENDING_REHEARSAL_5
+  AUTONOMOUS_REJECT_REPAIR_REREVIEW_LOOP: ACTIVE_PENDING_REHEARSAL_6
   TRACK_LOCK: BLOCKED_BY_TOY_FACTORY_REHEARSAL
   REAL_TRACK_BUILD: BLOCKED_BY_TRACK_LOCK
   EVIDENCE_GRAPH: ACTIVE
@@ -258,8 +265,9 @@ evidence_graph:
 
 exact_next_gate: TOY_FACTORY_REHEARSAL
 exact_next_action: >-
-  Merge the Claude Implementer runtime hardening only after static and technical preflight checks pass, then open
-  exactly one fresh toy/rehearsal-5 PR. Preserve zero human steering after initial PR dispatch. Claude Code must
+  Rehearsal 5 never dispatched because GitHub rejected the workflow before job creation; the runner.temp job-env
+  validation defect is corrected on main and actionlint is now part of the static gate. Open exactly one fresh
+  toy/rehearsal-6 PR from corrected main. Preserve zero human steering after initial PR dispatch. Claude Code must
   implement the four Toy stages, the independent Reviewer must run the official isolated harness, and any first
   REJECT must autonomously return to Claude for repair and re-review. Keep TRACK_LOCK and Pocketful blocked until
   terminal ACCEPT plus remaining room/export/evidence binding checks are proven.
