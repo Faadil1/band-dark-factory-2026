@@ -7,8 +7,10 @@ lifecycle_state: REAL_TRACK_STAGE_1
 source_of_truth:
   central_control_plane: Faadil1/faadil-agent-system@main
   central_project_path: projects/band-dark-factory-2026
-  pbpd_workspace: Faadil1/pbpd-cowork-system@d125bffe848cc6a0b5484af66d762591519f8a0d
+  pbpd_workspace: Faadil1/pbpd-cowork-system@ff035d80c02620ce9b36755a9759d89946f5f475
   living_prd: projects/band-dark-factory-2026/incoming/LIVING-PRD.md
+  living_prd_version: 0.2.0
+  living_prd_state: TRACK_LOCKED_READY_FOR_REAL_STAGE_1
   operational_repository: Faadil1/band-dark-factory-2026
 
 canonical_baseline_reconciliation:
