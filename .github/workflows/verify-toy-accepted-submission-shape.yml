@@ -1,0 +1,69 @@
+name: Verify Accepted Toy Submission Shape
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: read
+
+jobs:
+  offline-check:
+    if: github.head_ref == 'verify/toy-accepted-submission-shape-v1'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout accepted candidate
+        uses: actions/checkout@v6
+        with:
+          ref: 7679ba2f5d1937ebeed4b1e04449918ac8a7ecc8
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Clone pinned official harness
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone https://github.com/band-ai/dark-factory-wearedevs.git "$RUNNER_TEMP/kickoff"
+          git -C "$RUNNER_TEMP/kickoff" checkout 803560d2a678ace1414465c098eb0ab5380ffade
+          python -m pip install -r "$RUNNER_TEMP/kickoff/harness/requirements.txt"
+
+      - name: Build temporary submission shape
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/submission"
+          mkdir -p "$OUT"
+          cp toy-result/README.md "$OUT/README.md"
+          cp toy-result/FACTORY.md "$OUT/FACTORY.md"
+          cp -R toy-result/mandates "$OUT/mandates"
+          for n in 1 2 3 4; do cp -R "toy-result/stage-$n" "$OUT/stage-$n"; done
+          printf '%s\n' "ACCEPTED_REVISION=7679ba2f5d1937ebeed4b1e04449918ac8a7ecc8"
+          find "$OUT" -maxdepth 2 -type f | sort
+
+      - name: Run official offline check without fabricating room export
+        shell: bash
+        run: |
+          set +e
+          cd "$RUNNER_TEMP/kickoff"
+          python -m harness check "$RUNNER_TEMP/submission" --track toy             >"$RUNNER_TEMP/harness-check.stdout" 2>"$RUNNER_TEMP/harness-check.stderr"
+          RC=$?
+          set -e
+          cat "$RUNNER_TEMP/harness-check.stdout"
+          cat "$RUNNER_TEMP/harness-check.stderr"
+          echo "HARNESS_CHECK_EXIT=$RC"
+          # room.json is intentionally absent: fail only if any non-room defect exists.
+          python - "$RUNNER_TEMP/harness-check.stderr" <<'PY'
+          from pathlib import Path
+          import sys
+          lines=[x.strip() for x in Path(sys.argv[1]).read_text().splitlines() if x.strip()]
+          defects=[x for x in lines if not x.startswith("room.json is missing;") and not x.endswith("problem(s)")]
+          if defects:
+              print("NON_ROOM_DEFECTS:")
+              print("\n".join(defects))
+              raise SystemExit(1)
+          print("NON_ROOM_OFFLINE_CHECKS=PROVEN")
+          print("ROOM_JSON_REMAINS_REQUIRED=TRUE")
+          PY
