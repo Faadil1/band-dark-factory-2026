@@ -334,7 +334,7 @@ product_workstream_priority:
   first_live_slice_proven: true
   remaining_material_depth_gaps:
     - Pocketful_stage_1_authentic_full_room_export_binding_missing
-    - Pocketful_stage_2_browser_and_recovery_not_started
+    - Pocketful_stage_2_correct_reviewer_stage_verification_not_yet_proven
     - Pocketful_stage_3_temporal_corrections_not_started
     - Pocketful_stage_4_refunds_and_batch_corrections_not_started
     - hidden_test_success_UNKNOWN
@@ -415,6 +415,26 @@ winning_intelligence_v2_prelock:
   non_commodity_advantage: PROVEN_OBSERVED_REMOTE_EVIDENCE_BOUND_FACTORY
   track_lock: POCKETFUL_PROVEN
 
+pocketful_stage_2_runs:
+  run_1:
+    pr: 88
+    branch: pocketful/stage-2-run-1
+    room_id: bb699fd0-f11d-43cd-a669-9c0a3e49b150
+    run_token: pocketful-s2-r1-pr88-1f513da1817c
+    observed_candidate_revision: 3d9d33d95b0397cde4eff18a7441ad3454bcc60f
+    workflow_run_id: 37290320145
+    workflow_job_id: 111698941352
+    terminal_marker: ACCEPT_ATTEMPT_1
+    result: INVALIDATED_REVIEW_CONFIGURATION
+    invalidation_reason: REVIEWER_EXECUTED_STAGE_1_HARNESS_INSTEAD_OF_STAGE_2
+    product_candidate_promoted: false
+    pr_closed_unmerged: true
+    truth_boundary: >-
+      Claude produced a Stage 2 candidate and the workflow emitted ACCEPT, but Reviewer verification invoked
+      the pinned official Pocketful harness with --stage 1. Therefore the ACCEPT cannot prove Stage 2 and the
+      candidate must not be promoted from this run.
+  next_fresh_run: 2
+
 stage_1_spec_assurance:
   status: PROVEN
   target_revision: b27a7dcc627637be4cad037cb59c369c36181b63
@@ -432,7 +452,7 @@ stage_1_spec_assurance:
     hidden-test success or convert the hackathon service into production banking software.
 
 exact_next_action: >-
-  Preserve the accepted and independently assured Stage 1 revision. Begin Pocketful Stage 2 product exploitation:
-  implement the official Stage 2 browser wallet/product surface plus stale/lost-response recovery, holds and partial
-  capture while preserving all inherited Stage 1 behavior. Use a fresh BAND room, one initial dispatch, zero human
-  steering after dispatch, exact revision binding and independent verification. Do not begin demo/story packaging.
+  Preserve the accepted and independently assured Stage 1 revision. Correct the Stage 2 Reviewer to invoke the pinned
+  official Pocketful harness with --stage 2, prove the correction statically, then run fresh Pocketful Stage 2 run 2
+  from main with no pre-seeded Stage 2 implementation, one initial dispatch, zero human steering, exact revision
+  binding and independent Stage 2 verification. Do not promote PR 88 and do not begin demo/story packaging.
