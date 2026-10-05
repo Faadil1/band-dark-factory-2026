@@ -1,0 +1,75 @@
+name: Pocketful Stage 1 Spec-Derived Assurance
+
+on:
+  pull_request:
+    types: [opened, reopened]
+    paths:
+      - "assurance/pocketful-stage1/**"
+      - ".github/workflows/pocketful-stage1-spec-assurance.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  spec-derived-black-box:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Checkout assurance branch
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Materialize exact accepted candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          git worktree add "$RUNNER_TEMP/candidate" b27a7dcc627637be4cad037cb59c369c36181b63
+          test "$(git -C "$RUNNER_TEMP/candidate" rev-parse HEAD)" = "b27a7dcc627637be4cad037cb59c369c36181b63"
+
+      - name: Build accepted Stage 1 image
+        shell: bash
+        run: docker build -t pocketful-stage1-assurance "$RUNNER_TEMP/candidate/pocketful-result/stage-1"
+
+      - name: Start accepted Stage 1 service
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run -d --rm --name pocketful-stage1-assurance -e PORT=8080 -p 127.0.0.1:18080:8080 pocketful-stage1-assurance
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:18080/health >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          docker logs pocketful-stage1-assurance
+          exit 1
+
+      - name: Run independent spec-derived black-box suite
+        shell: bash
+        run: |
+          mkdir -p artifacts/pocketful-stage1-assurance
+          python assurance/pocketful-stage1/spec_assurance.py             http://127.0.0.1:18080             artifacts/pocketful-stage1-assurance/report.json
+
+      - name: Capture service logs
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p artifacts/pocketful-stage1-assurance
+          docker logs pocketful-stage1-assurance > artifacts/pocketful-stage1-assurance/service.log 2>&1 || true
+
+      - name: Stop service
+        if: always()
+        shell: bash
+        run: docker stop pocketful-stage1-assurance || true
+
+      - name: Upload assurance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pocketful-stage1-spec-assurance
+          path: artifacts/pocketful-stage1-assurance/**
+          if-no-files-found: error
