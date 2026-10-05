@@ -55,8 +55,12 @@ def resolve(room,key,ids):
 
 def post(room,key,content,mentions):
     if len(content)>15500: raise SystemExit(f"BAND message too large: {len(content)}")
-    return curl_json("POST",f"{BAND_BASE}/chats/{room}/messages",key,
-                     {"message":{"content":content,"mentions":mentions}})
+    message={"content":content}
+    # BAND rejects an explicitly empty mentions array. Omit the field for coordinator
+    # status messages that intentionally address the whole room.
+    if mentions:
+        message["mentions"]=mentions
+    return curl_json("POST",f"{BAND_BASE}/chats/{room}/messages",key,{"message":message})
 
 def gh_comment(repo,pr,body):
     p=run(["gh","api","--method","POST","-H","Accept: application/vnd.github+json",
