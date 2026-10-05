@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Counter</title></head>
+<body>
+<span data-testid="counter-value"></span>
+<button data-testid="increment-button" type="button">+1</button>
+<script>
+(function () {
+  var out = document.querySelector('[data-testid="counter-value"]');
+  var btn = document.querySelector('[data-testid="increment-button"]');
+  function show(d) { out.textContent = String(d.value); }
+  fetch('/counter', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(show);
+  btn.addEventListener('click', function () {
+    fetch('/counter/increment', { method: 'POST' }).then(function (r) { return r.json(); }).then(show);
+  });
+})();
+</script>
+</body>
+</html>
