@@ -16,9 +16,10 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     steps:
-      - name: Checkout assurance branch
+      - name: Checkout exact PR head
         uses: actions/checkout@v6
         with:
+          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
 
       - name: Set up Python
