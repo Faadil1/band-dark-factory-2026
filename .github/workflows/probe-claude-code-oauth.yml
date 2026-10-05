@@ -51,5 +51,5 @@ jobs:
           test "${changed[0]}" = "$target"
           git add "$target"
           git commit -m "Prove Claude Code OAuth runtime"
-          git push origin HEAD:"${{ github.head_ref }}"
+          git push --force-with-lease=refs/heads/"${{ github.head_ref }}":"${{ github.event.pull_request.head.sha }}" origin HEAD:"${{ github.head_ref }}"
           echo "CLAUDE_CODE_OAUTH_RUNTIME=PROVEN"
