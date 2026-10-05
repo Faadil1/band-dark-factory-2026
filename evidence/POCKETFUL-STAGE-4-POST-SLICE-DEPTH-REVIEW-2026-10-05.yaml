@@ -1,0 +1,94 @@
+project: band_dark_factory_wearedevelopers_2026
+milestone: POCKETFUL_STAGE_4_ACCEPTED_DEPTH_REVIEW
+date: 2026-10-05
+canonical_baseline_version: 0.1.57-submission-execution-assurance-promoted
+canonical_baseline_exact_main_sha: 072e6d14da4402d5e4f8aeb47c68a2b574cc56ea
+product_reality_version: 1.5.0
+
+accepted_candidate:
+  pr: 96
+  branch: pocketful/stage-4-run-1
+  room_id: 84fbd102-f985-4331-bb3f-b393498243f2
+  run_token: pocketful-s4-r1-pr96-e83bb2602c03
+  revision: f2744a48d31987732b830c02f77fcf086bae2683
+  promotion_merge_sha: ddb8950b006073203203c8fc3c110deb3f3b8b12
+  workflow_run_id: 37305617577
+  workflow_job_id: 111748464000
+  artifact_id: 11344245322
+  artifact_digest: sha256:6e3673c6fa385949a98ef49e513490f8075d8f424443bab4acffa039fbb6d3c1
+  reviewer_selector: "--stage 4"
+  official_isolated_harness_exit: 0
+  human_steering_after_pr_open: false
+  repair_attempt_2: SKIPPED_NOT_NEEDED
+
+observed_public_harness:
+  stage_1: {collected: 147, passed: 147, failed: 0, errors: 0}
+  stage_2: {collected: 35, passed: 35, failed: 0, errors: 0}
+  stage_3: {collected: 6, passed: 6, failed: 0, errors: 0}
+  stage_4: {collected: 5, passed: 5, failed: 0, errors: 0}
+  highest_contiguous: 4
+  claimed_stage: "4"
+  overshoot: null
+
+material_user_capability_delta_since_previous_milestone:
+  status: MATERIAL_DELTA
+  observed:
+    - recipient_refund_path_exists
+    - refund_available_funds_and_corrected_amount_constraints_exist
+    - refund_payments_are_immutable_linked_movements
+    - operator_batch_correction_path_exists
+    - settlement_complete_batch_correction_semantics_exist
+    - combined_current_and_historical_affordability_semantics_exist
+    - inherited_receipts_and_statement_snapshots_remain_immutable
+    - stage_4_public_harness_claims_stage_4_on_exact_candidate
+  truth_boundary: >-
+    The shipped public harness and exact candidate prove all four public Pocketful stages on one Stage 4 candidate.
+    They do not prove hidden-test success or exhaustive conformance to every normative requirement.
+
+post_stage_4_depth_review:
+  shipped_product_depth:
+    status: PUBLIC_STAGE_1_TO_4_COMPLETE
+  remaining_material_assurance:
+    - cumulative_spec_derived_black_box_assurance_for_requirements_beyond_shipped_tests
+    - one_fresh_four_stage_dark_factory_submission_run_in_one_fresh_room_and_fresh_result_repository
+    - authentic_complete_room_json_export_bound_to_exact_submitted_result
+  hidden_tests:
+    status: UNKNOWN
+  demo_packaging_allowed_as_primary: false
+  reason: >-
+    Product-depth implementation is complete on shipped checks, but the competition's submitted-run evidence and
+    cumulative independent assurance are still unresolved. Packaging cannot substitute for either.
+
+official_submission_rule_reconciliation:
+  fresh_submission_run_required: true
+  one_fresh_room_and_fresh_result_repository: true
+  stage_dispatches_may_be_separate_without_human_messages_between_them: true
+  complete_room_log_required: true
+  room_json_download_is_human_ui_action: true
+  room_json_must_be_saved_unchanged_except_required_secret_redaction: true
+
+truth_boundary:
+  OBSERVED:
+    - exact_revision_bound_to_BAND_run
+    - reviewer_used_pinned_official_harness_stage_4
+    - stage_1_147_of_147_public_checks_passed
+    - stage_2_35_of_35_public_checks_passed
+    - stage_3_6_of_6_public_checks_passed
+    - stage_4_5_of_5_public_checks_passed
+    - highest_contiguous_4
+    - no_public_harness_overshoot
+    - candidate_promoted_to_main
+  UNKNOWN:
+    - hidden_test_success
+    - exhaustive_normative_Stage_1_through_Stage_4_conformance
+    - final_submission_run_result
+    - final_room_json_binding
+    - production_banking_readiness
+
+exact_next_gate: POCKETFUL_CUMULATIVE_SPEC_ASSURANCE
+exact_next_owner: PBPD
+exact_next_action: >-
+  Derive and run independent black-box assurance from the full Stage 1-4 written specifications against the accepted
+  Stage 4 candidate. Repair only if a real counterexample is found. If it survives, prepare the fresh one-room,
+  fresh-result four-stage dark-factory submission run; keep submission and demo packaging blocked until room.json and
+  final canonical assurance are complete.
