@@ -1,0 +1,36 @@
+name: Claude Code OAuth Probe
+
+on:
+  pull_request:
+    types: [opened]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  id-token: write
+
+jobs:
+  probe:
+    if: github.event.pull_request.head.repo.full_name == github.repository && startsWith(github.head_ref, 'probe/claude-code-oauth-v1')
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Run bounded Claude Code probe
+        uses: anthropics/claude-code-action@cab360f6565aa35a51d6ce9e43f1f4287c0a32ea
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Diagnostic bounded execution probe only.
+            Modify exactly one existing file:
+            evidence/claude-code-oauth-probe.md
+
+            On the blank line immediately after "Expected marker:", add exactly:
+            CLAUDE_CODE_OAUTH=PROVEN
+
+            Do not create files.
+            Do not modify any other path.
+            Do not change workflow files.
+            Verify the resulting diff contains only that one-line content change.
+          claude_args: |
+            --max-turns 6
+            --allowedTools "Read,Edit,Write,Bash(git diff:*),Bash(git status:*)"
