@@ -2,13 +2,14 @@ name: Probe Claude Code OAuth Runtime
 
 on:
   pull_request:
-    types: [opened]
+    types: [opened, synchronize]
     paths:
       - "evidence/claude-code-oauth-runtime-probe.md"
       - ".github/workflows/probe-claude-code-oauth-runtime.yml"
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   probe:
