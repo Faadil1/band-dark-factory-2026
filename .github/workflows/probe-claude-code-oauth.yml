@@ -39,3 +39,17 @@ jobs:
           claude_args: |
             --max-turns 6
             --allowedTools "Read,Edit,Write,Bash(git diff:*),Bash(git status:*)"
+
+      - name: Verify and publish bounded probe
+        shell: bash
+        run: |
+          set -euo pipefail
+          target="evidence/claude-code-oauth-probe.md"
+          grep -Fxq 'CLAUDE_CODE_OAUTH=PROVEN' "$target"
+          mapfile -t changed < <(git diff --name-only)
+          test "${#changed[@]}" -eq 1
+          test "${changed[0]}" = "$target"
+          git add "$target"
+          git commit -m "Prove Claude Code OAuth runtime"
+          git push origin HEAD:"${{ github.head_ref }}"
+          echo "CLAUDE_CODE_OAUTH_RUNTIME=PROVEN"
