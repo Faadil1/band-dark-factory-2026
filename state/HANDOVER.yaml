@@ -175,14 +175,13 @@ next_gate:
 
 product_workstream_priority:
   first_live_slice_proven: true
-  current_primary_workstream: PRODUCT_ASSURANCE
+  current_primary_workstream: SUBMISSION_EXECUTION_ASSURANCE
   remaining_material_depth_gaps:
-    - Pocketful_cumulative_spec_derived_assurance_for_Stages_2_to_4_missing
     - Pocketful_final_submission_run_must_use_one_fresh_room_and_fresh_result_repository
     - Pocketful_authentic_full_room_json_export_and_commit_binding_missing
     - hidden_test_success_UNKNOWN
     - exhaustive_normative_conformance_beyond_observed_assurance_UNKNOWN
-  next_highest_value_depth_delta: CUMULATIVE_SPEC_DERIVED_ASSURANCE_BEFORE_FINAL_SUBMISSION_RUN
+  next_highest_value_depth_delta: FRESH_FOUR_STAGE_ONE_ROOM_SUBMISSION_RUN
   valid_stop_condition: null
   demo_packaging_allowed: false
   workstream_drift_status: NO_DRIFT_OBSERVED
@@ -305,7 +304,33 @@ pocketful_stage_4_runs:
     highest_contiguous: 4
     overshoot: null
     hidden_test_success: UNKNOWN
-  next_fresh_run: NONE_UNLESS_FINAL_SUBMISSION_RUN_OR_REVALIDATION_IS_JUSTIFIED
+  negative_event_after_acceptance:
+    pr: 98
+    result: REAL_COUNTEREXAMPLE_FOUND_BY_CUMULATIVE_ASSURANCE
+    target_revision: f2744a48d31987732b830c02f77fcf086bae2683
+    workflow_run_id: 37307554887
+    artifact_id: 11344740042
+    artifact_digest: sha256:166a419eb3296164149d1bb9354e3266b8d8d574b824afc453d923dc1e1da62d
+    defect: STAGE_3_IMPORTED_SNAPSHOT_RE_RENDERED_WITH_STAGE_4_REFUND_OF_NULL
+    pr_closed_unmerged: true
+  repaired_candidate:
+    pr: 99
+    revision: b7eb286a72f7bdf8829120eb5d7b507205e501ad
+    promotion_merge_sha: 64868ebfddc4a5a3c191b2e72f23c4a0710a5443
+    workflow_run_id: 37308275153
+    workflow_job_id: 111757134900
+    artifact_id: 11344237993
+    artifact_digest: sha256:05dc0119168f87af51090c8cd69cd90687fdfeb8a13e285d01a3959e9fdf958e
+    exact_pr_head_binding: PROVEN
+    public_harness: STAGE_1_147_OF_147__STAGE_2_35_OF_35__STAGE_3_6_OF_6__STAGE_4_5_OF_5
+    inherited_stage_1_independent_checks: 34_of_34
+    cumulative_stage_2_to_4_independent_checks: 44_of_44
+    highest_contiguous: 4
+    overshoot: null
+    hidden_test_success: UNKNOWN
+    exhaustive_normative_conformance: UNKNOWN
+  current_accepted_revision: b7eb286a72f7bdf8829120eb5d7b507205e501ad
+  next_fresh_run: FINAL_SUBMISSION_RUN_1
 
 stage_1_spec_assurance:
   status: PROVEN
@@ -319,7 +344,7 @@ stage_1_spec_assurance:
   hidden_test_success: UNKNOWN
 
 next_action: >-
-  Freeze the accepted Stage 4 product candidate and run cumulative spec-derived assurance across Stages 1-4 before
-  any packaging work. Then prepare a single fresh four-stage dark-factory submission run in one fresh BAND room and
-  fresh result repository. Human action is still required later to download the complete Band session and save it as
-  room.json; do not claim SUBMISSION_READY or SUBMITTED before that binding and final assurance exist.
+  Execute the fresh four-stage final submission run in one fresh BAND room and a fresh result repository, with no
+  human steering between stage dispatches. Then require the protected human Band-console download of the complete
+  session as room.json, run the offline submission check and pinned Stage 4 harness, and only then route to Final
+  Canonical Assurance. Hidden tests and exhaustive normative conformance remain UNKNOWN.

@@ -1,0 +1,66 @@
+project: band_dark_factory_wearedevelopers_2026
+milestone: POCKETFUL_CUMULATIVE_SPEC_DERIVED_ASSURANCE
+date: 2026-10-05
+canonical_baseline_version: 0.1.57-submission-execution-assurance-promoted
+canonical_baseline_exact_main_sha: 072e6d14da4402d5e4f8aeb47c68a2b574cc56ea
+
+negative_event:
+  pr: 98
+  target_revision: f2744a48d31987732b830c02f77fcf086bae2683
+  workflow_run_id: 37307554887
+  artifact_id: 11344740042
+  artifact_digest: sha256:166a419eb3296164149d1bb9354e3266b8d8d574b824afc453d923dc1e1da62d
+  stage_1_independent_checks: 34_of_34
+  stage_2_to_4_checks: 43_of_45
+  defect: >-
+    A saved Stage 3 statement snapshot imported into Stage 4 was reconstructed with the Stage 4-only
+    refund_of: null field. This violated the Stage 4 requirement that existing saved statements remain
+    available in their original form.
+  disposition: PR_98_CLOSED_UNMERGED_AS_NEGATIVE_EVENT_EVIDENCE
+
+repair:
+  pr: 99
+  exact_revision: b7eb286a72f7bdf8829120eb5d7b507205e501ad
+  promotion_merge_sha: 64868ebfddc4a5a3c191b2e72f23c4a0710a5443
+  mechanism: >-
+    Imported pre-Stage-4 snapshots are explicitly marked as using the legacy payment shape. Snapshot rendering
+    omits refund_of for those frozen entries while Stage 4-native snapshots retain the Stage 4 payment shape.
+  exact_pr_head_binding: PROVEN
+
+verification:
+  workflow_run_id: 37308275153
+  workflow_job_id: 111757134900
+  artifact_id: 11344237993
+  artifact_digest: sha256:05dc0119168f87af51090c8cd69cd90687fdfeb8a13e285d01a3959e9fdf958e
+  pinned_official_harness:
+    stage_1: 147_of_147
+    stage_2: 35_of_35
+    stage_3: 6_of_6
+    stage_4: 5_of_5
+    highest_contiguous: 4
+    overshoot: null
+  independent_black_box:
+    inherited_stage_1: 34_of_34
+    cumulative_stage_2_to_4: 44_of_44
+    total_additional_checks: 78_of_78
+
+truth_boundary:
+  OBSERVED:
+    - real_counterexample_found_after_public_Stage_4_acceptance
+    - repair_applied_to_exact_PR_head
+    - official_public_Stage_1_to_4_harness_green_on_repaired_head
+    - 78_of_78_independent_black_box_checks_green_on_repaired_head
+    - negative_event_preserved_in_closed_unmerged_PR_98
+  UNKNOWN:
+    - hidden_test_success
+    - exhaustive_normative_conformance
+    - final_submission_run_result
+    - authentic_room_json_binding
+    - production_banking_readiness
+
+next_gate: POCKETFUL_FRESH_FOUR_STAGE_SUBMISSION_RUN
+next_action: >-
+  Execute one fresh four-stage dark-factory run in a single fresh BAND room and fresh result repository with no
+  human steering between stage dispatches. After completion, download the full Band session through the protected
+  human UI flow, save it unchanged as room.json, run harness check and the pinned Stage 4 harness, then route to
+  Final Canonical Assurance.
