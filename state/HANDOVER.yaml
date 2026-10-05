@@ -2,7 +2,7 @@ version: 0.1.0
 project_id: band_dark_factory_wearedevelopers_2026
 date: 2026-10-05
 status: ACTIVE
-current_owner: PBPD
+current_owner: HUMAN_BAND_EXPORT
 current_stage: TOY_FACTORY_REHEARSAL
 
 canonical_baseline:
@@ -172,7 +172,7 @@ product_workstream_priority:
     - Track_Lock_not_proven
     - no_real_track_vertical_slice_exists
   next_highest_value_depth_delta: BIND_AUTHENTIC_BAND_ROOM_JSON_AND_RERUN_PINNED_FINAL_HARNESS_CHECK
-  valid_stop_condition: null
+  valid_stop_condition: WAITING_FOR_UNCHANGED_BAND_FULL_SESSION_EXPORT
   demo_packaging_allowed: false
   workstream_drift_status: NO_DRIFT_OBSERVED
   material_user_capability_delta_since_previous_milestone: NONE

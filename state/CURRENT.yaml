@@ -15,6 +15,8 @@ canonical_baseline_reconciliation:
   status: ALIGNED
   canonical_baseline_version: 0.1.56-canonical-baseline-drift-tripwire-promoted
   canonical_baseline_commit: 8a7e8a4ff5461641c595e2cf052a95fdc32a6340
+  central_reconciliation_wave_commit: fb062d6cd792cab8e27c342120824f285120bc2f
+  product_reality_version: "1.5.0"
   project_state_commit_at_reconciliation_start: a1260bd53695e04c7615316e464593d28fa4df39
   last_canonical_reconciliation_at: 2026-10-04
   baseline_delta_status: NON_MATERIAL_DELTA
@@ -322,7 +324,7 @@ product_workstream_priority:
     - no_real_track_vertical_slice_exists
   current_primary_workstream: PRE_SLICE_BUILD_AND_TECHNICAL_REALITY
   next_highest_value_depth_delta: BIND_AUTHENTIC_BAND_ROOM_JSON_AND_RERUN_PINNED_FINAL_HARNESS_CHECK
-  valid_stop_condition: null
+  valid_stop_condition: WAITING_FOR_UNCHANGED_BAND_FULL_SESSION_EXPORT
   demo_packaging_allowed: false
   workstream_drift_status: NO_DRIFT_OBSERVED
   material_user_capability_delta_since_previous_milestone: NONE
@@ -331,7 +333,7 @@ product_workstream_priority:
     harness acceptance, but it adds no real external-user product capability because the real track is still locked.
 
 exact_next_gate: TOY_FACTORY_REHEARSAL
-exact_next_owner: PBPD
+exact_next_owner: HUMAN_BAND_EXPORT
 repair_path_proof:
   status: PROVEN
   pr: 75
@@ -354,5 +356,7 @@ exact_next_action: >-
   Preserve Rehearsal 8 accepted revision 7679ba2f5d1937ebeed4b1e04449918ac8a7ecc8 unchanged. The autonomous
   REJECT -> repair -> independent re-review path is now PROVEN by PR 75 and must not be merged because it is a
   simulated-defect technical-proof branch. The remaining next input is the unchanged Rehearsal 8 BAND full-session
-  room.json downloaded by the human from Band. Once that authentic export exists, bind it and rerun the pinned
-  official harness check. Do not promote TRACK_LOCK before that final evidence edge is PROVEN.
+  room.json downloaded by the human from Band. Exact human action: open Rehearsal 8 room
+  bee3fb3e-6f4a-4f96-8a32-b72ac1a4f0f5 in Band -> menu -> Download -> Download full session, then provide the
+  unchanged JSON back to PBPD. Once that authentic export exists, PBPD must bind it and rerun the pinned official
+  harness check. Do not promote TRACK_LOCK before that final evidence edge is PROVEN.
