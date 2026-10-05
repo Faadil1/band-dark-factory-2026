@@ -1,0 +1,40 @@
+name: Claude Code Runtime Probe
+
+on:
+  pull_request:
+    types: [opened, reopened]
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  id-token: write
+  actions: read
+
+jobs:
+  probe:
+    if: startsWith(github.head_ref, 'probe/claude-runtime-')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout probe branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 1
+
+      - name: Run Claude Code probe
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            This is a bounded runtime probe.
+            Modify only evidence/claude-runtime-probe.md.
+            Replace the line CLAUDE_RUNTIME_PROBE=PENDING with CLAUDE_RUNTIME_PROBE=PROVEN.
+            Do not modify any other file.
+            Do not create new files.
+            Report the change.
+          claude_args: |
+            --max-turns 5
+            --allowedTools "Read,Edit"
