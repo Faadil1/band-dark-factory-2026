@@ -23,6 +23,13 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Lint GitHub Actions workflows
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash <(curl -fsSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash) 1.7.12
+          ./actionlint -color .github/workflows/toy-factory-rehearsal-dispatch.yml .github/workflows/toy-factory-rehearsal-review.yml
+
       - name: Compile Toy transport scripts
         run: |
           python -m py_compile \
