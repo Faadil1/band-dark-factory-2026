@@ -254,3 +254,33 @@ missing_edges:
         - hidden_test_success
         - production_banking_readiness
         - Stage_2_or_later_behavior
+
+  - claim_id: POCKETFUL_STAGE_2_PRODUCT_DEPTH
+    status: PROVEN_ON_SHIPPED_PUBLIC_HARNESS_WITH_RESIDUAL_UNKNOWN
+    evidence: evidence/POCKETFUL-STAGE-2-POST-SLICE-DEPTH-REVIEW-2026-10-05.yaml
+    observed:
+      pr: 90
+      room_id: f036d266-b2ec-4edd-aa95-9ca35dd96770
+      run_token: pocketful-s2-r2-pr90-b6586ab6f5a1
+      accepted_revision: 3b46422054dee1aa65379bd5efbca33988084fd2
+      promotion_merge_sha: 068fe2c70c83b55ad6ec7469d1d60b6dfb1eea99
+      workflow_run_id: 37299342044
+      workflow_job_id: 111728076908
+      official_isolated_harness_exit: 0
+      stage_1_checks: 147_of_147
+      stage_2_checks: 35_of_35
+      highest_contiguous: 2
+      overshoot: null
+      human_steering_after_pr_open: false
+    truth_boundary:
+      proves:
+        - exact_candidate_commit_binding
+        - reviewer_used_stage_2_selector
+        - shipped_public_Stage_1_and_Stage_2_checks_pass
+        - real_Stage_2_browser_and_authorization_capture_candidate_exists
+      does_not_prove:
+        - hidden_test_success
+        - exhaustive_normative_Stage_2_conformance
+        - Stage_3_or_Stage_4_behavior
+        - production_banking_readiness
+
