@@ -295,7 +295,7 @@ conditional_gateway_registry:
   CODEX_CLOUD_TASK_EXECUTION_CURRENT: BLOCKED
   CLAUDE_CODE_OAUTH_IMPLEMENTER_RUNTIME: PROVEN
   CLAUDE_BOUNDED_VERIFIED_PUBLISHER: PROVEN
-  AUTONOMOUS_REJECT_REPAIR_REREVIEW_LOOP: ACTIVE
+  AUTONOMOUS_REJECT_REPAIR_REREVIEW_LOOP: PROVEN
   TRACK_LOCK: BLOCKED
   REAL_TRACK_BUILD: BLOCKED
   EVIDENCE_GRAPH: ACTIVE
@@ -317,11 +317,11 @@ product_workstream_priority:
   first_live_slice_proven: false
   remaining_material_depth_gaps:
     - unchanged_BAND_full_session_room_json_export_and_binding
-    - autonomous_REJECT_repair_rereview_runtime_path_not_yet_proven
+    - final_pinned_official_harness_check_with_authentic_room_json
     - Track_Lock_not_proven
     - no_real_track_vertical_slice_exists
   current_primary_workstream: PRE_SLICE_BUILD_AND_TECHNICAL_REALITY
-  next_highest_value_depth_delta: PROVE_AUTONOMOUS_REJECT_REPAIR_REREVIEW_RUNTIME_PATH
+  next_highest_value_depth_delta: BIND_AUTHENTIC_BAND_ROOM_JSON_AND_RERUN_PINNED_FINAL_HARNESS_CHECK
   valid_stop_condition: null
   demo_packaging_allowed: false
   workstream_drift_status: NO_DRIFT_OBSERVED
@@ -332,10 +332,27 @@ product_workstream_priority:
 
 exact_next_gate: TOY_FACTORY_REHEARSAL
 exact_next_owner: PBPD
+repair_path_proof:
+  status: PROVEN
+  pr: 75
+  branch: proof/toy-reject-repair-rereview-v2
+  run_token: toy-repair-proof-pr75-04dc725abab2
+  room_id: b69303ee-c773-4680-bdec-3d35aa101ab7
+  evidence_class: SIMULATED_DEFECT_TECHNICAL_PROOF
+  source_accepted_revision: 7679ba2f5d1937ebeed4b1e04449918ac8a7ecc8
+  injected_defect_revision: 45f1932930e7d31bd8fd9a7ff1dbcd8fa98dde8c
+  repaired_revision: 16ea21d87c6e2fa19619d259872184a0b03da692
+  terminal: ACCEPT
+  attempt: 2
+  official_harness_exit: 0
+  production_merge: FORBIDDEN_SIMULATED_DEFECT_BRANCH
+  truth_boundary: >-
+    This proves the autonomous REJECT -> Claude repair -> independent re-review control path only.
+    It does not modify or supersede the accepted Rehearsal 8 product candidate.
+
 exact_next_action: >-
-  Preserve Rehearsal 8 accepted revision 7679ba2f5d1937ebeed4b1e04449918ac8a7ecc8 unchanged. Run one bounded
-  development-only negative-path proof that exercises Reviewer REJECT -> autonomous Claude repair -> exact repaired
-  revision -> independent re-review, without representing the injected defect as product behavior. In parallel the
-  human must download the Rehearsal 8 BAND room as an unchanged full-session room.json. After both are bound, rerun
-  the pinned official harness check with the authentic room export. Do not promote TRACK_LOCK before all remaining
-  Toy evidence edges are PROVEN.
+  Preserve Rehearsal 8 accepted revision 7679ba2f5d1937ebeed4b1e04449918ac8a7ecc8 unchanged. The autonomous
+  REJECT -> repair -> independent re-review path is now PROVEN by PR 75 and must not be merged because it is a
+  simulated-defect technical-proof branch. The remaining next input is the unchanged Rehearsal 8 BAND full-session
+  room.json downloaded by the human from Band. Once that authentic export exists, bind it and rerun the pinned
+  official harness check. Do not promote TRACK_LOCK before that final evidence edge is PROVEN.
