@@ -1,0 +1,119 @@
+version: 0.1.0
+project_id: band_dark_factory_wearedevelopers_2026
+date: 2026-10-05
+policy_context:
+  canonical_baseline_version: 0.1.56-canonical-baseline-drift-tripwire-promoted
+  canonical_baseline_commit: 8a7e8a4ff5461641c595e2cf052a95fdc32a6340
+  central_reconciliation_wave_commit: fb062d6cd792cab8e27c342120824f285120bc2f
+  product_reality_version: "1.5.0"
+  winning_intelligence_version: "v2"
+
+winning_intelligence_v2_prelock:
+  status: PROVEN_WITH_CONCEPT_REVISION
+  problem_reality:
+    status: PROVEN
+    basis:
+      - official_Pocketful_specs_require_conservation_idempotency_retry_recovery_historical_truth_and_atomic_corrections
+      - payment_retry_and_uncertain_outcome_problem_already_primary_verified_in_canonical_research
+  contrastive_submission_signal:
+    status: PROVEN
+    competitiveness_floor:
+      - multi_agent_factory
+      - independent_reviewer
+      - exact_commit_acceptance
+      - requirements_or_spec_derived_verification
+      - three_seat_factory
+      - evidence_gated_acceptance
+      - retry_recovery_UI
+      - temporal_history_and_original_receipt_UI
+    current_public_scan:
+      observed_at: 2026-10-05
+      live_dashboard_submissions: 50
+      live_dashboard_pocketful: 19
+      live_dashboard_tablekeeper: 31
+      high_signal_reviewed:
+        - DanKam0001/pocketful-dark-factory
+        - HyunsikParker/pocketful-band-factory
+        - lablab_RDPT_Pocketful_Dark_Factory
+        - lablab_Obsidian_Foundry
+        - lablab_Twin_Builder_Never_Grades_Itself
+        - lablab_Ledger_Line
+        - lablab_Dark_Factory_refuses_its_own_work
+  ai_commodity_test:
+    exposure: HIGH
+    status: PROVEN_HIGH_WITH_NON_COMMODITY_ADVANTAGE
+    commodity_components:
+      - coding_agent_implementation
+      - multi_agent_role_split
+      - adversarial_review
+      - spec_first_verification
+      - three_seat_minimality
+    non_commodity_advantage:
+      name: REMOTE_EVIDENCE_BOUND_FACTORY
+      observed_components:
+        - BAND_remote_agent_coordination
+        - GitHub_hosted_execution_without_local_Docker_or_admin_privilege
+        - bounded_verified_publisher
+        - exact_revision_and_branch_binding
+        - fail_closed_scope_runtime_and_evidence_checks
+        - autonomous_REJECT_to_repair_to_independent_rereview
+      proof:
+        - evidence/TR-REMOTE-SEAT-ELIGIBILITY-001.yaml
+        - evidence/EVIDENCE-GRAPH.yaml
+        - Toy_Rehearsal_8_final_binding_PR_78
+      public_collision_boundary: >-
+        This mechanism was not observed in the reviewed high-signal public Pocketful submissions.
+        This is not a claim that no submission among all entries has any similar implementation.
+  demand_and_founder_problem_fit:
+    demand_reality: PROVEN_EVALUATOR_DEMAND
+    basis: official_rubric_weights_factory_50_percent_app_25_percent_agent_teamwork_25_percent
+    founder_problem_fit: N_A_JUDGED_BUILD_NOT_STARTUP_DEMAND_GATE
+  creative_divergence:
+    candidates:
+      - concept: TRUTH_LENS_V1_AS_PRIMARY_REASON_TO_WIN
+        verdict: KILLED_BY_COLLISION
+        reason: multiple_strong_entries_now_expose_equivalent_retry_temporal_history_original_receipt_surfaces
+      - concept: THREE_SEAT_LEAN_FACTORY_AS_PRIMARY_REASON_TO_WIN
+        verdict: KILLED_AS_COMPETITIVENESS_FLOOR
+        reason: multiple_current_submissions_use_three_seat_or_evidence_gated_factories
+      - concept: REMOTE_EVIDENCE_BOUND_FACTORY_WITH_POCKETFUL_CONSEQUENCE_DEPTH
+        verdict: SELECTED
+        reason: observed_runtime_advantage_material_to_factory_rubric_and_not_observed_in_reviewed_high_signal_entries
+  collision:
+    status: PROVEN_FRESH_2026_10_05
+    truth_lens_equivalent_collision: HIGH
+    remote_evidence_bound_factory_collision: NOT_OBSERVED_IN_REVIEWED_HIGH_SIGNAL_SET
+  concept_lock:
+    status: PROVEN
+    concept: REMOTE_EVIDENCE_BOUND_FACTORY_WITH_POCKETFUL_CONSEQUENCE_DEPTH
+    primary_reason_to_win: >-
+      A reusable BAND factory that can operate from a locked-down/no-local-Docker workstation by moving implementation,
+      isolated verification and bounded publishing to GitHub-hosted execution while retaining exact room-to-commit
+      evidence, fail-closed acceptance and autonomous repair.
+    secondary_product_depth: >-
+      Pocketful's required retry, refusal, hold, history, correction and refund consequences remain user-legible,
+      but temporal-truth UI is no longer claimed as unique differentiation.
+  prior_kill_condition_resolution:
+    truth_lens_collision_condition: TRIGGERED
+    prior_concept: KILLED_NOT_REWRITTEN
+    track_resolution: >-
+      Pocketful is re-evaluated rather than silently grandfathered. It survives only because Creative Divergence
+      identified a separate observed non-commodity factory mechanism that is material to the 50-percent Factory rubric.
+  track_lock:
+    status: PROVEN
+    track: POCKETFUL
+    reason:
+      - strongest_fit_for_retry_concurrency_idempotency_and_recovery_stress
+      - remote_factory_mechanism_can_be_exercised_without_future_stage_overshoot
+      - Tablekeeper_has_higher_current_submission_count_and_known_product_collision
+    truth_boundary:
+      observed:
+        - Toy_factory_remote_execution_and_fail_closed_controls
+        - autonomous_repair_path
+        - fresh_public_competitor_patterns
+      inferred:
+        - judge_value_of_remote_no_local_privilege_reusability
+      unknown:
+        - hidden_test_result
+        - final_rank
+        - uniqueness_across_every_uninspected_submission
