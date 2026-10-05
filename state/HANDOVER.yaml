@@ -208,8 +208,21 @@ winning_intelligence_v2_prelock:
   selected_non_commodity_advantage: REMOTE_EVIDENCE_BOUND_FACTORY
   track_lock: POCKETFUL_PROVEN
 
+pocketful_stage_1_runs:
+  run_1:
+    pr: 81
+    branch: pocketful/stage-1-run-1
+    room_id: 4d404182-cc62-4be2-9b33-6c6311111ca0
+    run_token: pocketful-s1-r1-pr81-972bbfedf404
+    result: BLOCKED_WORKFLOW_BOOTSTRAP
+    implementation_produced: false
+    reviewer_ran: false
+    root_cause: CLAUDE_WORKFLOW_MUST_EXIST_IDENTICALLY_ON_DEFAULT_BRANCH
+  next_fresh_run: 2
+
 next_action: >-
-  Update the Living PRD for the locked Pocketful concept, then dispatch Pocketful Stage 1 through the proven remote
-  evidence-bound factory in a fresh BAND room. One initial task only; no human steering after dispatch. Bind the exact
-  accepted revision to independent official isolated verification. After the first valid real-track vertical slice,
-  run the Post-Vertical-Slice Depth Gap Review before any demo or submission packaging.
+  Bootstrap the Pocketful Stage 1 Claude workflow on main, then open fresh pocketful/stage-1-run-2. Run 1 is terminal
+  BLOCKED before Claude execution because the action requires its workflow file to already exist identically on the
+  default branch. Run 2 must preserve one initial task, zero human steering after dispatch, exact revision binding and
+  independent pinned official isolated verification. After the first valid real-track vertical slice, run the
+  Post-Vertical-Slice Depth Gap Review before any demo or submission packaging.

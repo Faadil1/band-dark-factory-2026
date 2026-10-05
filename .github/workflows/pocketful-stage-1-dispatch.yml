@@ -1,0 +1,145 @@
+name: Pocketful Stage 1 Factory Run
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  id-token: write
+
+concurrency:
+  group: pocketful-stage-1-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      startsWith(github.event.pull_request.head.ref, 'pocketful/stage-1-run-')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BAND_COORDINATOR_AGENT_ID: ${{ secrets.BAND_COORDINATOR_AGENT_ID }}
+      BAND_COORDINATOR_API_KEY: ${{ secrets.BAND_COORDINATOR_API_KEY }}
+      BAND_IMPLEMENTER_AGENT_ID: ${{ secrets.BAND_IMPLEMENTER_AGENT_ID }}
+      BAND_IMPLEMENTER_API_KEY: ${{ secrets.BAND_IMPLEMENTER_API_KEY }}
+      BAND_REVIEWER_AGENT_ID: ${{ secrets.BAND_REVIEWER_AGENT_ID }}
+      BAND_REVIEWER_API_KEY: ${{ secrets.BAND_REVIEWER_API_KEY }}
+
+    steps:
+      - name: Checkout Pocketful candidate
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Initialize runtime paths
+        shell: bash
+        run: echo "KICKOFF=$RUNNER_TEMP/dark-factory-wearedevs" >> "$GITHUB_ENV"
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Clone pinned official kickoff
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone https://github.com/band-ai/dark-factory-wearedevs.git "$KICKOFF"
+          git -C "$KICKOFF" checkout 803560d2a678ace1414465c098eb0ab5380ffade
+          test "$(git -C "$KICKOFF" rev-parse HEAD)" = "803560d2a678ace1414465c098eb0ab5380ffade"
+
+      - name: Install official harness
+        shell: bash
+        run: python -m pip install -r "$KICKOFF/harness/requirements.txt"
+
+      - name: Validate BAND and Claude credentials
+        shell: bash
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "$BAND_COORDINATOR_AGENT_ID"
+          test -n "$BAND_COORDINATOR_API_KEY"
+          test -n "$BAND_IMPLEMENTER_AGENT_ID"
+          test -n "$BAND_IMPLEMENTER_API_KEY"
+          test -n "$BAND_REVIEWER_AGENT_ID"
+          test -n "$BAND_REVIEWER_API_KEY"
+          test -n "$CLAUDE_CODE_OAUTH_TOKEN"
+
+      - name: Prepare fresh BAND room
+        id: prepare
+        run: python infra/pocketful-stage1/claude_pipeline.py prepare
+
+      - name: Claude Implementer attempt 1
+        uses: anthropics/claude-code-action@cab360f6565aa35a51d6ce9e43f1f4287c0a32ea
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Act as the Implementer seat for the first real Pocketful Stage 1 factory run.
+            Run token: ${{ steps.prepare.outputs.run_token }}
+            Branch: ${{ steps.prepare.outputs.branch }}
+
+            Read the complete authoritative requirements in pocketful-input/stage-1.md.
+            Implement exactly Stage 1 under pocketful-result/stage-1/.
+            Do not intentionally implement Stage 2+ behavior.
+            Build to the written requirements, not merely the shipped tests.
+            Include source files, Dockerfile, and RUN.md.
+            Runtime must be self-contained with no outbound dependency.
+            Modify ONLY pocketful-result/stage-1/.
+            Do not modify specs, state, evidence, workflows, FACTORY.md, README.md, or mandates.
+            Do not commit or push.
+            Do not ask the human for clarification or steering.
+            You may run lightweight checks that do not require Docker.
+          claude_args: |
+            --max-turns 70
+            --allowedTools "Read,Edit,Write,Glob,Grep,Bash(python:*),Bash(git diff:*),Bash(git status:*),Bash(find:*),Bash(mkdir:*),Bash(chmod:*)"
+
+      - name: Validate and publish attempt 1
+        id: publish1
+        run: python infra/pocketful-stage1/claude_pipeline.py publish 1 "${{ steps.prepare.outputs.initial_sha }}"
+
+      - name: Independent Reviewer attempt 1
+        id: review1
+        run: python infra/pocketful-stage1/claude_pipeline.py review 1 "${{ steps.publish1.outputs.revision }}"
+
+      - name: Claude repair attempt 2
+        if: steps.review1.outputs.verdict == 'REJECT'
+        uses: anthropics/claude-code-action@cab360f6565aa35a51d6ce9e43f1f4287c0a32ea
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            ${{ steps.review1.outputs.repair_context }}
+          claude_args: |
+            --max-turns 50
+            --allowedTools "Read,Edit,Write,Glob,Grep,Bash(python:*),Bash(git diff:*),Bash(git status:*),Bash(find:*)"
+
+      - name: Validate and publish attempt 2
+        if: steps.review1.outputs.verdict == 'REJECT'
+        id: publish2
+        run: python infra/pocketful-stage1/claude_pipeline.py publish 2 "${{ steps.publish1.outputs.revision }}"
+
+      - name: Independent Reviewer attempt 2
+        if: steps.review1.outputs.verdict == 'REJECT'
+        id: review2
+        run: python infra/pocketful-stage1/claude_pipeline.py review 2 "${{ steps.publish2.outputs.revision }}"
+
+      - name: Fail closed on unexpected pipeline failure
+        if: failure()
+        run: python infra/pocketful-stage1/claude_pipeline.py block PIPELINE_FAILURE
+
+      - name: Upload Pocketful Stage 1 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pocketful-stage-1-${{ github.event.pull_request.number }}
+          path: |
+            artifacts/pocketful-stage-1/**
+            ${{ runner.temp }}/pocketful-stage1-attempt-1/**
+            ${{ runner.temp }}/pocketful-stage1-attempt-2/**
+          if-no-files-found: warn
