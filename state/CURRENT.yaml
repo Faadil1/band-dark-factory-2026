@@ -333,14 +333,13 @@ evidence_graph:
 product_workstream_priority:
   first_live_slice_proven: true
   remaining_material_depth_gaps:
-    - Pocketful_stage_1_independent_spec_derived_assurance_missing
     - Pocketful_stage_1_authentic_full_room_export_binding_missing
     - Pocketful_stage_2_browser_and_recovery_not_started
     - Pocketful_stage_3_temporal_corrections_not_started
     - Pocketful_stage_4_refunds_and_batch_corrections_not_started
     - hidden_test_success_UNKNOWN
   current_primary_workstream: PRODUCT_EXPLOITATION
-  next_highest_value_depth_delta: STAGE_1_SPEC_DERIVED_INDEPENDENT_ASSURANCE
+  next_highest_value_depth_delta: POCKETFUL_STAGE_2_BROWSER_RECOVERY_HOLDS_PARTIAL_CAPTURE
   valid_stop_condition: null
   demo_packaging_allowed: false
   workstream_drift_status: NO_DRIFT_OBSERVED
@@ -350,7 +349,7 @@ product_workstream_priority:
     wallet operations, payments, requests, splits, settlements, idempotency and export/import can execute where no
     real Pocketful implementation existed at the previous milestone.
 
-exact_next_gate: POCKETFUL_STAGE_1_DEPTH_ASSURANCE
+exact_next_gate: POCKETFUL_STAGE_2_PRODUCT_DEPTH
 exact_next_owner: PBPD
 repair_path_proof:
   status: PROVEN
@@ -397,7 +396,14 @@ pocketful_stage_1_runs:
     official_isolated_harness_exit: 0
     human_steering_after_pr_open: false
     hidden_test_success: UNKNOWN
-    independent_spec_derived_assurance: MISSING
+    independent_spec_derived_assurance: PROVEN
+    spec_assurance_pr: 85
+    spec_assurance_merge_sha: 4fa7bb7babd065f8bbc9eff61e0bff87f77a362c
+    spec_assurance_run_id: 37286577859
+    spec_assurance_job_id: 111686787538
+    spec_assurance_check_count: 34
+    spec_assurance_artifact_id: 11333774368
+    spec_assurance_artifact_digest: sha256:49fc1af2be0388dea63ef5bf639b8d34023878f8b64147782688bd4fcae079d1
   next_fresh_run: NONE_UNLESS_REPAIR_OR_REVALIDATION_IS_JUSTIFIED
 
 winning_intelligence_v2_prelock:
@@ -409,9 +415,24 @@ winning_intelligence_v2_prelock:
   non_commodity_advantage: PROVEN_OBSERVED_REMOTE_EVIDENCE_BOUND_FACTORY
   track_lock: POCKETFUL_PROVEN
 
+stage_1_spec_assurance:
+  status: PROVEN
+  target_revision: b27a7dcc627637be4cad037cb59c369c36181b63
+  pr: 85
+  merge_sha: 4fa7bb7babd065f8bbc9eff61e0bff87f77a362c
+  workflow_run_id: 37286577859
+  workflow_job_id: 111686787538
+  checks_passed: 34
+  checks_failed: 0
+  artifact_id: 11333774368
+  artifact_digest: sha256:49fc1af2be0388dea63ef5bf639b8d34023878f8b64147782688bd4fcae079d1
+  hidden_test_success: UNKNOWN
+  truth_boundary: >-
+    This materially strengthens Stage 1 conformance confidence beyond the shipped public harness but does not prove
+    hidden-test success or convert the hackathon service into production banking software.
+
 exact_next_action: >-
-  Preserve accepted Stage 1 revision b27a7dcc627637be4cad037cb59c369c36181b63. Run an independent spec-derived
-  adversarial black-box assurance pass against the complete Stage 1 written requirements, using the shipped harness
-  only as one evidence source. Do not modify product code unless a real counterexample is reproduced. If the accepted
-  revision survives, bind the assurance evidence and proceed directly to Pocketful Stage 2 browser/recovery depth.
-  Keep demo/story/submission packaging blocked while material product-depth gaps remain.
+  Preserve the accepted and independently assured Stage 1 revision. Begin Pocketful Stage 2 product exploitation:
+  implement the official Stage 2 browser wallet/product surface plus stale/lost-response recovery, holds and partial
+  capture while preserving all inherited Stage 1 behavior. Use a fresh BAND room, one initial dispatch, zero human
+  steering after dispatch, exact revision binding and independent verification. Do not begin demo/story packaging.

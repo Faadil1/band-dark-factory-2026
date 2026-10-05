@@ -228,3 +228,29 @@ missing_edges:
         - independent_spec_derived_adversarial_assurance_beyond_shipped_harness
         - Stage_2_or_later_depth
         - production_banking_readiness
+
+  - claim_id: POCKETFUL_STAGE_1_SPEC_DERIVED_ASSURANCE
+    status: COMPLETE
+    target_revision: b27a7dcc627637be4cad037cb59c369c36181b63
+    assurance_pr: 85
+    assurance_merge_sha: 4fa7bb7babd065f8bbc9eff61e0bff87f77a362c
+    workflow_run_id: 37286577859
+    workflow_job_id: 111686787538
+    check_count: 34
+    result: PASS_ALL
+    artifact_id: 11333774368
+    artifact_digest: sha256:49fc1af2be0388dea63ef5bf639b8d34023878f8b64147782688bd4fcae079d1
+    truth_boundary:
+      proves:
+        - independent_black_box_checks_derived_from_Stage_1_spec
+        - conservation_under_concurrency
+        - idempotency_replay_conflict_and_failed_key_reuse
+        - request_authority_and_recovery
+        - split_rounding_and_zero_share_behavior
+        - export_import_token_and_idempotency_preservation
+        - settlement_authority_atomic_failure_and_replay
+        - derived_handle_collision_behavior
+      does_not_prove:
+        - hidden_test_success
+        - production_banking_readiness
+        - Stage_2_or_later_behavior
