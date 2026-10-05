@@ -2,8 +2,8 @@ version: 0.1.0
 project_id: band_dark_factory_wearedevelopers_2026
 date: 2026-10-05
 status: ACTIVE
-current_owner: HUMAN_BAND_EXPORT
-current_stage: TOY_FACTORY_REHEARSAL
+current_owner: PBPD
+current_stage: REAL_TRACK_STAGE_1
 
 canonical_baseline:
   status: ALIGNED
@@ -34,12 +34,12 @@ read_order:
   - mandates/implementer.md
   - mandates/reviewer.md
 
-last_proven_gate: TECHNICAL_REALITY_CHECK
+last_proven_gate: TRACK_LOCK
 
 current_truth:
   project_authorized: true
   pocketful_recommended: true
-  pocketful_locked: false
+  pocketful_locked: true
   coordinator_remote_agent_created: true
   implementer_remote_agent_created: true
   reviewer_remote_agent_created: true
@@ -50,7 +50,7 @@ current_truth:
   remote_linux_harness: proven_in_operational_repo
   dedicated_repo_actions_preflight: proven
   evidence_graph: active
-  toy_factory: rehearsal_8_ACCEPT_attempt_1_pending_room_export_and_repair_path_proof
+  toy_factory: PROVEN_rehearsal_8_authentic_room_final_official_check
   toy_transport_hardening: user_authored_dispatch_proven_and_fast_fail_patch_merged
   codex_transport_actor_finding: user_authored_mentions_accepted_bot_authored_mentions_not_observed
   codex_cloud_task_execution_current: blocked_external_unknown
@@ -105,7 +105,7 @@ toy_rehearsal_history:
     - pr: 71
       room_id: bee3fb3e-6f4a-4f96-8a32-b72ac1a4f0f5
       run_token: toy-r8-pr71-337369dc6327
-      result: ACCEPT_ATTEMPT_1_PENDING_FINAL_ROOM_BINDING
+      result: PROVEN_ACCEPT_ATTEMPT_1_WITH_AUTHENTIC_ROOM_AND_FINAL_CHECK
       accepted_revision: 7679ba2f5d1937ebeed4b1e04449918ac8a7ecc8
       workflow_run_id: 37262382681
       workflow_job_id: 111612125945
@@ -117,7 +117,11 @@ toy_rehearsal_history:
       offline_non_room_check_run_id: 37262872054
       offline_non_room_check_job_id: 111613560000
       offline_non_room_checks: PROVEN
-      room_json_binding: BLOCKED_PENDING_UNCHANGED_BAND_FULL_SESSION_DOWNLOAD
+      room_json_binding: PROVEN
+      room_json_sha256: 679852b4eda5285b7659f033235dd8e94fba2c90a3f8c7605e66062c69f71103
+      final_verification_run_id: 37271665351
+      final_verification_job_id: 111639772107
+      final_verification_merge_sha: 1325406074c50bc3b8a147aa0872362381af1e69
   next_fresh_rehearsal: NONE_UNLESS_NEW_RUNTIME_REHEARSAL_IS_JUSTIFIED
 
 runtime_evidence:
@@ -165,14 +169,15 @@ next_gate:
 
 product_workstream_priority:
   first_live_slice_proven: false
-  current_primary_workstream: PRE_SLICE_BUILD_AND_TECHNICAL_REALITY
+  current_primary_workstream: REAL_TRACK_VERTICAL_SLICE_IMPLEMENTATION
   remaining_material_depth_gaps:
-    - unchanged_BAND_full_session_room_json_export_and_binding
-    - final_pinned_official_harness_check_with_authentic_room_json
-    - Track_Lock_not_proven
     - no_real_track_vertical_slice_exists
-  next_highest_value_depth_delta: BIND_AUTHENTIC_BAND_ROOM_JSON_AND_RERUN_PINNED_FINAL_HARNESS_CHECK
-  valid_stop_condition: WAITING_FOR_UNCHANGED_BAND_FULL_SESSION_EXPORT
+    - Pocketful_stage_1_live_core_loop_not_proven
+    - Pocketful_stage_1_real_user_surface_not_proven
+    - Pocketful_stage_1_failure_and_recovery_depth_not_proven
+    - later_official_stage_depth_pending
+  next_highest_value_depth_delta: BUILD_POCKETFUL_STAGE_1_THROUGH_REMOTE_EVIDENCE_BOUND_FACTORY
+  valid_stop_condition: null
   demo_packaging_allowed: false
   workstream_drift_status: NO_DRIFT_OBSERVED
   material_user_capability_delta_since_previous_milestone: NONE
@@ -189,9 +194,16 @@ repair_path_proof:
   official_harness_exit: 0
   production_merge: FORBIDDEN_SIMULATED_DEFECT_BRANCH
 
+winning_intelligence_v2_prelock:
+  status: PROVEN_WITH_CONCEPT_REVISION
+  evidence: Faadil1/band-dark-factory-2026/evidence/WINNING-INTELLIGENCE-V2-PRELOCK-2026-10-05.yaml
+  truth_lens_v1: KILLED_BY_COLLISION
+  three_seat_only: COMPETITIVENESS_FLOOR
+  selected_non_commodity_advantage: REMOTE_EVIDENCE_BOUND_FACTORY
+  track_lock: POCKETFUL_PROVEN
+
 next_action: >-
-  Preserve accepted Toy revision 7679ba2f5d1937ebeed4b1e04449918ac8a7ecc8 unchanged. The autonomous repair path
-  is PROVEN. The human must now export the Rehearsal 8 room through Band: Open in Band -> menu -> Download ->
-  Download full session, and keep the downloaded JSON unchanged. Once the authentic room.json exists, PBPD must bind
-  it and rerun the pinned official harness check. Only then may TOY_FACTORY_REHEARSAL be considered for PROVEN and
-  routed to TRACK_LOCK.
+  Update the Living PRD for the locked Pocketful concept, then dispatch Pocketful Stage 1 through the proven remote
+  evidence-bound factory in a fresh BAND room. One initial task only; no human steering after dispatch. Bind the exact
+  accepted revision to independent official isolated verification. After the first valid real-track vertical slice,
+  run the Post-Vertical-Slice Depth Gap Review before any demo or submission packaging.
