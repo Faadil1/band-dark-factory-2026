@@ -243,6 +243,18 @@ pocketful_stage_1_runs:
     spec_assurance_artifact_digest: sha256:49fc1af2be0388dea63ef5bf639b8d34023878f8b64147782688bd4fcae079d1
   next_fresh_run: NONE_UNLESS_REPAIR_OR_REVALIDATION_IS_JUSTIFIED
 
+pocketful_stage_2_runs:
+  run_1:
+    pr: 88
+    room_id: bb699fd0-f11d-43cd-a669-9c0a3e49b150
+    run_token: pocketful-s2-r1-pr88-1f513da1817c
+    observed_candidate_revision: 3d9d33d95b0397cde4eff18a7441ad3454bcc60f
+    result: INVALIDATED_REVIEW_CONFIGURATION
+    invalidation_reason: REVIEWER_EXECUTED_STAGE_1_HARNESS_INSTEAD_OF_STAGE_2
+    product_candidate_promoted: false
+    pr_closed_unmerged: true
+  next_fresh_run: 2
+
 stage_1_spec_assurance:
   status: PROVEN
   target_revision: b27a7dcc627637be4cad037cb59c369c36181b63
@@ -255,7 +267,6 @@ stage_1_spec_assurance:
   hidden_test_success: UNKNOWN
 
 next_action: >-
-  Begin Pocketful Stage 2 in a fresh BAND room through the same evidence-bound factory. Preserve every Stage 1
-  requirement, add the official browser wallet/product surface, stale/lost-response recovery, holds and partial
-  capture, and independently verify the exact candidate. Keep demo/story packaging blocked while material depth
-  remains.
+  Correct the Pocketful Stage 2 Reviewer from --stage 1 to --stage 2 and enforce that selector with the existing
+  static pipeline check. Merge only after validation, then launch fresh Stage 2 run 2 from main with no Stage 2
+  implementation pre-seeded. Keep PR 88 closed unmerged and keep demo/story packaging blocked.
