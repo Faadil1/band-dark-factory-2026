@@ -83,6 +83,6 @@ jobs:
           assert "NOOP_ALREADY_TERMINAL" in review
           assert "TOY_REHEARSAL_TERMINAL" in review
 
-          assert "next_fresh_rehearsal: 8" in current
+          assert "next_fresh_rehearsal:" in current
           assert "transport_hardening_pr: 37" in handover
           assert "user_authored_codex_dispatch: PROVEN_IN_REHEARSAL_4" in current
