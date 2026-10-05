@@ -7,6 +7,8 @@ on:
       - "infra/toy-rehearsal/**"
       - ".github/workflows/pocketful-stage-2-dispatch.yml"
       - "infra/pocketful-stage2/**"
+      - ".github/workflows/pocketful-stage-3-dispatch.yml"
+      - "infra/pocketful-stage3/**"
       - "state/CURRENT.yaml"
       - "state/HANDOVER.yaml"
 
@@ -30,7 +32,7 @@ jobs:
         run: |
           set -euo pipefail
           bash <(curl -fsSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash) 1.7.12
-          ./actionlint -color .github/workflows/toy-factory-rehearsal-dispatch.yml .github/workflows/toy-factory-rehearsal-review.yml .github/workflows/pocketful-stage-2-dispatch.yml
+          ./actionlint -color .github/workflows/toy-factory-rehearsal-dispatch.yml .github/workflows/toy-factory-rehearsal-review.yml .github/workflows/pocketful-stage-2-dispatch.yml .github/workflows/pocketful-stage-3-dispatch.yml
 
       - name: Compile Toy transport scripts
         run: |
@@ -38,7 +40,8 @@ jobs:
             infra/toy-rehearsal/dispatch.py \
             infra/toy-rehearsal/review.py \
             infra/toy-rehearsal/claude_pipeline.py \
-            infra/pocketful-stage2/claude_pipeline.py
+            infra/pocketful-stage2/claude_pipeline.py \
+            infra/pocketful-stage3/claude_pipeline.py
 
       - name: Assert transport invariants
         shell: python
@@ -93,6 +96,18 @@ jobs:
           assert "Pocketful Stage 2 Factory Run" in stage2_workflow
           assert "steps.review1.outputs.verdict == 'REJECT'" in stage2_workflow
           assert "Claude repair attempt 2" in stage2_workflow
+
+          stage3 = Path("infra/pocketful-stage3/claude_pipeline.py").read_text()
+          stage3_workflow = Path(".github/workflows/pocketful-stage-3-dispatch.yml").read_text()
+          assert '"--stage","3","--mode","isolated"' in stage3
+          assert '"--stage","2","--mode","isolated"' not in stage3
+          assert "pocketful-input/stage-1.md" in stage3
+          assert "pocketful-input/stage-2.md" in stage3
+          assert "pocketful-input/stage-3.md" in stage3
+          assert "Pocketful Stage 3 Factory Run" in stage3_workflow
+          assert "pocketful/stage-3-run-" in stage3_workflow
+          assert "steps.review1.outputs.verdict == 'REJECT'" in stage3_workflow
+          assert "Claude repair attempt 2" in stage3_workflow
           assert "next_fresh_rehearsal:" in current
           assert "transport_hardening_pr: 37" in handover
           assert "user_authored_codex_dispatch: PROVEN_IN_REHEARSAL_4" in current
