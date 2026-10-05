@@ -226,7 +226,23 @@ toy_factory_rehearsal:
       user_authored_probe_comment_id: 5983795312
       codex_reply_comment_ids: [5983809519, 5983810255]
       interpretation: CODEX_CONNECTOR_ACTIVE_FOR_USER_AUTHORED_MENTIONS_BUT_BOT_AUTHORED_MENTIONS_NOT_OBSERVED
-  next_fresh_rehearsal: 7
+  rehearsal_7:
+    pr: 69
+    room_id: 832ab029-5411-4a04-bb7f-afdc4b5cd3ed
+    run_token: toy-r7-pr69-8caa37aa28f4
+    result: BLOCKED_SCOPE_VALIDATOR_FALSE_POSITIVE
+    claude_attempt_1: SUCCESS
+    implementation_committed: false
+    reviewer_ran: false
+    failure_stage: VALIDATE_AND_PUBLISH_ATTEMPT_1
+    observed_scope_report:
+      - toy-result/stage-1/
+      - toy-result/stage-2/
+      - toy-result/stage-3/
+      - toy-result/stage-4/
+    root_cause: GIT_STATUS_COLLAPSED_UNTRACKED_DIRECTORIES_WITHOUT_UNTRACKED_FILES_ALL
+    truth_boundary: OBSERVED
+  next_fresh_rehearsal: 8
   reuse_rehearsal_1_or_2: false
 
 factory:
@@ -255,7 +271,7 @@ conditional_gateway_registry:
   CODEX_CLOUD_TASK_EXECUTION_CURRENT: BLOCKED_EXTERNAL_UNKNOWN
   CLAUDE_CODE_OAUTH_IMPLEMENTER_RUNTIME: PROVEN
   CLAUDE_BOUNDED_VERIFIED_PUBLISHER: PROVEN
-  AUTONOMOUS_REJECT_REPAIR_REREVIEW_LOOP: ACTIVE_PENDING_REHEARSAL_7
+  AUTONOMOUS_REJECT_REPAIR_REREVIEW_LOOP: ACTIVE_PENDING_REHEARSAL_8
   TRACK_LOCK: BLOCKED_BY_TOY_FACTORY_REHEARSAL
   REAL_TRACK_BUILD: BLOCKED_BY_TRACK_LOCK
   EVIDENCE_GRAPH: ACTIVE
@@ -273,12 +289,32 @@ evidence_graph:
   path: evidence/EVIDENCE-GRAPH.yaml
   first_material_claim: TR_REMOTE_HARNESS_001
 
+product_workstream_priority:
+  first_live_slice_proven: false
+  remaining_material_depth_gaps:
+    - autonomous_Toy_Factory_end_to_end_not_proven
+    - exact_candidate_publish_then_independent_review_not_proven
+    - autonomous_REJECT_repair_rereview_not_proven
+    - Toy_official_harness_green_not_proven
+    - room_export_and_runtime_commit_evidence_binding_not_proven
+    - Track_Lock_not_proven
+    - no_real_track_vertical_slice_exists
+  current_primary_workstream: PRE_SLICE_BUILD_AND_TECHNICAL_REALITY
+  next_highest_value_depth_delta: PROVE_FRESH_TOY_REHEARSAL_END_TO_END_WITH_CORRECTED_PUBLISH_SCOPE
+  valid_stop_condition: null
+  demo_packaging_allowed: false
+  workstream_drift_status: NO_DRIFT_OBSERVED
+  material_user_capability_delta_since_previous_milestone: NONE
+  material_user_capability_delta_reason: >-
+    Rehearsal 7 improved runtime evidence but added no real external user/operator product capability.
+    The project remains pre-slice and the Toy gate is a required prebuild gate, not demo-first work.
+
 exact_next_gate: TOY_FACTORY_REHEARSAL
+exact_next_owner: PBPD
 exact_next_action: >-
-  Rehearsal 6 reached Claude Code and Claude returned a successful implementation result after 25 turns, but the
-  action failed closed because the configured maximum was 24, so no candidate was published or reviewed. The
-  initial and repair turn budgets are now raised to 40 and 32 on main. Open exactly one fresh toy/rehearsal-7 PR.
-  Preserve zero human steering after initial PR dispatch. Claude Code must implement the four Toy stages, the
-  independent Reviewer must run the official isolated harness, and any first REJECT must autonomously return to
-  Claude for repair and re-review. Keep TRACK_LOCK and Pocketful blocked until terminal ACCEPT plus remaining
-  room/export/evidence binding checks are proven.
+  Rehearsal 7 is terminal BLOCKED after Claude Implementer attempt 1 succeeded but the bounded publisher rejected
+  Git's collapsed untracked-directory status entries for the four expected toy-result/stage-N directories. Correct
+  changed-path enumeration to expose untracked files while preserving the existing toy-result/stage-1..4 scope
+  boundary, prove static assurance, merge the correction, close Rehearsal 7 unmerged, then open exactly one fresh
+  toy/rehearsal-8 PR. Preserve zero human steering after initial PR dispatch and keep TRACK_LOCK/Pocketful blocked
+  until terminal ACCEPT plus room/export/evidence binding checks are proven.

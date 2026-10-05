@@ -71,6 +71,8 @@ jobs:
           assert "runtime=CLAUDE_CODE_OAUTH" in claude
           assert "--force-with-lease" in claude
           assert "human_steering_after_pr_open" in claude
+          assert '"--untracked-files=all"' in claude
+          assert 'allowed=re.compile(r"^toy-result/stage-[1-4]/.+")' in claude
 
           # Legacy Codex transport remains retained for historical evidence only.
           assert "CODEX_TRANSPORT_TIMEOUT" in dispatch
@@ -81,6 +83,6 @@ jobs:
           assert "NOOP_ALREADY_TERMINAL" in review
           assert "TOY_REHEARSAL_TERMINAL" in review
 
-          assert "next_fresh_rehearsal: 7" in current
+          assert "next_fresh_rehearsal: 8" in current
           assert "transport_hardening_pr: 37" in handover
           assert "user_authored_codex_dispatch: PROVEN_IN_REHEARSAL_4" in current
