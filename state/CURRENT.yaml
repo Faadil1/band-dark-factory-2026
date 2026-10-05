@@ -2,7 +2,7 @@ version: 0.1.0
 project_id: band_dark_factory_wearedevelopers_2026
 date: 2026-10-05
 status: ACTIVE
-lifecycle_state: PRODUCT_EXPLOITATION_STAGE_4_NEXT
+lifecycle_state: POST_STAGE_4_PRODUCT_ASSURANCE
 
 source_of_truth:
   central_control_plane: Faadil1/faadil-agent-system@main
@@ -43,7 +43,7 @@ authorization:
   track_lock: PROVEN
   locked_track: POCKETFUL
   concept_lock: REMOTE_EVIDENCE_BOUND_FACTORY_WITH_POCKETFUL_CONSEQUENCE_DEPTH
-  real_track_build: ACTIVE_PRODUCT_EXPLOITATION_STAGE_4_NEXT
+  real_track_build: PUBLIC_STAGE_1_TO_4_COMPLETE__FINAL_ASSURANCE_ACTIVE
 
 technical_reality:
   local_windows_git: PROVEN
@@ -334,24 +334,24 @@ evidence_graph:
 product_workstream_priority:
   first_live_slice_proven: true
   remaining_material_depth_gaps:
-    - Pocketful_stage_1_authentic_full_room_export_binding_missing
-    - Pocketful_stage_2_hidden_and_full_normative_conformance_UNKNOWN
-    - Pocketful_stage_3_hidden_and_full_normative_conformance_UNKNOWN
-    - Pocketful_stage_4_refunds_and_batch_corrections_not_started
+    - Pocketful_cumulative_spec_derived_assurance_for_Stages_2_to_4_missing
+    - Pocketful_final_submission_run_must_use_one_fresh_room_and_fresh_result_repository
+    - Pocketful_authentic_full_room_json_export_and_commit_binding_missing
     - hidden_test_success_UNKNOWN
-  current_primary_workstream: PRODUCT_EXPLOITATION
-  next_highest_value_depth_delta: POCKETFUL_STAGE_4_REFUNDS_AND_BATCH_CORRECTIONS
+    - exhaustive_normative_conformance_beyond_observed_assurance_UNKNOWN
+  current_primary_workstream: PRODUCT_ASSURANCE
+  next_highest_value_depth_delta: CUMULATIVE_SPEC_DERIVED_ASSURANCE_BEFORE_FINAL_SUBMISSION_RUN
   valid_stop_condition: null
   demo_packaging_allowed: false
   workstream_drift_status: NO_DRIFT_OBSERVED
   material_user_capability_delta_since_previous_milestone: MATERIAL_DELTA
   material_user_capability_delta_reason: >-
-    Pocketful Stage 3 now exists as a real accepted candidate in the pinned official isolated runtime. The product
-    adds historical/as-of balances, immutable payment revision/correction semantics, stable statement pagination,
-    effective-vs-recorded-time views and historical hold accounting on top of Stages 1 and 2.
-    Public harness evidence is complete for shipped Stages 1 through 3; hidden/full normative conformance remains UNKNOWN.
+    Pocketful Stage 4 is accepted and promoted in the pinned official isolated runtime. The cumulative public
+    candidate now passes all shipped Stage 1 through Stage 4 checks and adds recipient refunds plus atomic operator
+    batch corrections while preserving inherited temporal, snapshot, hold and correction semantics. Public-harness
+    completion does not prove hidden tests or exhaustive normative conformance.
 
-exact_next_gate: POCKETFUL_STAGE_4_PRODUCT_DEPTH
+exact_next_gate: POCKETFUL_CUMULATIVE_SPEC_ASSURANCE
 exact_next_owner: PBPD
 repair_path_proof:
   status: PROVEN
@@ -481,6 +481,32 @@ pocketful_stage_3_runs:
     hidden_test_success: UNKNOWN
   next_fresh_run: NONE_UNLESS_REPAIR_OR_REVALIDATION_IS_JUSTIFIED
 
+pocketful_stage_4_runs:
+  run_1:
+    pr: 96
+    branch: pocketful/stage-4-run-1
+    room_id: 84fbd102-f985-4331-bb3f-b393498243f2
+    run_token: pocketful-s4-r1-pr96-e83bb2602c03
+    result: ACCEPT_ATTEMPT_1_VALID_STAGE_4_REVIEW
+    accepted_revision: f2744a48d31987732b830c02f77fcf086bae2683
+    promotion_merge_sha: ddb8950b006073203203c8fc3c110deb3f3b8b12
+    workflow_run_id: 37305617577
+    workflow_job_id: 111748464000
+    artifact_id: 11344245322
+    artifact_digest: sha256:6e3673c6fa385949a98ef49e513490f8075d8f424443bab4acffa039fbb6d3c1
+    reviewer_selector: "--stage 4"
+    official_isolated_harness_exit: 0
+    stage_1_public_checks: 147_of_147
+    stage_2_public_checks: 35_of_35
+    stage_3_public_checks: 6_of_6
+    stage_4_public_checks: 5_of_5
+    highest_contiguous: 4
+    overshoot: null
+    human_steering_after_pr_open: false
+    repair_attempt_2: SKIPPED_NOT_NEEDED
+    hidden_test_success: UNKNOWN
+  next_fresh_run: NONE_UNLESS_FINAL_SUBMISSION_RUN_OR_REVALIDATION_IS_JUSTIFIED
+
 stage_1_spec_assurance:
   status: PROVEN
   target_revision: b27a7dcc627637be4cad037cb59c369c36181b63
@@ -498,7 +524,8 @@ stage_1_spec_assurance:
     hidden-test success or convert the hackathon service into production banking software.
 
 exact_next_action: >-
-  Preserve the accepted Stage 3 candidate and begin Pocketful Stage 4 product exploitation from the pinned official
-  specification: recipient refunds from available funds, operator batch corrections, settlement-wide correction
-  integrity, original receipt/snapshot immutability and inherited historical/concurrency semantics. Keep demo/story
-  packaging blocked until the Stage 4 product-depth gap is resolved or a valid stop condition fires.
+  Keep the Stage 4 product candidate frozen. Build cumulative independent black-box assurance derived from the full
+  Stage 1-4 written specifications, especially requirements not covered by the shipped harness. If that assurance
+  finds no material defect, prepare one fresh four-stage dark-factory submission run in one fresh BAND room and a
+  fresh result repository, with no human steering between stage dispatches. The final submission remains blocked
+  until the complete authentic room export is saved unchanged as room.json and bound to the exact submitted code.
