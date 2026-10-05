@@ -2,8 +2,8 @@
 
 Status: PREFLIGHT_RUNTIME_CONFIGURED
 
-Harness: BAND Remote Agent + Codex Cloud via GitHub comment relay + GitHub Actions safe publisher
-Model: OpenAI Codex Cloud default model (managed by ChatGPT plan; exact internal model ID not exposed by the GitHub-triggered task)
+Harness: BAND Remote Agent + Claude Code OAuth in GitHub Actions + bounded verified publisher + independent official Reviewer harness
+Model: Claude Code subscription runtime; probe observed claude-sonnet-5-5
 
 ## Mission
 
