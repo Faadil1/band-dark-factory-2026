@@ -1,0 +1,28 @@
+name: Probe Copilot Cloud Agent Availability
+
+on:
+  pull_request:
+    types: [opened]
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    env:
+      GH_TOKEN: ${{ secrets.CODEX_GITHUB_USER_TOKEN }}
+    steps:
+      - name: Check suggested actors
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$GH_TOKEN"
+          QUERY='query { repository(owner: "Faadil1", name: "band-dark-factory-2026") { suggestedActors(capabilities: [CAN_BE_ASSIGNED], first: 100) { nodes { login __typename ... on Bot { id } ... on User { id } } } } }'
+          OUT="$(gh api graphql -f query="$QUERY")"
+          echo "$OUT" | jq -r '.data.repository.suggestedActors.nodes[].login'
+          if echo "$OUT" | jq -e '.data.repository.suggestedActors.nodes[] | select(.login == "copilot-swe-agent")' >/dev/null; then
+            echo "COPILOT_CLOUD_AGENT_AVAILABLE=true"
+          else
+            echo "COPILOT_CLOUD_AGENT_AVAILABLE=false"
+          fi
