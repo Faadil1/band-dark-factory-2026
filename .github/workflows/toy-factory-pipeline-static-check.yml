@@ -52,6 +52,9 @@ jobs:
           assert "CODEX_TRANSPORT_TIMEOUT" in dispatch
           assert "validate_codex_user_token" in dispatch
           assert "token=codex_user_token" in dispatch
+          assert "CODEX_EXPLICIT_FAILURE_MARKERS" in dispatch
+          assert "EXPLICIT_FAILURE" in dispatch
+          assert "CODEX_EXECUTION_FAILURE" in dispatch
           assert "attempt 2/2" in dispatch
           assert 're.fullmatch(r"toy/rehearsal-(\\d+)", branch)' in dispatch
 
