@@ -3,18 +3,18 @@ project_id: band_dark_factory_wearedevelopers_2026
 date: 2026-10-05
 status: ACTIVE
 current_owner: PBPD
-current_stage: REAL_TRACK_STAGE_1
+current_stage: PRODUCT_EXPLOITATION_STAGE_4_NEXT
 
 canonical_baseline:
   status: ALIGNED
-  version: 0.1.56-canonical-baseline-drift-tripwire-promoted
-  commit: 8a7e8a4ff5461641c595e2cf052a95fdc32a6340
-  project_state_commit_at_reconciliation_start: a1260bd53695e04c7615316e464593d28fa4df39
-  delta_status: NON_MATERIAL_DELTA
-  delta_reason: governance_control_update_only_while_project_remains_pre_slice
+  version: 0.1.57-submission-execution-assurance-promoted
+  commit: 072e6d14da4402d5e4f8aeb47c68a2b574cc56ea
+  project_state_commit_at_reconciliation_start: 0bcda50d3e1138ca287a51faef778f22aee53d0f
+  delta_status: NON_MATERIAL_DELTA_FOR_STAGE_4_PRODUCT_DEPTH
+  delta_reason: submission_execution_assurance_strengthens_terminal_submission_truth_but_does_not_change_stage_4_product_depth
   first_live_slice_proven: true
-  material_user_capability_delta_since_previous_milestone: NONE
-  central_main_reconciliation_wave: fb062d6cd792cab8e27c342120824f285120bc2f
+  material_user_capability_delta_since_previous_milestone: MATERIAL_DELTA
+  central_main_reconciliation_wave: 597c48bda5687e261a34e1010c29dae8616795b2
   product_reality_version: "1.5.0"
   central_advance_materiality: NON_MATERIAL_DELTA
   affected_transition_blocked: false
@@ -179,10 +179,10 @@ product_workstream_priority:
   remaining_material_depth_gaps:
     - Pocketful_stage_1_authentic_full_room_export_binding_missing
     - Pocketful_stage_2_hidden_and_full_normative_conformance_UNKNOWN
-    - Pocketful_stage_3_statements_and_payment_corrections_not_started
+    - Pocketful_stage_3_hidden_and_full_normative_conformance_UNKNOWN
     - Pocketful_stage_4_refunds_and_batch_corrections_not_started
     - hidden_test_success_UNKNOWN
-  next_highest_value_depth_delta: POCKETFUL_STAGE_3_STATEMENTS_AND_PAYMENT_CORRECTIONS
+  next_highest_value_depth_delta: POCKETFUL_STAGE_4_REFUNDS_AND_BATCH_CORRECTIONS
   valid_stop_condition: null
   demo_packaging_allowed: false
   workstream_drift_status: NO_DRIFT_OBSERVED
@@ -269,6 +269,25 @@ pocketful_stage_2_runs:
     hidden_test_success: UNKNOWN
   next_fresh_run: NONE_UNLESS_REPAIR_OR_REVALIDATION_IS_JUSTIFIED
 
+pocketful_stage_3_runs:
+  run_1:
+    pr: 93
+    room_id: 36eba472-90b3-4b9d-9f52-8bb2fcdaba59
+    run_token: pocketful-s3-r1-pr93-e05b625ce17a
+    result: ACCEPT_ATTEMPT_1_VALID_STAGE_3_REVIEW
+    accepted_revision: e88148c01348a22d8cf6d2c1d4940e6907472df1
+    promotion_merge_sha: 0bcda50d3e1138ca287a51faef778f22aee53d0f
+    workflow_run_id: 37302846725
+    workflow_job_id: 111739443670
+    artifact_id: 11342783013
+    artifact_digest: sha256:63e817d988fc8108b226d590436b9e531a7e086e2839fbcfb47a1da57154c8fe
+    reviewer_selector: "--stage 3"
+    public_harness: STAGE_1_147_OF_147__STAGE_2_35_OF_35__STAGE_3_6_OF_6
+    highest_contiguous: 3
+    overshoot: null
+    hidden_test_success: UNKNOWN
+  next_fresh_run: NONE_UNLESS_REPAIR_OR_REVALIDATION_IS_JUSTIFIED
+
 stage_1_spec_assurance:
   status: PROVEN
   target_revision: b27a7dcc627637be4cad037cb59c369c36181b63
@@ -281,6 +300,6 @@ stage_1_spec_assurance:
   hidden_test_success: UNKNOWN
 
 next_action: >-
-  Begin Pocketful Stage 3 product exploitation from the pinned official Stage 3 spec while preserving Stage 1 and
-  Stage 2 behavior. Prioritize real statements, historical/as-of balances, payment corrections, effective-vs-recorded
-  time, stable snapshots and historical hold semantics. Keep demo/story packaging blocked.
+  Begin Pocketful Stage 4 product exploitation from the pinned official Stage 4 spec while preserving Stages 1-3.
+  Prioritize real recipient refunds, operator batch corrections, settlement-wide correction integrity, immutable
+  receipts/snapshots and inherited historical/concurrency semantics. Keep demo/story packaging blocked.

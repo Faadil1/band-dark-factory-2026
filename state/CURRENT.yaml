@@ -2,7 +2,7 @@ version: 0.1.0
 project_id: band_dark_factory_wearedevelopers_2026
 date: 2026-10-05
 status: ACTIVE
-lifecycle_state: REAL_TRACK_STAGE_1
+lifecycle_state: PRODUCT_EXPLOITATION_STAGE_4_NEXT
 
 source_of_truth:
   central_control_plane: Faadil1/faadil-agent-system@main
@@ -15,23 +15,24 @@ source_of_truth:
 
 canonical_baseline_reconciliation:
   status: ALIGNED
-  canonical_baseline_version: 0.1.56-canonical-baseline-drift-tripwire-promoted
-  canonical_baseline_commit: 8a7e8a4ff5461641c595e2cf052a95fdc32a6340
-  central_reconciliation_wave_commit: fb062d6cd792cab8e27c342120824f285120bc2f
+  canonical_baseline_version: 0.1.57-submission-execution-assurance-promoted
+  canonical_baseline_commit: 072e6d14da4402d5e4f8aeb47c68a2b574cc56ea
+  central_reconciliation_wave_commit: 597c48bda5687e261a34e1010c29dae8616795b2
   product_reality_version: "1.5.0"
-  project_state_commit_at_reconciliation_start: a1260bd53695e04c7615316e464593d28fa4df39
-  last_canonical_reconciliation_at: 2026-10-04
-  baseline_delta_status: NON_MATERIAL_DELTA
+  project_state_commit_at_reconciliation_start: 0bcda50d3e1138ca287a51faef778f22aee53d0f
+  last_canonical_reconciliation_at: 2026-10-05
+  baseline_delta_status: NON_MATERIAL_DELTA_FOR_STAGE_4_PRODUCT_DEPTH
   delta_reason: >-
-    The central change adds baseline pinning, material-delta reconciliation, and drift tripwires. BAND is still
-    pre-live-slice at TOY_FACTORY_REHEARSAL, so this does not alter the locked problem, architecture, Toy gate,
-    Pocketful recommendation, or exact next action. The new controls become binding for subsequent material touches
-    and immediately fail closed if project state becomes stale or demo/evidence work displaces real product depth.
+    Central canon advanced to Submission Execution Assurance v1. The delta strengthens terminal submission truth,
+    external receipt requirements, safety-margin handling and the distinction between SUBMISSION_READY and SUBMITTED.
+    It does not change the locked Pocketful product mechanism or the next justified Stage 4 product-depth workstream,
+    so Stage 4 may proceed while terminal submission/readiness remains fail-closed until those controls are satisfied.
   first_live_slice_proven: true
-  material_user_capability_delta_since_previous_milestone: NONE
+  material_user_capability_delta_since_previous_milestone: MATERIAL_DELTA
   material_user_capability_delta_reason: >-
-    No product capability is claimed at this reconciliation. The latest progress is Codex transport hardening for the
-    pre-slice Toy rehearsal infrastructure.
+    Pocketful Stage 3 is accepted and promoted. Historical/as-of balances, statement pagination/snapshots,
+    immutable payment corrections, effective-vs-recorded-time semantics and historical hold accounting now exist
+    in the accepted candidate; hidden tests and exhaustive normative conformance remain UNKNOWN.
   affected_transition_blocked: false
   next_reconciliation_trigger: NEXT_MATERIAL_PROJECT_TOUCH_OR_CENTRAL_CANONICAL_BASELINE_ADVANCE
 
@@ -42,7 +43,7 @@ authorization:
   track_lock: PROVEN
   locked_track: POCKETFUL
   concept_lock: REMOTE_EVIDENCE_BOUND_FACTORY_WITH_POCKETFUL_CONSEQUENCE_DEPTH
-  real_track_build: ACTIVE_STAGE_1
+  real_track_build: ACTIVE_PRODUCT_EXPLOITATION_STAGE_4_NEXT
 
 technical_reality:
   local_windows_git: PROVEN
@@ -335,22 +336,22 @@ product_workstream_priority:
   remaining_material_depth_gaps:
     - Pocketful_stage_1_authentic_full_room_export_binding_missing
     - Pocketful_stage_2_hidden_and_full_normative_conformance_UNKNOWN
-    - Pocketful_stage_3_statements_and_payment_corrections_not_started
+    - Pocketful_stage_3_hidden_and_full_normative_conformance_UNKNOWN
     - Pocketful_stage_4_refunds_and_batch_corrections_not_started
     - hidden_test_success_UNKNOWN
   current_primary_workstream: PRODUCT_EXPLOITATION
-  next_highest_value_depth_delta: POCKETFUL_STAGE_3_STATEMENTS_AND_PAYMENT_CORRECTIONS
+  next_highest_value_depth_delta: POCKETFUL_STAGE_4_REFUNDS_AND_BATCH_CORRECTIONS
   valid_stop_condition: null
   demo_packaging_allowed: false
   workstream_drift_status: NO_DRIFT_OBSERVED
   material_user_capability_delta_since_previous_milestone: MATERIAL_DELTA
   material_user_capability_delta_reason: >-
-    Pocketful Stage 2 now exists as a real accepted candidate in the pinned official isolated runtime. The product
-    adds a browser wallet surface plus authorization/capture and available/held wallet behavior on top of Stage 1.
-    Public harness evidence is complete for shipped Stage 1 and Stage 2 checks; hidden/full normative conformance
-    remains UNKNOWN.
+    Pocketful Stage 3 now exists as a real accepted candidate in the pinned official isolated runtime. The product
+    adds historical/as-of balances, immutable payment revision/correction semantics, stable statement pagination,
+    effective-vs-recorded-time views and historical hold accounting on top of Stages 1 and 2.
+    Public harness evidence is complete for shipped Stages 1 through 3; hidden/full normative conformance remains UNKNOWN.
 
-exact_next_gate: POCKETFUL_STAGE_3_PRODUCT_DEPTH
+exact_next_gate: POCKETFUL_STAGE_4_PRODUCT_DEPTH
 exact_next_owner: PBPD
 repair_path_proof:
   status: PROVEN
@@ -456,6 +457,30 @@ pocketful_stage_2_runs:
     hidden_test_success: UNKNOWN
   next_fresh_run: NONE_UNLESS_REPAIR_OR_REVALIDATION_IS_JUSTIFIED
 
+pocketful_stage_3_runs:
+  run_1:
+    pr: 93
+    branch: pocketful/stage-3-run-1
+    room_id: 36eba472-90b3-4b9d-9f52-8bb2fcdaba59
+    run_token: pocketful-s3-r1-pr93-e05b625ce17a
+    result: ACCEPT_ATTEMPT_1_VALID_STAGE_3_REVIEW
+    accepted_revision: e88148c01348a22d8cf6d2c1d4940e6907472df1
+    promotion_merge_sha: 0bcda50d3e1138ca287a51faef778f22aee53d0f
+    workflow_run_id: 37302846725
+    workflow_job_id: 111739443670
+    artifact_id: 11342783013
+    artifact_digest: sha256:63e817d988fc8108b226d590436b9e531a7e086e2839fbcfb47a1da57154c8fe
+    reviewer_selector: "--stage 3"
+    official_isolated_harness_exit: 0
+    stage_1_public_checks: 147_of_147
+    stage_2_public_checks: 35_of_35
+    stage_3_public_checks: 6_of_6
+    highest_contiguous: 3
+    overshoot: null
+    human_steering_after_pr_open: false
+    hidden_test_success: UNKNOWN
+  next_fresh_run: NONE_UNLESS_REPAIR_OR_REVALIDATION_IS_JUSTIFIED
+
 stage_1_spec_assurance:
   status: PROVEN
   target_revision: b27a7dcc627637be4cad037cb59c369c36181b63
@@ -473,7 +498,7 @@ stage_1_spec_assurance:
     hidden-test success or convert the hackathon service into production banking software.
 
 exact_next_action: >-
-  Preserve the accepted Stage 2 candidate and begin Pocketful Stage 3 product exploitation from the pinned official
-  specification: statements, historical/as-of balances, effective-vs-recorded-time revisions, corrections, stable
-  statement snapshots, settlement/capture immutability and historical hold semantics. Keep evidence and demo
-  packaging secondary while Stage 3 and Stage 4 product-depth gaps remain.
+  Preserve the accepted Stage 3 candidate and begin Pocketful Stage 4 product exploitation from the pinned official
+  specification: recipient refunds from available funds, operator batch corrections, settlement-wide correction
+  integrity, original receipt/snapshot immutability and inherited historical/concurrency semantics. Keep demo/story
+  packaging blocked until the Stage 4 product-depth gap is resolved or a valid stop condition fires.

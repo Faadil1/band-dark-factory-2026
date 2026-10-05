@@ -1,0 +1,87 @@
+project: band_dark_factory_wearedevelopers_2026
+milestone: POCKETFUL_STAGE_3_ACCEPTED_DEPTH_REVIEW
+date: 2026-10-05
+canonical_baseline_version: 0.1.57-submission-execution-assurance-promoted
+canonical_baseline_exact_main_sha: 072e6d14da4402d5e4f8aeb47c68a2b574cc56ea
+canonical_baseline_promotion_merge_sha: 597c48bda5687e261a34e1010c29dae8616795b2
+product_reality_version: 1.5.0
+baseline_delta_status: NON_MATERIAL_DELTA_FOR_STAGE_4_PRODUCT_DEPTH
+baseline_delta_reason: >-
+  Submission Execution Assurance v1 strengthens terminal submission truth, external receipt requirements,
+  event-specific safety margins and the SUBMISSION_READY versus SUBMITTED boundary. It does not change the locked
+  Pocketful mechanism or the next justified Stage 4 product-depth workstream.
+
+accepted_candidate:
+  pr: 93
+  branch: pocketful/stage-3-run-1
+  room_id: 36eba472-90b3-4b9d-9f52-8bb2fcdaba59
+  run_token: pocketful-s3-r1-pr93-e05b625ce17a
+  revision: e88148c01348a22d8cf6d2c1d4940e6907472df1
+  promotion_merge_sha: 0bcda50d3e1138ca287a51faef778f22aee53d0f
+  workflow_run_id: 37302846725
+  workflow_job_id: 111739443670
+  artifact_id: 11342783013
+  artifact_digest: sha256:63e817d988fc8108b226d590436b9e531a7e086e2839fbcfb47a1da57154c8fe
+  reviewer_selector: "--stage 3"
+  official_isolated_harness_exit: 0
+  human_steering_after_pr_open: false
+  repair_attempt_2: SKIPPED_NOT_NEEDED
+
+observed_public_harness:
+  stage_1: {collected: 147, passed: 147, failed: 0, errors: 0}
+  stage_2: {collected: 35, passed: 35, failed: 0, errors: 0}
+  stage_3: {collected: 6, passed: 6, failed: 0, errors: 0}
+  stage_4_probe: {collected: 5, passed: 0, failed: 1, errors: 0}
+  highest_contiguous: 3
+  claimed_stage: "3"
+  overshoot: null
+
+material_user_capability_delta_since_previous_milestone:
+  status: MATERIAL_DELTA
+  observed:
+    - historical_as_of_wallet_balance_semantics_exist
+    - paginated_statement_and_stable_snapshot_surface_exists
+    - immutable_payment_revision_and_correction_surface_exists
+    - effective_time_and_recorded_time_are_distinguished
+    - historical_hold_accounting_semantics_exist
+    - stage_3_public_harness_claims_stage_3_on_exact_candidate
+  truth_boundary: >-
+    The shipped public harness and exact repository candidate prove a real Stage 3 implementation and the listed
+    public behaviors. They do not prove hidden-test success or exhaustive conformance to every normative Stage 3 rule.
+
+depth_review:
+  first_live_slice_proven: true
+  current_primary_workstream: PRODUCT_EXPLOITATION
+  remaining_material_depth_gaps:
+    - Pocketful_stage_1_authentic_full_room_export_binding_missing
+    - Pocketful_stage_2_hidden_and_full_normative_conformance_UNKNOWN
+    - Pocketful_stage_3_hidden_and_full_normative_conformance_UNKNOWN
+    - Pocketful_stage_4_refunds_and_batch_corrections_not_started
+    - hidden_test_success_UNKNOWN
+  next_highest_value_depth_delta: POCKETFUL_STAGE_4_REFUNDS_AND_BATCH_CORRECTIONS
+  valid_stop_condition: null
+  demo_packaging_allowed: false
+  workstream_drift_status: NO_DRIFT_OBSERVED
+
+truth_boundary:
+  OBSERVED:
+    - exact_revision_bound_to_BAND_run
+    - reviewer_used_pinned_official_harness_stage_3
+    - stage_1_147_of_147_public_checks_passed
+    - stage_2_35_of_35_public_checks_passed
+    - stage_3_6_of_6_public_checks_passed
+    - no_public_harness_overshoot
+    - Stage_4_probe_did_not_pass
+    - candidate_promoted_to_main
+  UNKNOWN:
+    - hidden_test_success
+    - exhaustive_normative_Stage_3_conformance_beyond_shipped_checks
+    - production_banking_readiness
+
+exact_next_gate: POCKETFUL_STAGE_4_PRODUCT_DEPTH
+exact_next_owner: PBPD
+exact_next_action: >-
+  Preserve the accepted Stage 3 candidate and begin Stage 4 product exploitation from the pinned official
+  specification: recipient refunds, operator batch corrections, settlement-wide correction integrity and immutable
+  prior receipts/snapshots. Keep evidence and demo packaging secondary until Stage 4 is resolved or a valid stop
+  condition fires.
