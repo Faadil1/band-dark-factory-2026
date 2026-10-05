@@ -61,6 +61,13 @@ def write_output(key, value):
     with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
         f.write(f"{key}={value}\n")
 
+def write_output_multiline(key, value):
+    marker = "TOY_REPAIR_CONTEXT_EOF"
+    if marker in value:
+        value = value.replace(marker, "TOY_REPAIR_CONTEXT")
+    with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+        f.write(f"{key}<<{marker}\n{value}\n{marker}\n")
+
 def rehearsal_identity():
     event = json.loads(Path(os.environ["GITHUB_EVENT_PATH"]).read_text(encoding="utf-8"))
     pr = int(event["pull_request"]["number"])
@@ -243,9 +250,7 @@ def cmd_review(attempt, revision):
             "Repair the rejected candidate from Reviewer evidence and return it for independent re-review. "
             "Do not ask the human for steering.",
             [{"id":impl["id"],"name":impl["name"],"handle":impl["handle"]}])
-        prompt=Path(os.environ["RUNNER_TEMP"])/"toy-claude-repair-prompt.txt"
-        prompt.write_text(
-            f"""Toy Factory autonomous repair attempt 2/2.
+        repair_context = f"""Toy Factory autonomous repair attempt 2/2.
 Run token: {ctx['token']}
 Rejected revision: {revision}
 
@@ -255,8 +260,8 @@ Modify ONLY toy-result/stage-1/ through toy-result/stage-4/.
 Do not commit or push.
 Reviewer evidence tail:
 {tail}
-""",encoding="utf-8")
-        write_output("repair_prompt",str(prompt))
+"""
+        write_output_multiline("repair_context", repair_context)
     else:
         terminal(ctx["repo"],ctx["pr"],ctx,"REJECT",revision=revision,harness_exit=p.returncode,attempt=attempt)
 
