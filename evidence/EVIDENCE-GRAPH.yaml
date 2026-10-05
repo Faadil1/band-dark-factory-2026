@@ -152,7 +152,28 @@ missing_edges:
       job_id: 111613560000
       result: NON_ROOM_OFFLINE_CHECKS_PROVEN
       remaining_problem: room.json_missing
+    repair_path_proof:
+      status: COMPLETE
+      pr: 75
+      run_token: toy-repair-proof-pr75-04dc725abab2
+      room_id: b69303ee-c773-4680-bdec-3d35aa101ab7
+      evidence_class: SIMULATED_DEFECT_TECHNICAL_PROOF
+      source_accepted_revision: 7679ba2f5d1937ebeed4b1e04449918ac8a7ecc8
+      injected_defect_revision: 45f1932930e7d31bd8fd9a7ff1dbcd8fa98dde8c
+      repaired_revision: 16ea21d87c6e2fa19619d259872184a0b03da692
+      terminal: ACCEPT_ATTEMPT_2
+      official_harness_exit: 0
+      truth_boundary:
+        proves:
+          - autonomous_REJECT_to_Claude_repair
+          - repaired_revision_publish
+          - independent_rereview_after_repair
+          - official_harness_green_after_repair
+        does_not_prove:
+          - real_product_failure
+          - Rehearsal_8_room_export_binding
+          - Track_Lock
+          - real_track_vertical_slice
     remaining_edges:
       - unchanged_BAND_full_session_room_json_export_and_binding
-      - autonomous_REJECT_repair_rereview_runtime_path
       - final_full_offline_harness_check_with_authentic_room_json
