@@ -133,7 +133,7 @@ jobs:
           final_workflow = Path(".github/workflows/pocketful-final-submission-run.yml").read_text()
           assert "Pocketful Final One-Room Four-Stage Run" in final_workflow
           assert "submission/pocketful-final-run-" in final_workflow
-          assert "ref: ${{ github.event.pull_request.head.sha }}" in final_workflow
+          assert ("ref: $" + "{{ github.event.pull_request.head.sha }}") in final_workflow
           assert "rm -rf pocketful-result submission-final-runtime" in final_workflow
           assert "Prepare one fresh room and one fresh result repository" in final_workflow
           for stage in range(1, 5):
