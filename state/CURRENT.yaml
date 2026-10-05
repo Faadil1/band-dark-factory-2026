@@ -1,6 +1,6 @@
 version: 0.1.0
 project_id: band_dark_factory_wearedevelopers_2026
-date: 2026-10-04
+date: 2026-10-05
 status: ACTIVE
 lifecycle_state: TOY_FACTORY_REHEARSAL
 
@@ -140,6 +140,42 @@ toy_factory_rehearsal:
     implementation_produced: false
     first_attempt_seconds: 480
     retry_attempt_seconds: 720
+  rehearsal_4:
+    pr: 42
+    room_id: 61a1b408-7562-4150-944d-793dd12b2409
+    run_token: toy-r4-pr42-30d07c40ae89
+    result: BLOCKED_CODEX_EXECUTION_FAILURE_AFTER_TWO_ATTEMPTS
+    implementation_produced: false
+    first_prompt_comment_id: 5986549969
+    first_failure_comment_ids: [5986556226, 5986557702]
+    retry_prompt_comment_id: 5986615299
+    retry_failure_comment_id: 5986622621
+  codex_execution_diagnostics:
+    status: BLOCKED_EXTERNAL_OR_ACCOUNT_SPECIFIC
+    root_cause: UNKNOWN
+    connector_transport: PROVEN
+    user_authored_mentions: PROVEN
+    task_execution_current: FAILING
+    evidence:
+      - pr: 44
+        test: bounded_stage_1
+        result: CODEX_COULD_NOT_COMPLETE
+      - pr: 45
+        test: create_one_new_text_file
+        result: CODEX_COULD_NOT_COMPLETE
+      - pr: 46
+        test: edit_three_existing_scaffold_files_for_stage_1
+        result: CODEX_COULD_NOT_COMPLETE
+      - pr: 47
+        test: repeat_tiny_existing_markdown_edit_after_failures
+        result: CODEX_COULD_NOT_COMPLETE
+      - pr: 39
+        test: earlier_tiny_existing_markdown_edit
+        result: PROVEN_BEFORE_CURRENT_FAILURE_WINDOW
+    interpretation: >-
+      The GitHub-to-Codex actor path is working, but Codex Cloud task execution is currently unavailable for
+      even a minimal edit on this account/session path. Do not attribute this to quota, capacity, or outage
+      without account-level evidence.
   transport_hardening:
     code_status: IMPLEMENTED_IN_PR_37
     runtime_status: PROVEN_FAIL_CLOSED_ON_REHEARSAL_3
@@ -150,14 +186,14 @@ toy_factory_rehearsal:
     synchronize_redispatch_removed: true
     late_duplicate_reply_guard: true
     review_terminal_markers: true
-    user_authored_codex_dispatch: PENDING_SECRET_AND_REHEARSAL_4
+    user_authored_codex_dispatch: PROVEN_IN_REHEARSAL_4
     root_cause_evidence:
       bot_authored_mentions_35_36_38: NO_CODEX_REACTION_OR_REPLY
       user_authored_probe_pr_39: CODEX_TASK_COMPLETED_WITH_TWO_BOT_REPLIES
       user_authored_probe_comment_id: 5983795312
       codex_reply_comment_ids: [5983809519, 5983810255]
       interpretation: CODEX_CONNECTOR_ACTIVE_FOR_USER_AUTHORED_MENTIONS_BUT_BOT_AUTHORED_MENTIONS_NOT_OBSERVED
-  next_fresh_rehearsal: 4
+  next_fresh_rehearsal: 5
   reuse_rehearsal_1_or_2: false
 
 factory:
@@ -180,9 +216,10 @@ conditional_gateway_registry:
   TECHNICAL_REALITY_CHECK: PROVEN
   CODEX_COMMENT_RELAY_WRITE_PATH: PROVEN
   BAND_TO_CODEX_END_TO_END: PROVEN
-  TOY_FACTORY_REHEARSAL: ACTIVE
+  TOY_FACTORY_REHEARSAL: BLOCKED_BY_CODEX_CLOUD_TASK_EXECUTION_CURRENT
   TOY_CODEX_TRANSPORT_HARDENING: ACTIVE
-  CODEX_USER_AUTHORED_DISPATCH_IDENTITY: BLOCKED_BY_MISSING_USER_TOKEN_SECRET
+  CODEX_USER_AUTHORED_DISPATCH_IDENTITY: PROVEN
+  CODEX_CLOUD_TASK_EXECUTION_CURRENT: BLOCKED_EXTERNAL_UNKNOWN_OR_ACCOUNT_ALLOWANCE
   TRACK_LOCK: BLOCKED_BY_TOY_FACTORY_REHEARSAL
   REAL_TRACK_BUILD: BLOCKED_BY_TRACK_LOCK
   EVIDENCE_GRAPH: ACTIVE
@@ -202,9 +239,8 @@ evidence_graph:
 
 exact_next_gate: TOY_FACTORY_REHEARSAL
 exact_next_action: >-
-  Install a repository-scoped fine-grained GitHub PAT as Actions secret CODEX_GITHUB_USER_TOKEN so workflow
-  comments addressed to @codex are authored by Faadil1 rather than github-actions[bot]. The token must be limited
-  to this repository and only the minimum Issues read/write permission needed to create PR conversation comments.
-  After the secret is present and the user-authored dispatch patch is merged, launch only a fresh toy/rehearsal-4
-  PR. Keep TRACK_LOCK and Pocketful blocked until Codex responds, Reviewer completes, the official isolated Toy
-  harness is green, room evidence is exported, and the exact accepted revision is bound to receipts.
+  Check the account-level Codex allowance/reset state in ChatGPT Settings > Usage. If Codex execution becomes
+  available again, prove it first with one minimal user-authored micro task, then launch only a fresh
+  toy/rehearsal-5 using the hardened fast-fail transport. If account allowance is exhausted or execution remains
+  unavailable, activate and prove an alternate challenge-compliant Implementer runtime before Rehearsal 5.
+  Keep TRACK_LOCK and Pocketful blocked until a full Toy rehearsal reaches ACCEPT with bound evidence.
