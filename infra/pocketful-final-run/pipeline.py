@@ -55,12 +55,10 @@ def resolve(room,key,ids):
 
 def post(room,key,content,mentions):
     if len(content)>15500: raise SystemExit(f"BAND message too large: {len(content)}")
-    message={"content":content}
-    # BAND rejects an explicitly empty mentions array. Omit the field for coordinator
-    # status messages that intentionally address the whole room.
-    if mentions:
-        message["mentions"]=mentions
-    return curl_json("POST",f"{BAND_BASE}/chats/{room}/messages",key,{"message":message})
+    if not mentions:
+        raise SystemExit("BAND messages require at least one explicit seat mention")
+    return curl_json("POST",f"{BAND_BASE}/chats/{room}/messages",key,
+                     {"message":{"content":content,"mentions":mentions}})
 
 def gh_comment(repo,pr,body):
     p=run(["gh","api","--method","POST","-H","Accept: application/vnd.github+json",
@@ -292,10 +290,14 @@ def cmd_gate(stage):
     ctx=load(); st=ctx["stages"].get(str(stage),{})
     if st.get("status")!="ACCEPT":
         raise SystemExit(f"Stage {stage} not accepted: {st.get('status')}")
-    post(ctx["room_id"],pe()["coord_key"],
-         f"STAGE_{stage}_PROMOTED_WITHIN_FINAL_RUN run_token={ctx['token']} "
-         f"revision={st['accepted_revision']} attempt={st['accepted_attempt']}. Proceeding autonomously.",
-         [])
+    env=pe()
+    parts=resolve(ctx["room_id"],env["coord_key"],{env["coord_id"],env["impl_id"],env["review_id"]})
+    impl,reviewer=parts[env["impl_id"]],parts[env["review_id"]]
+    post(ctx["room_id"],env["coord_key"],
+         f"@{impl['handle']} @{reviewer['handle']} STAGE_{stage}_PROMOTED_WITHIN_FINAL_RUN "
+         f"run_token={ctx['token']} revision={st['accepted_revision']} "
+         f"attempt={st['accepted_attempt']}. Proceeding autonomously.",
+         [mention(impl),mention(reviewer)])
     output("accepted_revision",st["accepted_revision"])
 
 def cmd_finalize():
