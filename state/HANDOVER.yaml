@@ -47,7 +47,7 @@ current_truth:
   remote_linux_harness: proven_in_operational_repo
   dedicated_repo_actions_preflight: proven
   evidence_graph: active
-  toy_factory: rehearsals_1_2_3_4_blocked_before_implementation
+  toy_factory: rehearsals_1_2_3_4_5_blocked_before_implementation
   toy_transport_hardening: user_authored_dispatch_proven_and_fast_fail_patch_merged
   codex_transport_actor_finding: user_authored_mentions_accepted_bot_authored_mentions_not_observed
   codex_cloud_task_execution_current: blocked_external_unknown
@@ -71,12 +71,18 @@ toy_rehearsal_history:
     room_id: 61a1b408-7562-4150-944d-793dd12b2409
     run_token: toy-r4-pr42-30d07c40ae89
     result: BLOCKED_CODEX_EXECUTION_FAILURE_AFTER_TWO_ATTEMPTS
+  - pr: 61
+    result: BLOCKED_BEFORE_DISPATCH_WORKFLOW_LOAD
+    band_room_created: false
+    implementation_produced: false
+    cause: GITHUB_WORKFLOW_VALIDATION_ERROR_RUNNER_CONTEXT_IN_JOB_ENV
+    correction_merge: dd98e8a89f7aad6a4770a296ab810b5b5ad07eef
   transport_hardening_pr: 37
   codex_user_probe_pr: 39
   codex_user_probe_signal: CODEX_TASK_COMPLETED_WITH_TWO_BOT_REPLIES
   codex_user_probe_comment_id: 5983795312
   codex_reply_comment_ids: [5983809519, 5983810255]
-  next_fresh_rehearsal: 5
+  next_fresh_rehearsal: 6
 
 runtime_evidence:
   workflow_run_id: 37087966392
@@ -112,7 +118,7 @@ next_gate:
     - CODEX_GITHUB_USER_TOKEN_secret_installed_with_minimum_repo_scope
     - user_authored_Codex_dispatch_runtime_proven_on_rehearsal_4
     - Claude_Code_OAuth_Implementer_runtime_proven
-    - fresh_rehearsal_5_with_Claude_Implementer
+    - fresh_rehearsal_6_with_Claude_Implementer
     - autonomous_Toy_Factory_room_run
     - toy_result_commits_and_review_repair_trace
     - toy_harness_green
@@ -122,7 +128,9 @@ next_gate:
     - TRACK_LOCK
 
 next_action: >-
-  Merge the Claude Implementer pipeline after CI/preflight. Then open only a fresh toy/rehearsal-5 PR.
-  From PR open to terminal result, do not steer manually. Require Claude implementation, bounded commit/push,
-  independent official Reviewer harness, autonomous repair plus re-review on first REJECT, and terminal
-  ACCEPT/REJECT/BLOCKED. Track Lock remains blocked until ACCEPT and full evidence binding.
+  Rehearsal 5 is closed as blocked before dispatch because GitHub rejected the workflow definition before any BAND
+  room or implementation existed. The runner.temp job-env defect is fixed and actionlint is now green. Open only a
+  fresh toy/rehearsal-6 PR from corrected main. From PR open to terminal result, do not steer manually. Require
+  Claude implementation, bounded commit/push, independent official Reviewer harness, autonomous repair plus
+  re-review on first REJECT, and terminal ACCEPT/REJECT/BLOCKED. Track Lock remains blocked until ACCEPT and full
+  evidence binding.
