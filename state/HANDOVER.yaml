@@ -60,47 +60,48 @@ current_truth:
   claude_probe_output_head: 78fad542df1cf5cced4c5e23df7ed72625101488
 
 toy_rehearsal_history:
-  - pr: 35
-    room_id: 1851e664-a13a-41cf-a0d0-de6a31f312f3
-    result: STALLED_NO_CODEX_RESPONSE
-  - pr: 36
-    room_id: ca610561-d3da-46db-8f2c-fbb530eaa25a
-    result: BLOCKED_CODEX_TRANSPORT
-  - pr: 38
-    room_id: e97af8a4-c28e-4731-bcc7-459012937bed
-    run_token: toy-r3-pr38-e6462fdd4ac4
-    result: BLOCKED_CODEX_TRANSPORT_TIMEOUT_AFTER_BOUNDED_RETRY
-  - pr: 42
-    room_id: 61a1b408-7562-4150-944d-793dd12b2409
-    run_token: toy-r4-pr42-30d07c40ae89
-    result: BLOCKED_CODEX_EXECUTION_FAILURE_AFTER_TWO_ATTEMPTS
-  - pr: 61
-    result: BLOCKED_BEFORE_DISPATCH_WORKFLOW_LOAD
-    band_room_created: false
-    implementation_produced: false
-    cause: GITHUB_WORKFLOW_VALIDATION_ERROR_RUNNER_CONTEXT_IN_JOB_ENV
-    correction_merge: dd98e8a89f7aad6a4770a296ab810b5b5ad07eef
-  - pr: 65
-    room_id: 72791c02-0dab-4be0-a05d-9b1bc9397214
-    run_token: toy-r6-pr65-78515d084c3b
-    result: BLOCKED_CLAUDE_MAX_TURNS_AFTER_SUCCESS
-    claude_result: SUCCESS_AFTER_25_TURNS
-    configured_max_turns: 24
-    implementation_committed: false
-    correction_merge: fc9e46dc169cf7dc58524235b8cc4e51f45296ae
+  rehearsals:
+    - pr: 35
+      room_id: 1851e664-a13a-41cf-a0d0-de6a31f312f3
+      result: STALLED_NO_CODEX_RESPONSE
+    - pr: 36
+      room_id: ca610561-d3da-46db-8f2c-fbb530eaa25a
+      result: BLOCKED_CODEX_TRANSPORT
+    - pr: 38
+      room_id: e97af8a4-c28e-4731-bcc7-459012937bed
+      run_token: toy-r3-pr38-e6462fdd4ac4
+      result: BLOCKED_CODEX_TRANSPORT_TIMEOUT_AFTER_BOUNDED_RETRY
+    - pr: 42
+      room_id: 61a1b408-7562-4150-944d-793dd12b2409
+      run_token: toy-r4-pr42-30d07c40ae89
+      result: BLOCKED_CODEX_EXECUTION_FAILURE_AFTER_TWO_ATTEMPTS
+    - pr: 61
+      result: BLOCKED_BEFORE_DISPATCH_WORKFLOW_LOAD
+      band_room_created: false
+      implementation_produced: false
+      cause: GITHUB_WORKFLOW_VALIDATION_ERROR_RUNNER_CONTEXT_IN_JOB_ENV
+      correction_merge: dd98e8a89f7aad6a4770a296ab810b5b5ad07eef
+    - pr: 65
+      room_id: 72791c02-0dab-4be0-a05d-9b1bc9397214
+      run_token: toy-r6-pr65-78515d084c3b
+      result: BLOCKED_CLAUDE_MAX_TURNS_AFTER_SUCCESS
+      claude_result: SUCCESS_AFTER_25_TURNS
+      configured_max_turns: 24
+      implementation_committed: false
+      correction_merge: fc9e46dc169cf7dc58524235b8cc4e51f45296ae
+    - pr: 69
+      room_id: 832ab029-5411-4a04-bb7f-afdc4b5cd3ed
+      run_token: toy-r7-pr69-8caa37aa28f4
+      result: BLOCKED_SCOPE_VALIDATOR_FALSE_POSITIVE
+      claude_attempt_1: SUCCESS
+      implementation_committed: false
+      reviewer_ran: false
+      root_cause: GIT_STATUS_COLLAPSED_UNTRACKED_DIRECTORIES_WITHOUT_UNTRACKED_FILES_ALL
   transport_hardening_pr: 37
   codex_user_probe_pr: 39
   codex_user_probe_signal: CODEX_TASK_COMPLETED_WITH_TWO_BOT_REPLIES
   codex_user_probe_comment_id: 5983795312
   codex_reply_comment_ids: [5983809519, 5983810255]
-  - pr: 69
-    room_id: 832ab029-5411-4a04-bb7f-afdc4b5cd3ed
-    run_token: toy-r7-pr69-8caa37aa28f4
-    result: BLOCKED_SCOPE_VALIDATOR_FALSE_POSITIVE
-    claude_attempt_1: SUCCESS
-    implementation_committed: false
-    reviewer_ran: false
-    root_cause: GIT_STATUS_COLLAPSED_UNTRACKED_DIRECTORIES_WITHOUT_UNTRACKED_FILES_ALL
   next_fresh_rehearsal: 8
 
 runtime_evidence:
@@ -137,7 +138,7 @@ next_gate:
     - CODEX_GITHUB_USER_TOKEN_secret_installed_with_minimum_repo_scope
     - user_authored_Codex_dispatch_runtime_proven_on_rehearsal_4
     - Claude_Code_OAuth_Implementer_runtime_proven
-    - fresh_rehearsal_7_with_Claude_Implementer
+    - fresh_rehearsal_8_with_Claude_Implementer
     - autonomous_Toy_Factory_room_run
     - toy_result_commits_and_review_repair_trace
     - toy_harness_green
