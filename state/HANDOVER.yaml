@@ -1,6 +1,6 @@
 version: 0.1.0
 project_id: band_dark_factory_wearedevelopers_2026
-date: 2026-10-04
+date: 2026-10-05
 status: ACTIVE
 current_owner: PBPD
 current_stage: TOY_FACTORY_REHEARSAL
@@ -47,9 +47,10 @@ current_truth:
   remote_linux_harness: proven_in_operational_repo
   dedicated_repo_actions_preflight: proven
   evidence_graph: active
-  toy_factory: rehearsals_1_2_3_blocked_before_implementation
-  toy_transport_hardening: pr_37_fail_closed_behavior_proven_on_rehearsal_3
+  toy_factory: rehearsals_1_2_3_4_blocked_before_implementation
+  toy_transport_hardening: user_authored_dispatch_proven_and_fast_fail_patch_merged
   codex_transport_actor_finding: user_authored_mentions_accepted_bot_authored_mentions_not_observed
+  codex_cloud_task_execution_current: blocked_external_unknown_or_account_allowance
 
 toy_rehearsal_history:
   - pr: 35
@@ -62,12 +63,16 @@ toy_rehearsal_history:
     room_id: e97af8a4-c28e-4731-bcc7-459012937bed
     run_token: toy-r3-pr38-e6462fdd4ac4
     result: BLOCKED_CODEX_TRANSPORT_TIMEOUT_AFTER_BOUNDED_RETRY
+  - pr: 42
+    room_id: 61a1b408-7562-4150-944d-793dd12b2409
+    run_token: toy-r4-pr42-30d07c40ae89
+    result: BLOCKED_CODEX_EXECUTION_FAILURE_AFTER_TWO_ATTEMPTS
   transport_hardening_pr: 37
   codex_user_probe_pr: 39
   codex_user_probe_signal: CODEX_TASK_COMPLETED_WITH_TWO_BOT_REPLIES
   codex_user_probe_comment_id: 5983795312
   codex_reply_comment_ids: [5983809519, 5983810255]
-  next_fresh_rehearsal: 4
+  next_fresh_rehearsal: 5
 
 runtime_evidence:
   workflow_run_id: 37087966392
@@ -101,7 +106,9 @@ next_gate:
     - BAND_Desktop_v0_4_12_meets_v0_4_10_plus_requirement
   remaining_pass_conditions:
     - CODEX_GITHUB_USER_TOKEN_secret_installed_with_minimum_repo_scope
-    - user_authored_Codex_dispatch_runtime_proven_on_fresh_rehearsal_4
+    - user_authored_Codex_dispatch_runtime_proven_on_rehearsal_4
+    - Codex_Cloud_task_execution_restored_or_alternate_Implementer_runtime_proven
+    - fresh_rehearsal_5_after_execution_runtime_recovery
     - autonomous_Toy_Factory_room_run
     - toy_result_commits_and_review_repair_trace
     - toy_harness_green
@@ -111,7 +118,7 @@ next_gate:
     - TRACK_LOCK
 
 next_action: >-
-  Add the CODEX_GITHUB_USER_TOKEN Actions secret using a fine-grained PAT owned by Faadil1, restricted to this
-  repository and minimum Issues read/write permission. Merge the user-authored dispatch fix only after static/CI
-  checks pass. Then open only a fresh toy/rehearsal-4 PR. Preserve zero human steering after initial dispatch and
-  require terminal ACCEPT/REJECT/BLOCKED plus full evidence binding before Track Lock.
+  Check ChatGPT Settings > Usage for the account-level Codex allowance and reset time. Do not launch another full
+  Toy rehearsal while even the micro probe is failing. When Codex execution recovers, prove one tiny user-authored
+  task first and then open only a fresh toy/rehearsal-5. If Codex remains unavailable, switch the Implementer seat
+  to another challenge-compliant runtime and prove that runtime before Rehearsal 5. Track Lock remains blocked.
