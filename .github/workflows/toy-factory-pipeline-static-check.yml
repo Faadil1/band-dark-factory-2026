@@ -25,7 +25,10 @@ jobs:
 
       - name: Compile Toy transport scripts
         run: |
-          python -m py_compile             infra/toy-rehearsal/dispatch.py             infra/toy-rehearsal/review.py
+          python -m py_compile \
+            infra/toy-rehearsal/dispatch.py \
+            infra/toy-rehearsal/review.py \
+            infra/toy-rehearsal/claude_pipeline.py
 
       - name: Assert transport invariants
         shell: python
@@ -41,21 +44,30 @@ jobs:
 
           assert "types: [opened, reopened]" in dispatch_workflow
           assert "synchronize" not in dispatch_workflow
-          assert "CODEX_FIRST_WINDOW_SECONDS" in dispatch_workflow
-          assert "CODEX_RETRY_WINDOW_SECONDS" in dispatch_workflow
-          assert "CODEX_GITHUB_USER_TOKEN:" in dispatch_workflow
+          assert "id-token: write" in dispatch_workflow
+          assert "CLAUDE_CODE_OAUTH_TOKEN" in dispatch_workflow
+          assert "anthropics/claude-code-action@" in dispatch_workflow
+          assert "Claude Implementer attempt 1" in dispatch_workflow
+          assert "Claude repair attempt 2" in dispatch_workflow
+          assert "steps.review1.outputs.verdict == 'REJECT'" in dispatch_workflow
+          assert "claude_pipeline.py publish 1" in dispatch_workflow
+          assert "claude_pipeline.py review 2" in dispatch_workflow
+          assert "CODEX_GITHUB_USER_TOKEN" not in dispatch_workflow
 
           assert "toy/rehearsal-1" not in review_workflow
           assert "toy/rehearsal-[0-9]*" in review_workflow
           assert "cancel-in-progress: false" in review_workflow
 
+          claude = Path("infra/toy-rehearsal/claude_pipeline.py").read_text()
+          assert "TOY_IMPLEMENTER_RUNTIME=CLAUDE_CODE_OAUTH" in claude
+          assert "TOY_REPAIR_REQUESTED" in claude
+          assert "runtime=CLAUDE_CODE_OAUTH" in claude
+          assert "--force-with-lease" in claude
+          assert "human_steering_after_pr_open" in claude
+
+          # Legacy Codex transport remains retained for historical evidence only.
           assert "CODEX_TRANSPORT_TIMEOUT" in dispatch
           assert "validate_codex_user_token" in dispatch
-          assert "token=codex_user_token" in dispatch
-          assert "CODEX_EXPLICIT_FAILURE_MARKERS" in dispatch
-          assert "EXPLICIT_FAILURE" in dispatch
-          assert "CODEX_EXECUTION_FAILURE" in dispatch
-          assert "attempt 2/2" in dispatch
           assert 're.fullmatch(r"toy/rehearsal-(\\d+)", branch)' in dispatch
 
           assert 'f"HEAD:{branch}"' in review
