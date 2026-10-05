@@ -105,7 +105,7 @@ jobs:
             Do not commit or push. Do not ask the human for clarification.
             Run lightweight local checks when useful.
           claude_args: |
-            --max-turns 24
+            --max-turns 40
             --allowedTools "Read,Edit,Write,Glob,Grep,Bash(python:*),Bash(git diff:*),Bash(git status:*),Bash(find:*),Bash(cp:*),Bash(mkdir:*)"
 
       - name: Validate and publish attempt 1
@@ -124,7 +124,7 @@ jobs:
           prompt: |
             ${{ steps.review1.outputs.repair_context }}
           claude_args: |
-            --max-turns 18
+            --max-turns 32
             --allowedTools "Read,Edit,Write,Glob,Grep,Bash(python:*),Bash(git diff:*),Bash(git status:*),Bash(find:*)"
 
       - name: Validate and publish attempt 2
