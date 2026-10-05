@@ -346,3 +346,55 @@ missing_edges:
         - authentic_single_room_final_submission_run
         - room_json_submission_binding
         - production_banking_readiness
+
+
+  - claim_id: POCKETFUL_CUMULATIVE_SPEC_ASSURANCE_NEGATIVE_EVENT
+    status: COMPLETE_REAL_COUNTEREXAMPLE
+    observed:
+      pr: 98
+      target_revision: f2744a48d31987732b830c02f77fcf086bae2683
+      workflow_run_id: 37307554887
+      artifact_id: 11344740042
+      artifact_digest: sha256:166a419eb3296164149d1bb9354e3266b8d8d574b824afc453d923dc1e1da62d
+      inherited_stage_1_assurance: 34_of_34
+      stage_2_to_4_assurance_before_repair: 43_of_45
+      defect: STAGE_3_IMPORTED_SAVED_STATEMENT_CHANGED_SHAPE_BY_ADDING_REFUND_OF_NULL
+      pr_closed_unmerged: true
+    truth_boundary:
+      proves:
+        - independent_assurance_can_find_behavior_missed_by_shipped_public_harness
+        - accepted_public_harness_candidate_had_a_real_cross_stage_compatibility_defect
+      does_not_prove:
+        - other_hidden_or_normative_defects_do_not_exist
+
+  - claim_id: POCKETFUL_CUMULATIVE_SPEC_ASSURANCE
+    status: COMPLETE_BOUNDED_NON_EXHAUSTIVE
+    evidence: evidence/POCKETFUL-CUMULATIVE-SPEC-ASSURANCE-2026-10-05.yaml
+    observed:
+      repair_pr: 99
+      exact_repaired_revision: b7eb286a72f7bdf8829120eb5d7b507205e501ad
+      promotion_merge_sha: 64868ebfddc4a5a3c191b2e72f23c4a0710a5443
+      workflow_run_id: 37308275153
+      workflow_job_id: 111757134900
+      artifact_id: 11344237993
+      artifact_digest: sha256:05dc0119168f87af51090c8cd69cd90687fdfeb8a13e285d01a3959e9fdf958e
+      exact_pr_head_binding: true
+      official_stage_1_checks: 147_of_147
+      official_stage_2_checks: 35_of_35
+      official_stage_3_checks: 6_of_6
+      official_stage_4_checks: 5_of_5
+      highest_contiguous: 4
+      overshoot: null
+      inherited_stage_1_independent_checks: 34_of_34
+      cumulative_stage_2_to_4_independent_checks: 44_of_44
+    truth_boundary:
+      proves:
+        - repaired_candidate_survives_pinned_official_Stage_1_to_4_harness
+        - repaired_candidate_survives_78_additional_independent_black_box_checks
+        - Stage_3_to_4_saved_statement_shape_defect_is_repaired_for_the_tested_case
+      does_not_prove:
+        - hidden_test_success
+        - exhaustive_normative_conformance
+        - final_single_room_submission_run
+        - authentic_room_json_binding
+        - production_banking_readiness
