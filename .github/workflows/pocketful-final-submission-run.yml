@@ -1,0 +1,286 @@
+name: Pocketful Final One-Room Four-Stage Run
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  id-token: write
+
+concurrency:
+  group: pocketful-final-run-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  final-run:
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      startsWith(github.event.pull_request.head.ref, 'submission/pocketful-final-run-')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BAND_COORDINATOR_AGENT_ID: ${{ secrets.BAND_COORDINATOR_AGENT_ID }}
+      BAND_COORDINATOR_API_KEY: ${{ secrets.BAND_COORDINATOR_API_KEY }}
+      BAND_IMPLEMENTER_AGENT_ID: ${{ secrets.BAND_IMPLEMENTER_AGENT_ID }}
+      BAND_IMPLEMENTER_API_KEY: ${{ secrets.BAND_IMPLEMENTER_API_KEY }}
+      BAND_REVIEWER_AGENT_ID: ${{ secrets.BAND_REVIEWER_AGENT_ID }}
+      BAND_REVIEWER_API_KEY: ${{ secrets.BAND_REVIEWER_API_KEY }}
+
+    steps:
+      - name: Checkout exact run trigger
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Initialize runtime
+        shell: bash
+        run: |
+          echo "KICKOFF=$RUNNER_TEMP/dark-factory-wearedevs" >> "$GITHUB_ENV"
+          rm -rf pocketful-result submission-final-runtime artifacts/pocketful-final-run
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Clone pinned official kickoff
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone https://github.com/band-ai/dark-factory-wearedevs.git "$KICKOFF"
+          git -C "$KICKOFF" checkout 803560d2a678ace1414465c098eb0ab5380ffade
+          test "$(git -C "$KICKOFF" rev-parse HEAD)" = "803560d2a678ace1414465c098eb0ab5380ffade"
+          python -m pip install -r "$KICKOFF/harness/requirements.txt"
+
+      - name: Validate BAND and Claude credentials
+        shell: bash
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "$BAND_COORDINATOR_AGENT_ID"
+          test -n "$BAND_COORDINATOR_API_KEY"
+          test -n "$BAND_IMPLEMENTER_AGENT_ID"
+          test -n "$BAND_IMPLEMENTER_API_KEY"
+          test -n "$BAND_REVIEWER_AGENT_ID"
+          test -n "$BAND_REVIEWER_API_KEY"
+          test -n "$CLAUDE_CODE_OAUTH_TOKEN"
+
+      - name: Prepare one fresh room and one fresh result repository
+        id: prepare
+        run: python infra/pocketful-final-run/pipeline.py prepare
+
+      - name: Begin Stage 1
+        id: s1begin
+        run: python infra/pocketful-final-run/pipeline.py begin 1
+      - name: Claude Stage 1 attempt 1
+        uses: anthropics/claude-code-action@cab360f6565aa35a51d6ce9e43f1f4287c0a32ea
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Final dark-factory Stage 1 implementation. Run token: ${{ steps.prepare.outputs.run_token }}.
+            Read pocketful-input/stage-1.md. Work ONLY in submission-final-runtime/result/stage-1/.
+            This is a fresh result repository. Do not inspect or copy pocketful-result or any earlier implementation.
+            Implement the complete written specification, including requirements beyond shipped tests.
+            Include source files, Dockerfile and RUN.md. Runtime must be self-contained with no outbound dependency.
+            Do not modify README, FACTORY, mandates, specs, workflows, state or assurance code.
+            Do not commit or push. Do not ask the human for steering.
+          claude_args: |
+            --max-turns 120
+            --allowedTools "Read,Edit,Write,Glob,Grep,Bash(python:*),Bash(node:*),Bash(find:*),Bash(mkdir:*)"
+      - name: Publish Stage 1 attempt 1
+        id: s1pub1
+        run: python infra/pocketful-final-run/pipeline.py publish 1 1 "${{ steps.s1begin.outputs.base_revision }}"
+      - name: Review Stage 1 attempt 1
+        id: s1rev1
+        run: python infra/pocketful-final-run/pipeline.py review 1 1 "${{ steps.s1pub1.outputs.revision }}"
+      - name: Claude Stage 1 repair
+        if: steps.s1rev1.outputs.verdict == 'REJECT'
+        uses: anthropics/claude-code-action@cab360f6565aa35a51d6ce9e43f1f4287c0a32ea
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: ${{ steps.s1rev1.outputs.repair_context }}
+          claude_args: |
+            --max-turns 90
+            --allowedTools "Read,Edit,Write,Glob,Grep,Bash(python:*),Bash(node:*),Bash(find:*)"
+      - name: Publish Stage 1 attempt 2
+        if: steps.s1rev1.outputs.verdict == 'REJECT'
+        id: s1pub2
+        run: python infra/pocketful-final-run/pipeline.py publish 1 2 "${{ steps.s1pub1.outputs.revision }}"
+      - name: Review Stage 1 attempt 2
+        if: steps.s1rev1.outputs.verdict == 'REJECT'
+        id: s1rev2
+        run: python infra/pocketful-final-run/pipeline.py review 1 2 "${{ steps.s1pub2.outputs.revision }}"
+      - name: Gate Stage 1
+        run: python infra/pocketful-final-run/pipeline.py gate 1
+
+      - name: Begin Stage 2
+        id: s2begin
+        run: python infra/pocketful-final-run/pipeline.py begin 2
+      - name: Claude Stage 2 attempt 1
+        uses: anthropics/claude-code-action@cab360f6565aa35a51d6ce9e43f1f4287c0a32ea
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Final dark-factory Stage 2 implementation. Run token: ${{ steps.prepare.outputs.run_token }}.
+            Read pocketful-input/stage-1.md and pocketful-input/stage-2.md. Stage 2 was copied from the accepted
+            Stage 1 inside the fresh result repository. Work ONLY in submission-final-runtime/result/stage-2/.
+            Preserve all inherited behavior and implement the complete Stage 2 written requirements, not just tests.
+            Do not inspect or copy any earlier implementation outside this fresh result repository.
+            Do not commit or push. Do not ask the human for steering.
+          claude_args: |
+            --max-turns 150
+            --allowedTools "Read,Edit,Write,Glob,Grep,Bash(python:*),Bash(node:*),Bash(find:*),Bash(mkdir:*)"
+      - name: Publish Stage 2 attempt 1
+        id: s2pub1
+        run: python infra/pocketful-final-run/pipeline.py publish 2 1 "${{ steps.s2begin.outputs.base_revision }}"
+      - name: Review Stage 2 attempt 1
+        id: s2rev1
+        run: python infra/pocketful-final-run/pipeline.py review 2 1 "${{ steps.s2pub1.outputs.revision }}"
+      - name: Claude Stage 2 repair
+        if: steps.s2rev1.outputs.verdict == 'REJECT'
+        uses: anthropics/claude-code-action@cab360f6565aa35a51d6ce9e43f1f4287c0a32ea
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: ${{ steps.s2rev1.outputs.repair_context }}
+          claude_args: |
+            --max-turns 100
+            --allowedTools "Read,Edit,Write,Glob,Grep,Bash(python:*),Bash(node:*),Bash(find:*)"
+      - name: Publish Stage 2 attempt 2
+        if: steps.s2rev1.outputs.verdict == 'REJECT'
+        id: s2pub2
+        run: python infra/pocketful-final-run/pipeline.py publish 2 2 "${{ steps.s2pub1.outputs.revision }}"
+      - name: Review Stage 2 attempt 2
+        if: steps.s2rev1.outputs.verdict == 'REJECT'
+        id: s2rev2
+        run: python infra/pocketful-final-run/pipeline.py review 2 2 "${{ steps.s2pub2.outputs.revision }}"
+      - name: Gate Stage 2
+        run: python infra/pocketful-final-run/pipeline.py gate 2
+
+      - name: Begin Stage 3
+        id: s3begin
+        run: python infra/pocketful-final-run/pipeline.py begin 3
+      - name: Claude Stage 3 attempt 1
+        uses: anthropics/claude-code-action@cab360f6565aa35a51d6ce9e43f1f4287c0a32ea
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Final dark-factory Stage 3 implementation. Run token: ${{ steps.prepare.outputs.run_token }}.
+            Read pocketful-input/stage-1.md, stage-2.md and stage-3.md. Stage 3 was copied from accepted Stage 2
+            inside the fresh result repository. Work ONLY in submission-final-runtime/result/stage-3/.
+            Preserve inherited behavior and implement the complete written Stage 3 requirements, including temporal,
+            historical, correction, snapshot, migration and hold semantics beyond shipped tests.
+            Do not inspect or copy any earlier implementation outside this fresh result repository.
+            Do not commit or push. Do not ask the human for steering.
+          claude_args: |
+            --max-turns 170
+            --allowedTools "Read,Edit,Write,Glob,Grep,Bash(python:*),Bash(node:*),Bash(find:*),Bash(mkdir:*)"
+      - name: Publish Stage 3 attempt 1
+        id: s3pub1
+        run: python infra/pocketful-final-run/pipeline.py publish 3 1 "${{ steps.s3begin.outputs.base_revision }}"
+      - name: Review Stage 3 attempt 1
+        id: s3rev1
+        run: python infra/pocketful-final-run/pipeline.py review 3 1 "${{ steps.s3pub1.outputs.revision }}"
+      - name: Claude Stage 3 repair
+        if: steps.s3rev1.outputs.verdict == 'REJECT'
+        uses: anthropics/claude-code-action@cab360f6565aa35a51d6ce9e43f1f4287c0a32ea
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: ${{ steps.s3rev1.outputs.repair_context }}
+          claude_args: |
+            --max-turns 110
+            --allowedTools "Read,Edit,Write,Glob,Grep,Bash(python:*),Bash(node:*),Bash(find:*)"
+      - name: Publish Stage 3 attempt 2
+        if: steps.s3rev1.outputs.verdict == 'REJECT'
+        id: s3pub2
+        run: python infra/pocketful-final-run/pipeline.py publish 3 2 "${{ steps.s3pub1.outputs.revision }}"
+      - name: Review Stage 3 attempt 2
+        if: steps.s3rev1.outputs.verdict == 'REJECT'
+        id: s3rev2
+        run: python infra/pocketful-final-run/pipeline.py review 3 2 "${{ steps.s3pub2.outputs.revision }}"
+      - name: Gate Stage 3
+        run: python infra/pocketful-final-run/pipeline.py gate 3
+
+      - name: Begin Stage 4
+        id: s4begin
+        run: python infra/pocketful-final-run/pipeline.py begin 4
+      - name: Claude Stage 4 attempt 1
+        uses: anthropics/claude-code-action@cab360f6565aa35a51d6ce9e43f1f4287c0a32ea
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Final dark-factory Stage 4 implementation. Run token: ${{ steps.prepare.outputs.run_token }}.
+            Read all four pocketful-input stage specifications. Stage 4 was copied from accepted Stage 3 inside
+            the fresh result repository. Work ONLY in submission-final-runtime/result/stage-4/.
+            Preserve every inherited requirement and implement the complete Stage 4 spec, including cross-stage
+            saved-state compatibility. A prior factory iteration discovered that adding a later-stage response field
+            to a frozen earlier-stage saved view can violate original-form preservation; apply the written spec
+            generally rather than hard-coding that example.
+            Do not inspect or copy any earlier implementation outside this fresh result repository.
+            Do not commit or push. Do not ask the human for steering.
+          claude_args: |
+            --max-turns 170
+            --allowedTools "Read,Edit,Write,Glob,Grep,Bash(python:*),Bash(node:*),Bash(find:*),Bash(mkdir:*)"
+      - name: Publish Stage 4 attempt 1
+        id: s4pub1
+        run: python infra/pocketful-final-run/pipeline.py publish 4 1 "${{ steps.s4begin.outputs.base_revision }}"
+      - name: Review Stage 4 attempt 1
+        id: s4rev1
+        run: python infra/pocketful-final-run/pipeline.py review 4 1 "${{ steps.s4pub1.outputs.revision }}"
+      - name: Claude Stage 4 repair
+        if: steps.s4rev1.outputs.verdict == 'REJECT'
+        uses: anthropics/claude-code-action@cab360f6565aa35a51d6ce9e43f1f4287c0a32ea
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: ${{ steps.s4rev1.outputs.repair_context }}
+          claude_args: |
+            --max-turns 110
+            --allowedTools "Read,Edit,Write,Glob,Grep,Bash(python:*),Bash(node:*),Bash(find:*)"
+      - name: Publish Stage 4 attempt 2
+        if: steps.s4rev1.outputs.verdict == 'REJECT'
+        id: s4pub2
+        run: python infra/pocketful-final-run/pipeline.py publish 4 2 "${{ steps.s4pub1.outputs.revision }}"
+      - name: Review Stage 4 attempt 2
+        if: steps.s4rev1.outputs.verdict == 'REJECT'
+        id: s4rev2
+        run: python infra/pocketful-final-run/pipeline.py review 4 2 "${{ steps.s4pub2.outputs.revision }}"
+      - name: Gate Stage 4
+        run: python infra/pocketful-final-run/pipeline.py gate 4
+
+      - name: Run cumulative independent assurance on fresh final result
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/pocketful-final-run/cumulative
+          docker build -t pocketful-final-stage4 submission-final-runtime/result/stage-4
+          docker build -t pocketful-final-stage3 submission-final-runtime/result/stage-3
+          docker run -d --rm --name pocketful-final-stage4 -e PORT=8080 -p 127.0.0.1:18080:8080 pocketful-final-stage4
+          docker run -d --rm --name pocketful-final-stage3 -e PORT=8080 -p 127.0.0.1:18081:8080 pocketful-final-stage3
+          trap 'docker stop pocketful-final-stage4 pocketful-final-stage3 >/dev/null 2>&1 || true' EXIT
+          for port in 18080 18081; do
+            for i in $(seq 1 60); do
+              if curl -fsS "http://127.0.0.1:$port/health" >/dev/null; then break; fi
+              sleep 1
+            done
+            curl -fsS "http://127.0.0.1:$port/health" >/dev/null
+          done
+          python assurance/pocketful-stage1/spec_assurance.py             http://127.0.0.1:18080 artifacts/pocketful-final-run/cumulative/stage1-report.json
+          python assurance/pocketful-stage4/cumulative_assurance.py             http://127.0.0.1:18080 http://127.0.0.1:18081             artifacts/pocketful-final-run/cumulative/stage2-4-report.json
+
+      - name: Finalize fresh result and prove room-only remaining check
+        id: finalize
+        run: python infra/pocketful-final-run/pipeline.py finalize
+
+      - name: Upload final-run evidence and fresh repository bundle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pocketful-final-run-${{ github.event.pull_request.number }}
+          path: |
+            artifacts/pocketful-final-run/**
+          if-no-files-found: error
