@@ -1,0 +1,38 @@
+name: Claude Runtime Probe
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  probe:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'probe/claude-runtime-v1'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Run bounded Claude Code probe
+        id: claude
+        uses: anthropics/claude-code-action@cab360f6565aa35a51d6ce9e43f1f4287c0a32ea
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ github.token }}
+          prompt: |
+            Diagnostic runtime probe only.
+            Modify exactly one existing file: evidence/claude-runtime-probe.md
+            Add exactly this line on the blank line immediately after "Expected marker:":
+            CLAUDE_RUNTIME=PROVEN
+            Do not create, delete, rename, or modify any other file.
+            Verify the file content after editing.
+          claude_args: '--allowedTools "Read,Edit" --max-turns 8'
+
+      - name: Verify marker reached branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "${{ github.event.pull_request.head.ref }}"
+          git show "origin/${{ github.event.pull_request.head.ref }}:evidence/claude-runtime-probe.md" | grep -Fx 'CLAUDE_RUNTIME=PROVEN'
