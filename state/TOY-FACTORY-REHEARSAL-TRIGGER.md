@@ -1,6 +1,6 @@
 # BAND Dark Factory — Toy Rehearsal 8 Trigger
 
-Opening this pull request is the single initial human dispatch for fresh Toy Factory Rehearsal #7 using Claude Code OAuth as the Implementer runtime.
+Opening this pull request is the single initial human dispatch for fresh Toy Factory Rehearsal #8 using Claude Code OAuth as the Implementer runtime.
 
 No Toy stage implementation is pre-seeded. From PR open onward, Coordinator → Implementer/Claude Code → Reviewer must proceed without human steering. The run must end in ACCEPT, REJECT, or an explicit fail-closed BLOCKED terminal marker.
 
