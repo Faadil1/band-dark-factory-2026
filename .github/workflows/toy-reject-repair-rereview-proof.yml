@@ -1,0 +1,127 @@
+name: Toy Reject Repair Rereview Proof
+
+on:
+  pull_request:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  id-token: write
+
+jobs:
+  prove-repair-path:
+    if: github.head_ref == 'proof/toy-reject-repair-rereview-v1'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BAND_COORDINATOR_AGENT_ID: ${{ secrets.BAND_COORDINATOR_AGENT_ID }}
+      BAND_COORDINATOR_API_KEY: ${{ secrets.BAND_COORDINATOR_API_KEY }}
+      BAND_IMPLEMENTER_AGENT_ID: ${{ secrets.BAND_IMPLEMENTER_AGENT_ID }}
+      BAND_IMPLEMENTER_API_KEY: ${{ secrets.BAND_IMPLEMENTER_API_KEY }}
+      BAND_REVIEWER_AGENT_ID: ${{ secrets.BAND_REVIEWER_AGENT_ID }}
+      BAND_REVIEWER_API_KEY: ${{ secrets.BAND_REVIEWER_API_KEY }}
+
+    steps:
+      - name: Checkout disposable proof branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Initialize runtime paths
+        shell: bash
+        run: echo "KICKOFF=$RUNNER_TEMP/dark-factory-wearedevs" >> "$GITHUB_ENV"
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Clone pinned official harness
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone https://github.com/band-ai/dark-factory-wearedevs.git "$KICKOFF"
+          git -C "$KICKOFF" checkout 803560d2a678ace1414465c098eb0ab5380ffade
+          python -m pip install -r "$KICKOFF/harness/requirements.txt"
+
+      - name: Validate Claude credential
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: test -n "$CLAUDE_CODE_OAUTH_TOKEN"
+
+      - name: Prepare fresh BAND proof room
+        id: prepare
+        run: python infra/toy-rehearsal/repair_path_probe.py
+
+      - name: Inject one controlled development-only defect
+        id: inject
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p=Path("toy-result/stage-4/server.js")
+          s=p.read_text()
+          old="typeof by !== 'number' || !Number.isInteger(by) || by < 1"
+          new="typeof by !== 'number' || !Number.isInteger(by) || by < 0"
+          if s.count(old) != 1:
+              raise SystemExit("expected stage-4 validation expression not found exactly once")
+          p.write_text(s.replace(old,new))
+          PY
+          git config user.name "BAND Negative-Path Probe"
+          git config user.email "band-proof@users.noreply.github.com"
+          git add toy-result/stage-4/server.js
+          git commit -m "proof: inject simulated stage-4 validation regression"
+          REV="$(git rev-parse HEAD)"
+          git push origin "HEAD:${GITHUB_HEAD_REF}"
+          echo "revision=$REV" >> "$GITHUB_OUTPUT"
+          echo "SIMULATED_DEFECT_REVISION=$REV"
+
+      - name: Independent Reviewer must reject simulated defect
+        id: review1
+        run: python infra/toy-rehearsal/claude_pipeline.py review 1 "${{ steps.inject.outputs.revision }}"
+
+      - name: Assert negative path actually rejected
+        shell: bash
+        run: test "${{ steps.review1.outputs.verdict }}" = "REJECT"
+
+      - name: Claude autonomous repair after Reviewer rejection
+        uses: anthropics/claude-code-action@cab360f6565aa35a51d6ce9e43f1f4287c0a32ea
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            ${{ steps.review1.outputs.repair_context }}
+          claude_args: |
+            --max-turns 32
+            --allowedTools "Read,Edit,Write,Glob,Grep,Bash(python:*),Bash(git diff:*),Bash(git status:*),Bash(find:*)"
+
+      - name: Validate and publish autonomous repair
+        id: publish2
+        run: python infra/toy-rehearsal/claude_pipeline.py publish 2 "${{ steps.inject.outputs.revision }}"
+
+      - name: Independent re-review repaired revision
+        id: review2
+        run: python infra/toy-rehearsal/claude_pipeline.py review 2 "${{ steps.publish2.outputs.revision }}"
+
+      - name: Require repaired candidate acceptance
+        shell: bash
+        run: |
+          test "${{ steps.review2.outputs.verdict }}" = "ACCEPT"
+          test "${{ steps.review2.outputs.harness_exit }}" = "0"
+          echo "AUTONOMOUS_REJECT_REPAIR_REREVIEW=PROVEN"
+          echo "EVIDENCE_CLASS=SIMULATED_DEFECT_TECHNICAL_PROOF"
+
+      - name: Upload bounded repair-path evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: toy-repair-path-proof-${{ github.event.pull_request.number }}
+          path: |
+            artifacts/toy-rehearsal/**
+            ${{ runner.temp }}/toy-all-attempt-1/**
+            ${{ runner.temp }}/toy-all-attempt-2/**
+          if-no-files-found: warn
