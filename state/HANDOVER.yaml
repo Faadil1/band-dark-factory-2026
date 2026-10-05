@@ -178,11 +178,11 @@ product_workstream_priority:
   current_primary_workstream: PRODUCT_EXPLOITATION
   remaining_material_depth_gaps:
     - Pocketful_stage_1_authentic_full_room_export_binding_missing
-    - Pocketful_stage_2_browser_and_recovery_not_started
-    - Pocketful_stage_3_temporal_corrections_not_started
+    - Pocketful_stage_2_hidden_and_full_normative_conformance_UNKNOWN
+    - Pocketful_stage_3_statements_and_payment_corrections_not_started
     - Pocketful_stage_4_refunds_and_batch_corrections_not_started
     - hidden_test_success_UNKNOWN
-  next_highest_value_depth_delta: POCKETFUL_STAGE_2_BROWSER_RECOVERY_HOLDS_PARTIAL_CAPTURE
+  next_highest_value_depth_delta: POCKETFUL_STAGE_3_STATEMENTS_AND_PAYMENT_CORRECTIONS
   valid_stop_condition: null
   demo_packaging_allowed: false
   workstream_drift_status: NO_DRIFT_OBSERVED
@@ -253,7 +253,21 @@ pocketful_stage_2_runs:
     invalidation_reason: REVIEWER_EXECUTED_STAGE_1_HARNESS_INSTEAD_OF_STAGE_2
     product_candidate_promoted: false
     pr_closed_unmerged: true
-  next_fresh_run: 2
+  run_2:
+    pr: 90
+    room_id: f036d266-b2ec-4edd-aa95-9ca35dd96770
+    run_token: pocketful-s2-r2-pr90-b6586ab6f5a1
+    result: ACCEPT_ATTEMPT_1_VALID_STAGE_2_REVIEW
+    accepted_revision: 3b46422054dee1aa65379bd5efbca33988084fd2
+    promotion_merge_sha: 068fe2c70c83b55ad6ec7469d1d60b6dfb1eea99
+    workflow_run_id: 37299342044
+    workflow_job_id: 111728076908
+    artifact_id: 11340956631
+    artifact_digest: sha256:cf410aec7081dc472ff4a0fbb307dd4591203b6d13bab7e2a7d1cba20fc89681
+    reviewer_selector: "--stage 2"
+    public_harness: STAGE_1_147_OF_147__STAGE_2_35_OF_35
+    hidden_test_success: UNKNOWN
+  next_fresh_run: NONE_UNLESS_REPAIR_OR_REVALIDATION_IS_JUSTIFIED
 
 stage_1_spec_assurance:
   status: PROVEN
@@ -267,6 +281,6 @@ stage_1_spec_assurance:
   hidden_test_success: UNKNOWN
 
 next_action: >-
-  Correct the Pocketful Stage 2 Reviewer from --stage 1 to --stage 2 and enforce that selector with the existing
-  static pipeline check. Merge only after validation, then launch fresh Stage 2 run 2 from main with no Stage 2
-  implementation pre-seeded. Keep PR 88 closed unmerged and keep demo/story packaging blocked.
+  Begin Pocketful Stage 3 product exploitation from the pinned official Stage 3 spec while preserving Stage 1 and
+  Stage 2 behavior. Prioritize real statements, historical/as-of balances, payment corrections, effective-vs-recorded
+  time, stable snapshots and historical hold semantics. Keep demo/story packaging blocked.
