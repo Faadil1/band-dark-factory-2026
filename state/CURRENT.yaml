@@ -11,6 +11,26 @@ source_of_truth:
   living_prd: projects/band-dark-factory-2026/incoming/LIVING-PRD.md
   operational_repository: Faadil1/band-dark-factory-2026
 
+canonical_baseline_reconciliation:
+  status: ALIGNED
+  canonical_baseline_version: 0.1.56-canonical-baseline-drift-tripwire-promoted
+  canonical_baseline_commit: 8a7e8a4ff5461641c595e2cf052a95fdc32a6340
+  project_state_commit_at_reconciliation_start: a1260bd53695e04c7615316e464593d28fa4df39
+  last_canonical_reconciliation_at: 2026-10-04
+  baseline_delta_status: NON_MATERIAL_DELTA
+  delta_reason: >-
+    The central change adds baseline pinning, material-delta reconciliation, and drift tripwires. BAND is still
+    pre-live-slice at TOY_FACTORY_REHEARSAL, so this does not alter the locked problem, architecture, Toy gate,
+    Pocketful recommendation, or exact next action. The new controls become binding for subsequent material touches
+    and immediately fail closed if project state becomes stale or demo/evidence work displaces real product depth.
+  first_live_slice_proven: false
+  material_user_capability_delta_since_previous_milestone: NONE
+  material_user_capability_delta_reason: >-
+    No product capability is claimed at this reconciliation. The latest progress is Codex transport hardening for the
+    pre-slice Toy rehearsal infrastructure.
+  affected_transition_blocked: false
+  next_reconciliation_trigger: NEXT_MATERIAL_PROJECT_TOUCH_OR_CENTRAL_CANONICAL_BASELINE_ADVANCE
+
 authorization:
   project_authorized: PROVEN
   living_prd: PRD_READY

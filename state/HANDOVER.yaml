@@ -5,6 +5,22 @@ status: ACTIVE
 current_owner: PBPD
 current_stage: TOY_FACTORY_REHEARSAL
 
+canonical_baseline:
+  status: ALIGNED
+  version: 0.1.56-canonical-baseline-drift-tripwire-promoted
+  commit: 8a7e8a4ff5461641c595e2cf052a95fdc32a6340
+  project_state_commit_at_reconciliation_start: a1260bd53695e04c7615316e464593d28fa4df39
+  delta_status: NON_MATERIAL_DELTA
+  delta_reason: governance_control_update_only_while_project_remains_pre_slice
+  first_live_slice_proven: false
+  material_user_capability_delta_since_previous_milestone: NONE
+  affected_transition_blocked: false
+  rule: >-
+    Re-resolve the current central version and exact merged-main commit at the next material project touch.
+    If the baseline advances, classify materiality before changing Concept Lock, Track Lock, BUILD_CANDIDATE_READY,
+    LIVE/COMPLETE, release, or submission-readiness state. Do not treat demo, seed, replay, receipts, story, or judge
+    flow as product progress if material product-depth gaps later exist without a real user-capability delta.
+
 read_order:
   - state/CURRENT.yaml
   - state/HANDOVER.yaml
