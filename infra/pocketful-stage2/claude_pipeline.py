@@ -161,7 +161,7 @@ def cmd_review(attempt,revision):
     if current!=revision: raise SystemExit(f"review revision mismatch {current} != {revision}")
     kickoff=Path(os.environ["KICKOFF"]); out=Path(os.environ["RUNNER_TEMP"])/f"pocketful-stage2-attempt-{attempt}"
     cmd=["python","-m","harness","run","--track","pocketful","--repo",str(Path.cwd()/"pocketful-result"),
-         "--stage","1","--mode","isolated","--out",str(out)]
+         "--stage","2","--mode","isolated","--out",str(out)]
     p=run(cmd,cwd=kickoff,check=False,timeout=3000)
     art=Path("artifacts/pocketful-stage-2"); art.mkdir(parents=True,exist_ok=True)
     (art/f"attempt-{attempt}.stdout").write_text(p.stdout); (art/f"attempt-{attempt}.stderr").write_text(p.stderr)

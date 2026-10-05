@@ -5,6 +5,8 @@ on:
     paths:
       - ".github/workflows/toy-factory-rehearsal-*.yml"
       - "infra/toy-rehearsal/**"
+      - ".github/workflows/pocketful-stage-2-dispatch.yml"
+      - "infra/pocketful-stage2/**"
       - "state/CURRENT.yaml"
       - "state/HANDOVER.yaml"
 
@@ -28,14 +30,15 @@ jobs:
         run: |
           set -euo pipefail
           bash <(curl -fsSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash) 1.7.12
-          ./actionlint -color .github/workflows/toy-factory-rehearsal-dispatch.yml .github/workflows/toy-factory-rehearsal-review.yml
+          ./actionlint -color .github/workflows/toy-factory-rehearsal-dispatch.yml .github/workflows/toy-factory-rehearsal-review.yml .github/workflows/pocketful-stage-2-dispatch.yml
 
       - name: Compile Toy transport scripts
         run: |
           python -m py_compile \
             infra/toy-rehearsal/dispatch.py \
             infra/toy-rehearsal/review.py \
-            infra/toy-rehearsal/claude_pipeline.py
+            infra/toy-rehearsal/claude_pipeline.py \
+            infra/pocketful-stage2/claude_pipeline.py
 
       - name: Assert transport invariants
         shell: python
@@ -83,6 +86,13 @@ jobs:
           assert "NOOP_ALREADY_TERMINAL" in review
           assert "TOY_REHEARSAL_TERMINAL" in review
 
+          stage2 = Path("infra/pocketful-stage2/claude_pipeline.py").read_text()
+          stage2_workflow = Path(".github/workflows/pocketful-stage-2-dispatch.yml").read_text()
+          assert '"--stage","2","--mode","isolated"' in stage2
+          assert '"--stage","1","--mode","isolated"' not in stage2
+          assert "Pocketful Stage 2 Factory Run" in stage2_workflow
+          assert "steps.review1.outputs.verdict == 'REJECT'" in stage2_workflow
+          assert "Claude repair attempt 2" in stage2_workflow
           assert "next_fresh_rehearsal:" in current
           assert "transport_hardening_pr: 37" in handover
           assert "user_authored_codex_dispatch: PROVEN_IN_REHEARSAL_4" in current
