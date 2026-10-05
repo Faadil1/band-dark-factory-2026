@@ -168,18 +168,30 @@ product_workstream_priority:
   current_primary_workstream: PRE_SLICE_BUILD_AND_TECHNICAL_REALITY
   remaining_material_depth_gaps:
     - unchanged_BAND_full_session_room_json_export_and_binding
-    - autonomous_REJECT_repair_rereview_runtime_path_not_yet_proven
+    - final_pinned_official_harness_check_with_authentic_room_json
     - Track_Lock_not_proven
     - no_real_track_vertical_slice_exists
-  next_highest_value_depth_delta: PROVE_AUTONOMOUS_REJECT_REPAIR_REREVIEW_RUNTIME_PATH
+  next_highest_value_depth_delta: BIND_AUTHENTIC_BAND_ROOM_JSON_AND_RERUN_PINNED_FINAL_HARNESS_CHECK
   valid_stop_condition: null
   demo_packaging_allowed: false
   workstream_drift_status: NO_DRIFT_OBSERVED
   material_user_capability_delta_since_previous_milestone: NONE
 
+repair_path_proof:
+  status: PROVEN
+  pr: 75
+  run_token: toy-repair-proof-pr75-04dc725abab2
+  room_id: b69303ee-c773-4680-bdec-3d35aa101ab7
+  evidence_class: SIMULATED_DEFECT_TECHNICAL_PROOF
+  source_accepted_revision: 7679ba2f5d1937ebeed4b1e04449918ac8a7ecc8
+  repaired_revision: 16ea21d87c6e2fa19619d259872184a0b03da692
+  terminal: ACCEPT
+  official_harness_exit: 0
+  production_merge: FORBIDDEN_SIMULATED_DEFECT_BRANCH
+
 next_action: >-
-  Preserve accepted Toy revision 7679ba2f5d1937ebeed4b1e04449918ac8a7ecc8 unchanged. PBPD should run one bounded
-  development-only negative-path proof of REJECT -> autonomous repair -> independent re-review. In parallel the human
-  must export the Rehearsal 8 room through Band: Open in Band -> menu -> Download -> Download full session, then keep
-  the downloaded JSON unchanged. Once both edges exist, rerun pinned official harness check with the authentic
-  room.json and only then decide whether TOY_FACTORY_REHEARSAL can become PROVEN and route to TRACK_LOCK.
+  Preserve accepted Toy revision 7679ba2f5d1937ebeed4b1e04449918ac8a7ecc8 unchanged. The autonomous repair path
+  is PROVEN. The human must now export the Rehearsal 8 room through Band: Open in Band -> menu -> Download ->
+  Download full session, and keep the downloaded JSON unchanged. Once the authentic room.json exists, PBPD must bind
+  it and rerun the pinned official harness check. Only then may TOY_FACTORY_REHEARSAL be considered for PROVEN and
+  routed to TRACK_LOCK.
